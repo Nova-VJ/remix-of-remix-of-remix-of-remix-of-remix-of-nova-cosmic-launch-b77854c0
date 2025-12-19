@@ -1,16 +1,10 @@
 import logo from '@/assets/logo.png';
-
 const Footer = () => {
-  return (
-    <footer className="relative py-12 px-6 border-t border-border/30">
+  return <footer className="relative py-12 px-6 border-t border-border/30">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-6">
           {/* Logo */}
-          <img 
-            src={logo} 
-            alt="NOVA Marketing Solutions" 
-            className="w-32 opacity-70"
-          />
+          <img alt="NOVA Marketing Solutions" className="w-32 opacity-70" src="/lovable-uploads/e3229bd0-0856-4bcb-8a85-66feaafa1f92.png" />
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground text-center">
@@ -18,8 +12,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
