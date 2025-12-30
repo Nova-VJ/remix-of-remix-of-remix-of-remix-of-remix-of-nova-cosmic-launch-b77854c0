@@ -44,22 +44,6 @@ const ServicesSection = () => {
   } = useScrollReveal({
     threshold: 0.1
   });
-  return <section id="services" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background" />
-
-      <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Section header */}
-        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          
-          
-        </div>
-
-        {/* Services grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {services.map((service, index) => {})}
-        </div>
-      </div>
-    </section>;
+  return;
 };
 export default ServicesSection;

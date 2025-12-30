@@ -36,7 +36,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
       {/* Content */}
-      <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 mt-[120px]">
+      <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 my-[170px] mt-[190px]">
         {/* Main headline */}
         
 
