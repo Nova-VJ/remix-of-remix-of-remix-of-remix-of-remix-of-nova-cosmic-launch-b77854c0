@@ -1,8 +1,14 @@
 import { useRef, useEffect } from 'react';
 import loopVideo from '@/assets/loop.mp4';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Zap, TrendingUp, BarChart3, ArrowDown } from 'lucide-react';
 
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
+
+const benefits = [
+  { icon: Zap, text: "Entrega rápida" },
+  { icon: TrendingUp, text: "Enfoque en conversión" },
+  { icon: BarChart3, text: "Seguimiento real de resultados" },
+];
 
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -15,8 +21,12 @@ const HeroSection = () => {
     }
   }, []);
 
+  const scrollToServices = () => {
+    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-end overflow-hidden pb-16 sm:pb-24">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
       {/* Background video */}
       <video
         ref={videoRef}
@@ -29,26 +39,51 @@ const HeroSection = () => {
         <source src={loopVideo} type="video/mp4" />
       </video>
 
-      {/* Dark overlay - subtle bottom gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
-      {/* Content - positioned at bottom */}
-      <div className="relative z-10 text-center px-6 max-w-xl mx-auto">
+      {/* Content */}
+      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+        {/* Main headline */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 text-glow leading-tight">
+          Creamos webs, marcas y apps que convierten
+        </h1>
+
         {/* Subheadline */}
-        <p className="text-base sm:text-lg md:text-xl text-foreground/90 mb-6 font-light">
-          Diseño, estrategia y tecnología para vender más.
+        <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 mb-8 font-light">
+          Diseño, estrategia y tecnología para hacer crecer tu negocio online.
         </p>
 
-        {/* CTA Button */}
-        <a
-          href={WHATSAPP_GENERAL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-glow inline-flex items-center gap-2 sm:gap-3 text-primary-foreground text-sm sm:text-base px-5 sm:px-8 py-3 sm:py-4"
-        >
-          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className="text-center leading-tight">Cuéntanos tu proyecto<br className="sm:hidden" /><span className="hidden sm:inline"> · </span>Pide presupuesto gratis</span>
-        </a>
+        {/* Benefits */}
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10">
+          {benefits.map((benefit, index) => (
+            <div key={index} className="flex items-center gap-2 text-foreground/80">
+              <benefit.icon className="w-5 h-5 text-primary" />
+              <span className="text-sm sm:text-base">{benefit.text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a
+            href={WHATSAPP_GENERAL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-glow inline-flex items-center gap-2 sm:gap-3 text-primary-foreground text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
+          >
+            <MessageCircle className="w-5 h-5 flex-shrink-0" />
+            <span>Cuéntanos tu proyecto</span>
+          </a>
+          
+          <button
+            onClick={scrollToServices}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border/50 text-foreground/90 hover:bg-background/20 hover:border-primary/50 transition-all duration-300"
+          >
+            <ArrowDown className="w-5 h-5" />
+            <span>Ver servicios</span>
+          </button>
+        </div>
       </div>
 
       {/* Scroll indicator */}
