@@ -36,11 +36,9 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 mt-[120px]">
         {/* Main headline */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 text-glow leading-tight">
-          Creamos webs, marcas y apps que convierten
-        </h1>
+        
 
         {/* Subheadline */}
         <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 mb-8 font-light">
