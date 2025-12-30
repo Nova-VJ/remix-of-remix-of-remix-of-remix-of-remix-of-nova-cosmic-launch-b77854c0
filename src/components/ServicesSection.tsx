@@ -1,28 +1,27 @@
-import { Globe, Smartphone, Palette, Megaphone } from 'lucide-react';
+import serviceWeb from '@/assets/service-web.png';
+import serviceApps from '@/assets/service-apps.png';
+import serviceBranding from '@/assets/service-branding.png';
+import serviceSocial from '@/assets/service-social.png';
 
 const services = [
   {
-    icon: Globe,
-    title: "Páginas web que convierten",
-    hook: "SEO + embudos para captar clientes.",
+    image: serviceWeb,
+    alt: "Páginas web que convierten",
     whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20un%20presupuesto%20para%20una%20p%C3%A1gina%20web.%20Busco%20SEO%2C%20embudos%20de%20venta%20y%20posicionamiento%20en%20Google.%20Mi%20negocio%20es%3A%20_____.",
   },
   {
-    icon: Smartphone,
-    title: "Apps móviles (Android / iOS)",
-    hook: "Tu idea en la App Store y Google Play.",
+    image: serviceApps,
+    alt: "Apps móviles (Android / iOS)",
     whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20desarrollar%20una%20aplicaci%C3%B3n%20m%C3%B3vil%20(Android%20/%20iOS).%20La%20idea%20general%20de%20la%20app%20es%3A%20_____%20y%20mi%20objetivo%20es%3A%20_____.",
   },
   {
-    icon: Palette,
-    title: "Branding profesional completo",
-    hook: "Identidad sólida para destacar y vender.",
+    image: serviceBranding,
+    alt: "Branding profesional completo",
     whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20un%20branding%20profesional%20completo.%20Necesito%20identidad%20de%20marca%2C%20logo%2C%20manual%20y%20material%20corporativo.%20Mi%20marca%20se%20llama%3A%20_____.",
   },
   {
-    icon: Megaphone,
-    title: "Contenido para redes sociales",
-    hook: "Estrategia + formato actual para crecer.",
+    image: serviceSocial,
+    alt: "Contenido para redes sociales",
     whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20contenido%20y%20estrategia%20para%20redes%20sociales.%20Mi%20sector%20es%3A%20_____%20y%20mi%20objetivo%20principal%20es%3A%20crecimiento%20/%20ventas.",
   },
 ];
@@ -52,32 +51,14 @@ const ServicesSection = () => {
               href={service.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-card p-6 hover-lift cursor-pointer group"
+              className="block group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(167,139,250,0.3)]"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="flex items-start gap-5">
-                {/* Icon */}
-                <div className="service-icon flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  <service.icon className="w-8 h-8 text-primary" />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {service.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {service.hook}
-                  </p>
-                </div>
-
-                {/* Arrow indicator */}
-                <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
+              <img 
+                src={service.image} 
+                alt={service.alt}
+                className="w-full h-auto object-cover transition-transform duration-300 group-hover:brightness-110"
+              />
             </a>
           ))}
         </div>
