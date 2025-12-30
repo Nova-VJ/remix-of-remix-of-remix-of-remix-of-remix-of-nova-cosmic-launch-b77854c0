@@ -1,18 +1,19 @@
 import { useRef, useEffect } from 'react';
 import loopVideo from '@/assets/loop.mp4';
 import { MessageCircle, Zap, TrendingUp, BarChart3, ArrowDown } from 'lucide-react';
-
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
-
-const benefits = [
-  { icon: Zap, text: "Entrega rápida" },
-  { icon: TrendingUp, text: "Enfoque en conversión" },
-  { icon: BarChart3, text: "Seguimiento real de resultados" },
-];
-
+const benefits = [{
+  icon: Zap,
+  text: "Entrega rápida"
+}, {
+  icon: TrendingUp,
+  text: "Enfoque en conversión"
+}, {
+  icon: BarChart3,
+  text: "Seguimiento real de resultados"
+}];
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.play().catch(() => {
@@ -20,22 +21,14 @@ const HeroSection = () => {
       });
     }
   }, []);
-
   const scrollToServices = () => {
-    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('services')?.scrollIntoView({
+      behavior: 'smooth'
+    });
   };
-
-  return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
+  return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
       {/* Background video */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
+      <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
         <source src={loopVideo} type="video/mp4" />
       </video>
 
@@ -43,7 +36,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto mb-0 mt-[320px]">
         {/* Main headline */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 text-glow leading-tight">
           Creamos webs, marcas y apps que convierten
@@ -56,30 +49,20 @@ const HeroSection = () => {
 
         {/* Benefits */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-center gap-2 text-foreground/80">
+          {benefits.map((benefit, index) => <div key={index} className="flex items-center gap-2 text-foreground/80">
               <benefit.icon className="w-5 h-5 text-primary" />
               <span className="text-sm sm:text-base">{benefit.text}</span>
-            </div>
-          ))}
+            </div>)}
         </div>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a
-            href={WHATSAPP_GENERAL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-glow inline-flex items-center gap-2 sm:gap-3 text-primary-foreground text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4"
-          >
+          <a href={WHATSAPP_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-glow inline-flex items-center gap-2 sm:gap-3 text-primary-foreground text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4">
             <MessageCircle className="w-5 h-5 flex-shrink-0" />
             <span>Cuéntanos tu proyecto</span>
           </a>
           
-          <button
-            onClick={scrollToServices}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border/50 text-foreground/90 hover:bg-background/20 hover:border-primary/50 transition-all duration-300"
-          >
+          <button onClick={scrollToServices} className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border/50 text-foreground/90 hover:bg-background/20 hover:border-primary/50 transition-all duration-300">
             <ArrowDown className="w-5 h-5" />
             <span>Ver servicios</span>
           </button>
@@ -92,8 +75,6 @@ const HeroSection = () => {
           <div className="w-1 h-1.5 bg-foreground/60 rounded-full" />
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
