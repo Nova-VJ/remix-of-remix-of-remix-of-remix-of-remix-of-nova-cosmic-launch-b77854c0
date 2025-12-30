@@ -2,6 +2,7 @@ import serviceWeb from '@/assets/service-web.png';
 import serviceApps from '@/assets/service-apps.png';
 import serviceBranding from '@/assets/service-branding.png';
 import serviceSocial from '@/assets/service-social.png';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const services = [
   {
@@ -27,14 +28,16 @@ const services = [
 ];
 
 const ServicesSection = () => {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+
   return (
-    <section className="relative py-20 px-6">
+    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/30 to-background" />
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-12">
+        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
             Servicios
           </h2>
@@ -51,13 +54,13 @@ const ServicesSection = () => {
               href={service.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="block group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(167,139,250,0.3)]"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className={`block group transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               <img 
                 src={service.image} 
                 alt={service.alt}
-                className="w-full h-auto object-cover transition-transform duration-300 group-hover:brightness-110"
+                className="w-full h-auto rounded-2xl transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-[0_0_30px_rgba(167,139,250,0.3)] group-hover:brightness-110"
               />
             </a>
           ))}
