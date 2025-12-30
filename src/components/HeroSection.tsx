@@ -29,7 +29,7 @@ const HeroSection = () => {
   return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
       {/* Background video */}
       <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
-        <source src={loopVideo} type="video/mp4" />
+        <source src={loopVideo} type="video/mp4" className="mb-0 mt-[145px]" />
       </video>
 
       {/* Dark overlay */}
