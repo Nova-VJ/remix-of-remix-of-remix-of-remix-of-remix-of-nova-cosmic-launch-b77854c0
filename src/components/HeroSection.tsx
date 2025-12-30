@@ -29,14 +29,14 @@ const HeroSection = () => {
   return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
       {/* Background video */}
       <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
-        <source src={loopVideo} type="video/mp4" className="mb-0 mt-[145px] ml-[140px]" />
+        <source src={loopVideo} type="video/mp4" className="ml-[140px] mt-[160px]" />
       </video>
 
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto mb-0 mt-[320px]">
+      <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
         {/* Main headline */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 text-glow leading-tight">
           Creamos webs, marcas y apps que convierten
