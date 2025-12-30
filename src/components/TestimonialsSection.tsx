@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const testimonials = [
   {
@@ -25,14 +26,16 @@ const testimonials = [
 ];
 
 const TestimonialsSection = () => {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+
   return (
-    <section className="relative py-20 px-6">
+    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-12">
+        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
             Lo que dicen nuestros clientes
           </h2>
@@ -46,8 +49,8 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="glass-card p-6 flex flex-col"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className={`glass-card p-6 flex flex-col transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4">

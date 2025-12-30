@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 const ContactSection = () => {
   const { toast } = useToast();
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -50,13 +52,13 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="relative py-20 px-6">
+    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
 
       <div className="relative z-10 max-w-2xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-12">
+        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
             ¿Prefieres email?
           </h2>
@@ -66,7 +68,11 @@ const ContactSection = () => {
         </div>
 
         {/* Contact form */}
-        <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
+        <form 
+          onSubmit={handleSubmit} 
+          className={`glass-card p-8 space-y-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+          style={{ transitionDelay: '200ms' }}
+        >
           {/* Name field */}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium text-foreground flex items-center gap-2">
