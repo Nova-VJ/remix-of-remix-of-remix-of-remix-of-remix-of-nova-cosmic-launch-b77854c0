@@ -3,6 +3,7 @@ import IntroSection from '@/components/IntroSection';
 import HeroSection from '@/components/HeroSection';
 import ServicesSection from '@/components/ServicesSection';
 import PackagesSection from '@/components/PackagesSection';
+import PaymentSection from '@/components/PaymentSection';
 import ProcessSection from '@/components/ProcessSection';
 import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
@@ -34,6 +35,7 @@ const Index = () => {
         <HeroSection />
         <ServicesSection />
         <PackagesSection />
+        <PaymentSection />
         <ProcessSection />
         <ComparisonSection />
         <ResultsSection />
