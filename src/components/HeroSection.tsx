@@ -1,6 +1,9 @@
 import { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import loopVideo from '@/assets/loop.mp4';
-import { MessageCircle, Zap, TrendingUp, BarChart3, ArrowDown } from 'lucide-react';
+import { MessageCircle, Zap, TrendingUp, BarChart3, ArrowDown, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
 const benefits = [{
   icon: Zap,
@@ -14,6 +17,8 @@ const benefits = [{
 }];
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { user } = useAuth();
+  
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.play().catch(() => {
@@ -27,6 +32,26 @@ const HeroSection = () => {
     });
   };
   return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
+      {/* User login link */}
+      <div className="absolute top-6 right-6 z-20">
+        {user ? (
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-sm border border-border/30 text-foreground/90 hover:bg-background/30 transition-all"
+          >
+            <User className="w-4 h-4" />
+            <span className="text-sm">Mi cuenta</span>
+          </Link>
+        ) : (
+          <Link
+            to="/auth"
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-sm border border-border/30 text-foreground/90 hover:bg-background/30 transition-all"
+          >
+            <User className="w-4 h-4" />
+            <span className="text-sm">Acceder</span>
+          </Link>
+        )}
+      </div>
       {/* Background video */}
       <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
         <source src={loopVideo} type="video/mp4" className="ml-[140px] mt-[160px]" />

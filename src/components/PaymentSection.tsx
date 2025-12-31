@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { CreditCard, Shield, CheckCircle, Mail, Lock } from 'lucide-react';
+import { CreditCard, Shield, CheckCircle, Mail, Lock, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import logoStripe from '@/assets/logo-stripe.webp';
 import logoPaypal from '@/assets/logo-paypal.png';
 import logoCards from '@/assets/logo-cards.png';
@@ -16,6 +18,7 @@ const services = [
 
 const PaymentSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+  const { user } = useAuth();
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState(false);
@@ -49,6 +52,47 @@ const PaymentSection = () => {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Inicia tu proyecto de forma segura con tarjeta, Stripe o PayPal.
           </p>
+        </div>
+
+        {/* User account card */}
+        <div className={`glass-card p-6 mb-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{ transitionDelay: '150ms' }}>
+          {user ? (
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-foreground font-medium">Sesión iniciada</p>
+                  <p className="text-muted-foreground text-sm">{user.email}</p>
+                </div>
+              </div>
+              <Link
+                to="/dashboard"
+                className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all font-medium text-sm"
+              >
+                Ver mis proyectos
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-background/50 border border-border/30 flex items-center justify-center">
+                  <User className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-foreground font-medium">¿Tienes cuenta?</p>
+                  <p className="text-muted-foreground text-sm">Accede para ver tus proyectos y pagos</p>
+                </div>
+              </div>
+              <Link
+                to="/auth"
+                className="px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all font-medium text-sm"
+              >
+                Iniciar sesión
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Main payment card */}
