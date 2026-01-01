@@ -3,52 +3,111 @@ import serviceApps from '@/assets/service-apps.png';
 import serviceBranding from '@/assets/service-branding.png';
 import serviceSocial from '@/assets/service-social.png';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, MessageCircle } from 'lucide-react';
+import { Check, ShoppingCart, TrendingUp, Search } from 'lucide-react';
+import { useCart, SERVICES } from '@/contexts/CartContext';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const services = [
   {
+    id: 'web',
     image: serviceWeb,
     alt: "Páginas web que convierten",
     title: "Páginas web que convierten",
     description: "Diseño + velocidad + SEO para vender más.",
     includes: ["SEO base y estructura", "Embudos y landing pages", "Medición y optimización"],
-    cta: "Quiero mi web",
-    whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20un%20presupuesto%20para%20una%20p%C3%A1gina%20web.%20Busco%20SEO%2C%20embudos%20de%20venta%20y%20posicionamiento%20en%20Google.%20Mi%20negocio%20es%3A%20_____."
+    price: 1000,
+    priceLabel: "desde 1.000€",
   },
   {
+    id: 'apps',
     image: serviceApps,
     alt: "Aplicaciones móviles",
     title: "Aplicaciones móviles",
     description: "Tu app a medida, lista para publicar.",
     includes: ["Guía en estructura, análisis y mejora", "App Store & Play Store", "Experiencia de usuario optimizada"],
-    cta: "Quiero mi app",
-    whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20desarrollar%20una%20aplicaci%C3%B3n%20m%C3%B3vil%20(Android%20/%20iOS).%20La%20idea%20general%20de%20la%20app%20es%3A%20_____%20y%20mi%20objetivo%20es%3A%20_____."
+    price: 1700,
+    priceLabel: "desde 1.700€",
   },
   {
+    id: 'social',
     image: serviceSocial,
     alt: "Contenido para redes sociales",
     title: "Contenido para redes sociales",
     description: "Estrategia basada en algoritmo",
     includes: ["Crecimiento real y orgánico, copywriting", "Formato actual y adaptado al nicho"],
-    cta: "Quiero crecer en redes",
-    whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20contenido%20y%20estrategia%20para%20redes%20sociales.%20Mi%20sector%20es%3A%20_____%20y%20mi%20objetivo%20principal%20es%3A%20crecimiento%20/%20ventas."
+    price: 500,
+    priceLabel: "500€/mes",
+    isMonthly: true,
   },
   {
+    id: 'branding',
     image: serviceBranding,
     alt: "Branding profesional",
     title: "Branding profesional",
     description: "Creación de identidad visual premium y manual de marca",
     includes: ["Logotipo (variantes)", "Papelería corporativa", "Elementos gráficos"],
-    cta: "Quiero mi branding",
-    whatsapp: "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20un%20branding%20profesional%20completo.%20Necesito%20identidad%20de%20marca%2C%20logo%2C%20manual%20y%20material%20corporativo.%20Mi%20marca%20se%20llama%3A%20_____."
+    price: 300,
+    priceLabel: "desde 300€",
+  }
+];
+
+const additionalServices = [
+  {
+    id: 'marketing',
+    icon: TrendingUp,
+    title: "Marketing Digital",
+    subtitle: "Desarrollo de Estrategia",
+    description: "Planificación estratégica para maximizar tu presencia digital.",
+    price: 200,
+    priceLabel: "200€",
+    badge: "Gratis con 2+ servicios",
+  },
+  {
+    id: 'sem',
+    icon: Search,
+    title: "SEM",
+    subtitle: "Posicionamiento en Google",
+    description: "Crea campañas para el posicionamiento de tu página en Google.",
+    price: 150,
+    priceLabel: "150€/mes",
+    isMonthly: true,
+    badge: "Gratis con 4 servicios",
   }
 ];
 
 const ServicesSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+  const { addItem, items } = useCart();
+
+  const handleAddToCart = (service: typeof services[0]) => {
+    const cartItem = {
+      id: service.id,
+      name: service.title,
+      price: service.price,
+      type: 'service' as const,
+      isMonthly: service.isMonthly,
+    };
+    addItem(cartItem);
+    toast.success(`${service.title} añadido al carrito`);
+  };
+
+  const handleAddAdditionalService = (service: typeof additionalServices[0]) => {
+    const cartItem = {
+      id: service.id,
+      name: service.title,
+      price: service.price,
+      type: 'service' as const,
+      isMonthly: service.isMonthly,
+    };
+    addItem(cartItem);
+    toast.success(`${service.title} añadido al carrito`);
+  };
+
+  const isInCart = (id: string) => items.some(item => item.id === id);
 
   return (
-    <section id="servicios" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
+    <section id="servicios" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6 pt-24">
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -60,8 +119,8 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        {/* Services grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Main services grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {services.map((service, index) => (
             <div
               key={index}
@@ -78,7 +137,8 @@ const ServicesSection = () => {
               </div>
 
               {/* Title and description */}
-              <h3 className="text-xl font-bold text-foreground text-center mb-2">{service.title}</h3>
+              <h3 className="text-xl font-bold text-foreground text-center mb-1">{service.title}</h3>
+              <p className="text-primary font-bold text-center mb-2">{service.priceLabel}</p>
               <p className="text-muted-foreground text-center mb-4">{service.description}</p>
 
               {/* Includes list */}
@@ -91,18 +151,60 @@ const ServicesSection = () => {
                 ))}
               </ul>
 
-              {/* CTA Button */}
-              <a
-                href={service.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all font-medium"
+              {/* Add to cart button */}
+              <Button
+                onClick={() => handleAddToCart(service)}
+                disabled={isInCart(service.id)}
+                variant={isInCart(service.id) ? "secondary" : "default"}
+                className="w-full"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>👉 {service.cta}</span>
-              </a>
+                {isInCart(service.id) ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    En tu carrito
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Añadir al carrito
+                  </>
+                )}
+              </Button>
             </div>
           ))}
+        </div>
+
+        {/* Additional services */}
+        <div className={`mt-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
+          <h3 className="text-xl font-bold text-foreground text-center mb-6">Servicios adicionales</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {additionalServices.map((service, index) => (
+              <div
+                key={service.id}
+                className="glass-card p-5 flex items-center gap-4"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <service.icon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-bold text-foreground">{service.title}</h4>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">{service.badge}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{service.subtitle}</p>
+                  <p className="text-primary font-bold">{service.priceLabel}</p>
+                </div>
+                <Button
+                  onClick={() => handleAddAdditionalService(service)}
+                  disabled={isInCart(service.id)}
+                  variant="outline"
+                  size="sm"
+                >
+                  {isInCart(service.id) ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
