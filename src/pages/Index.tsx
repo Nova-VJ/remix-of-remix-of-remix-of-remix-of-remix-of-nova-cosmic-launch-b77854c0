@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import IntroSection from '@/components/IntroSection';
+import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import ServicesSection from '@/components/ServicesSection';
 import PackagesSection from '@/components/PackagesSection';
-import PaymentSection from '@/components/PaymentSection';
 import ProcessSection from '@/components/ProcessSection';
 import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
@@ -13,6 +13,7 @@ import ContactSection from '@/components/ContactSection';
 import TrustSection from '@/components/TrustSection';
 import FinalCTASection from '@/components/FinalCTASection';
 import StickyMobileCTA from '@/components/StickyMobileCTA';
+import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -32,10 +33,10 @@ const Index = () => {
       {showIntro && <IntroSection onIntroEnd={handleIntroEnd} />}
 
       <main className={`relative pb-20 md:pb-0 transition-opacity duration-500 ${showIntro ? 'opacity-0' : 'opacity-100'}`}>
+        <Navbar />
         <HeroSection />
         <ServicesSection />
         <PackagesSection />
-        <PaymentSection />
         <ProcessSection />
         <ComparisonSection />
         <ResultsSection />
@@ -46,6 +47,7 @@ const Index = () => {
         <FinalCTASection />
         <Footer />
         <StickyMobileCTA />
+        <ShoppingCart />
       </main>
     </>
   );

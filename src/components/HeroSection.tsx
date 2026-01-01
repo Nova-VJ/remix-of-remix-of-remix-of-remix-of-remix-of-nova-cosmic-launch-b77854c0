@@ -31,27 +31,7 @@ const HeroSection = () => {
       behavior: 'smooth'
     });
   };
-  return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16">
-      {/* User login link */}
-      <div className="absolute top-6 right-6 z-20">
-        {user ? (
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-sm border border-border/30 text-foreground/90 hover:bg-background/30 transition-all"
-          >
-            <User className="w-4 h-4" />
-            <span className="text-sm">Mi cuenta</span>
-          </Link>
-        ) : (
-          <Link
-            to="/auth"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/20 backdrop-blur-sm border border-border/30 text-foreground/90 hover:bg-background/30 transition-all"
-          >
-            <User className="w-4 h-4" />
-            <span className="text-sm">Acceder</span>
-          </Link>
-        )}
-      </div>
+  return <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-16 pt-20">
       {/* Background video */}
       <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline>
         <source src={loopVideo} type="video/mp4" className="ml-[140px] mt-[160px]" />
