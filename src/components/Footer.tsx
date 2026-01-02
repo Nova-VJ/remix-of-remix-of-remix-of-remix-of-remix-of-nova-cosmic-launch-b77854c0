@@ -1,6 +1,10 @@
-import logo from '@/assets/logo.png';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const openCookieSettings = () => {
+    window.dispatchEvent(new CustomEvent('openCookieSettings'));
+  };
+
   return (
     <footer className="relative py-12 px-6 border-t border-border/30">
       <div className="max-w-5xl mx-auto">
@@ -19,11 +23,13 @@ const Footer = () => {
 
           {/* Legal links */}
           <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
-            <span>Aviso legal</span>
+            <Link to="/aviso-legal" className="hover:text-primary transition-colors">Aviso legal</Link>
             <span>·</span>
-            <span>Política de privacidad</span>
+            <Link to="/politica-de-privacidad" className="hover:text-primary transition-colors">Política de privacidad</Link>
             <span>·</span>
-            <span>Cookies</span>
+            <Link to="/politica-de-cookies" className="hover:text-primary transition-colors">Cookies</Link>
+            <span>·</span>
+            <button onClick={openCookieSettings} className="hover:text-primary transition-colors">Configurar cookies</button>
           </div>
 
           {/* Copyright */}

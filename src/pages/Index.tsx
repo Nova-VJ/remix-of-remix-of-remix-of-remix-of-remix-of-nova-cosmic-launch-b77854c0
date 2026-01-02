@@ -15,6 +15,7 @@ import FinalCTASection from '@/components/FinalCTASection';
 import StickyMobileCTA from '@/components/StickyMobileCTA';
 import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
+import VirtualAssistant from '@/components/VirtualAssistant';
 
 const Index = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -48,6 +49,7 @@ const Index = () => {
         <Footer />
         <StickyMobileCTA />
         <ShoppingCart />
+        <VirtualAssistant />
       </main>
     </>
   );
