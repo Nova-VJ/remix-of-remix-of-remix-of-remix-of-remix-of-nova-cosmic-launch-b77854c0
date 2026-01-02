@@ -14,6 +14,237 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          calendly_link: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          preferred_dates: Json | null
+          status: string | null
+          topic: string
+        }
+        Insert: {
+          calendly_link?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          preferred_dates?: Json | null
+          status?: string | null
+          topic: string
+        }
+        Update: {
+          calendly_link?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_dates?: Json | null
+          status?: string | null
+          topic?: string
+        }
+        Relationships: []
+      }
+      assets_links: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          project_id: string | null
+          type: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          project_id?: string | null
+          type?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          project_id?: string | null
+          type?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_messages: {
+        Row: {
+          category: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string | null
+          subject: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string | null
+          subject: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          budget_range: string | null
+          business_type: string | null
+          created_at: string
+          email: string
+          goal: string | null
+          id: string
+          message: string | null
+          name: string
+          phone: string | null
+          service_type: string
+          source: string | null
+          status: string | null
+          urgency: string | null
+        }
+        Insert: {
+          budget_range?: string | null
+          business_type?: string | null
+          created_at?: string
+          email: string
+          goal?: string | null
+          id?: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          service_type: string
+          source?: string | null
+          status?: string | null
+          urgency?: string | null
+        }
+        Update: {
+          budget_range?: string | null
+          business_type?: string | null
+          created_at?: string
+          email?: string
+          goal?: string | null
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          service_type?: string
+          source?: string | null
+          status?: string | null
+          urgency?: string | null
+        }
+        Relationships: []
+      }
+      maintenance_logs: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string
+          read: boolean | null
+          title: string
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message: string
+          read?: boolean | null
+          title: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -56,6 +287,8 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_admin: boolean | null
+          referral_code: string | null
           updated_at: string
           user_id: string
         }
@@ -64,6 +297,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
+          referral_code?: string | null
           updated_at?: string
           user_id: string
         }
@@ -72,41 +307,120 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
+          referral_code?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
+      project_milestones: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          milestone_type: string
+          notes: string | null
+          project_id: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          milestone_type: string
+          notes?: string | null
+          project_id?: string | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          milestone_type?: string
+          notes?: string | null
+          project_id?: string | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string
+          domain_status: string | null
+          estimated_end_date: string | null
+          hosting_status: string | null
           id: string
+          last_backup_date: string | null
+          maintenance_active: boolean | null
+          max_revisions: number | null
           name: string
+          next_maintenance_date: string | null
           notes: string | null
           payment_id: string | null
+          revisions_used: number | null
           service_type: string
+          ssl_status: string | null
+          start_date: string | null
           status: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
           created_at?: string
+          domain_status?: string | null
+          estimated_end_date?: string | null
+          hosting_status?: string | null
           id?: string
+          last_backup_date?: string | null
+          maintenance_active?: boolean | null
+          max_revisions?: number | null
           name: string
+          next_maintenance_date?: string | null
           notes?: string | null
           payment_id?: string | null
+          revisions_used?: number | null
           service_type: string
+          ssl_status?: string | null
+          start_date?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           created_at?: string
+          domain_status?: string | null
+          estimated_end_date?: string | null
+          hosting_status?: string | null
           id?: string
+          last_backup_date?: string | null
+          maintenance_active?: boolean | null
+          max_revisions?: number | null
           name?: string
+          next_maintenance_date?: string | null
           notes?: string | null
           payment_id?: string | null
+          revisions_used?: number | null
           service_type?: string
+          ssl_status?: string | null
+          start_date?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
@@ -118,6 +432,224 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "payments"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          discount_earned: number | null
+          free_marketing_earned: boolean | null
+          id: string
+          referral_code: string
+          referred_email: string | null
+          referred_user_id: string | null
+          referrer_id: string | null
+          status: string | null
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          discount_earned?: number | null
+          free_marketing_earned?: boolean | null
+          id?: string
+          referral_code: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          discount_earned?: number | null
+          free_marketing_earned?: boolean | null
+          id?: string
+          referral_code?: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      revision_requests: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          description: string
+          id: string
+          project_id: string | null
+          resolved_at: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          project_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          project_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_requests_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revision_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      security_assessments: {
+        Row: {
+          checklist: Json | null
+          created_at: string
+          id: string
+          project_id: string | null
+          report_date: string | null
+          report_url: string | null
+          scope_summary: string | null
+          status: string | null
+          type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          checklist?: Json | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          report_date?: string | null
+          report_url?: string | null
+          scope_summary?: string | null
+          status?: string | null
+          type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          checklist?: Json | null
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          report_date?: string | null
+          report_url?: string | null
+          scope_summary?: string | null
+          status?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_assessments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_assessments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          created_at: string
+          email: string | null
+          id: string
+          message: string
+          name: string | null
+          phone: string | null
+          priority: string | null
+          status: string | null
+          subject: string
+          ticket_number: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          category: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          message: string
+          name?: string | null
+          phone?: string | null
+          priority?: string | null
+          status?: string | null
+          subject: string
+          ticket_number?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string
+          name?: string | null
+          phone?: string | null
+          priority?: string | null
+          status?: string | null
+          subject?: string
+          ticket_number?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
         ]
       }
