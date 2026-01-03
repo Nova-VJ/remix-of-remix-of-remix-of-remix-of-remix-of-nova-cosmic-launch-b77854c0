@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import CasosExito from "./pages/CasosExito";
+import InvitaAmigo from "./pages/InvitaAmigo";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import LegalNotice from "./pages/LegalNotice";
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/casos-exito" element={<CasosExito />} />
+              <Route path="/invita-a-un-amigo" element={<InvitaAmigo />} />
               <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
               <Route path="/politica-de-cookies" element={<CookiePolicy />} />
               <Route path="/aviso-legal" element={<LegalNotice />} />
