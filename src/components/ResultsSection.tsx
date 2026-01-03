@@ -1,5 +1,7 @@
-import { TrendingUp, Rocket, Smartphone, Target } from 'lucide-react';
+import { TrendingUp, Rocket, Smartphone, Target, Sparkles } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const results = [
   {
@@ -55,6 +57,16 @@ const ResultsSection = () => {
               <p className="text-muted-foreground text-sm">{result.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Casos de éxito CTA */}
+        <div className={`mt-10 text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
+          <Link to="/casos-exito">
+            <Button variant="ghost" className="text-sm text-muted-foreground hover:text-primary group">
+              <Sparkles className="w-4 h-4 mr-2 text-primary group-hover:animate-pulse" />
+              ¿Necesitas inspiración? Conoce historias de personas como tú, que dieron el salto a un sistema digital, supieron reinventarse, sortear obstáculos y multiplicaron sus ventas. ¡Sé el siguiente!
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

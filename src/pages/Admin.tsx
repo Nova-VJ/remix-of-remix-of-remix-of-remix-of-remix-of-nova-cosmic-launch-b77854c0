@@ -354,17 +354,15 @@ const Admin = () => {
                           value={project.status} 
                           onValueChange={(value) => updateProjectStatus(project.id, value)}
                         >
-                          <SelectTrigger className="w-40">
+                          <SelectTrigger className="w-48">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">Pendiente</SelectItem>
-                            <SelectItem value="review">En revisión</SelectItem>
-                            <SelectItem value="budgeted">Presupuestado</SelectItem>
-                            <SelectItem value="in_progress">En desarrollo</SelectItem>
-                            <SelectItem value="revision_phase">Fase revisión</SelectItem>
-                            <SelectItem value="delivered">Entregado</SelectItem>
-                            <SelectItem value="maintenance">Mantenimiento</SelectItem>
+                            <SelectItem value="review">Proyecto en revisión</SelectItem>
+                            <SelectItem value="quote_done">Presupuesto finalizado</SelectItem>
+                            <SelectItem value="in_progress">Inicio del Proyecto</SelectItem>
+                            <SelectItem value="revision">Fase de revisión</SelectItem>
+                            <SelectItem value="delivered">Entrega</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
