@@ -16,6 +16,7 @@ import StickyMobileCTA from '@/components/StickyMobileCTA';
 import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
+import ReferralPopup from '@/components/ReferralPopup';
 
 const Index = () => {
   const [showIntro, setShowIntro] = useState(true);
@@ -50,6 +51,7 @@ const Index = () => {
         <StickyMobileCTA />
         <ShoppingCart />
         <VirtualAssistant />
+        <ReferralPopup />
       </main>
     </>
   );

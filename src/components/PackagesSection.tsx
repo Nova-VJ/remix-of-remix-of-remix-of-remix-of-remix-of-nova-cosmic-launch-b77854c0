@@ -35,7 +35,7 @@ const packages = [
     ],
     freeItems: ["Marketing Digital GRATIS", "1 mes de SEM GRATIS"],
     highlight: true,
-    note: "No acumulable con código NOVA30",
+    note: "No acumulable con código NOVA20",
   }
 ];
 
@@ -91,7 +91,7 @@ const PackagesSection = () => {
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {pkg.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-full whitespace-nowrap shadow-lg">
                   MEJOR VALOR
                 </div>
               )}

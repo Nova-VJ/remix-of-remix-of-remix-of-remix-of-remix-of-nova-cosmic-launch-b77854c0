@@ -64,7 +64,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const applyPromo = (): boolean => {
-    if (promoCode.toUpperCase() === 'NOVA30') {
+    if (promoCode.toUpperCase() === 'NOVA20') {
       setIsPromoApplied(true);
       return true;
     }
@@ -109,8 +109,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const getTotal = () => {
     const baseTotal = items.reduce((sum, item) => sum + (item.isFree ? 0 : item.price), 0);
     if (isPromoApplied) {
-      // NOVA30 = 30% descuento
-      return baseTotal * 0.7;
+      // NOVA20 = 20% descuento
+      return baseTotal * 0.8;
     }
     return baseTotal;
   };
@@ -118,7 +118,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const getDiscount = () => {
     if (!isPromoApplied) return 0;
     const baseTotal = items.reduce((sum, item) => sum + (item.isFree ? 0 : item.price), 0);
-    return baseTotal * 0.3;
+    return baseTotal * 0.2;
   };
 
   const itemCount = items.length + freeItems.length;

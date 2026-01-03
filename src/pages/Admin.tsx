@@ -5,12 +5,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Shield } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -56,6 +58,25 @@ interface Project {
   created_at: string;
 }
 
+interface MilestoneType {
+  id: string;
+  project_id: string;
+  title: string;
+  milestone_type: string;
+  status: string;
+  start_date: string | null;
+  end_date: string | null;
+  notes: string | null;
+}
+
+interface MaintenanceLog {
+  id: string;
+  project_id: string;
+  type: string;
+  date: string;
+  notes: string | null;
+}
+
 const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -67,6 +88,41 @@ const Admin = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [emails, setEmails] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [milestones, setMilestones] = useState<MilestoneType[]>([]);
+  const [maintenanceLogs, setMaintenanceLogs] = useState<MaintenanceLog[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
+
+  // Create project dialog
+  const [showCreateProject, setShowCreateProject] = useState(false);
+  const [newProject, setNewProject] = useState({
+    name: '',
+    service_type: 'web',
+    user_email: '',
+    notes: '',
+    start_date: '',
+    estimated_end_date: ''
+  });
+
+  // Create milestone dialog
+  const [showCreateMilestone, setShowCreateMilestone] = useState(false);
+  const [selectedProjectForMilestone, setSelectedProjectForMilestone] = useState('');
+  const [newMilestone, setNewMilestone] = useState({
+    title: '',
+    milestone_type: 'design',
+    status: 'pending',
+    start_date: '',
+    end_date: '',
+    notes: ''
+  });
+
+  // Create maintenance log dialog
+  const [showCreateMaintenance, setShowCreateMaintenance] = useState(false);
+  const [selectedProjectForMaintenance, setSelectedProjectForMaintenance] = useState('');
+  const [newMaintenance, setNewMaintenance] = useState({
+    type: 'routine',
+    date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
 
   useEffect(() => {
     checkAdminStatus();
@@ -101,12 +157,15 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
       supabase.from('email_messages').select('*').order('created_at', { ascending: false }),
-      supabase.from('appointments').select('*').order('created_at', { ascending: false })
+      supabase.from('appointments').select('*').order('created_at', { ascending: false }),
+      supabase.from('project_milestones').select('*').order('created_at', { ascending: false }),
+      supabase.from('maintenance_logs').select('*').order('date', { ascending: false }),
+      supabase.from('profiles').select('*')
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -114,6 +173,9 @@ const Admin = () => {
     if (projectsRes.data) setProjects(projectsRes.data);
     if (emailsRes.data) setEmails(emailsRes.data);
     if (appointmentsRes.data) setAppointments(appointmentsRes.data);
+    if (milestonesRes.data) setMilestones(milestonesRes.data as MilestoneType[]);
+    if (maintenanceRes.data) setMaintenanceLogs(maintenanceRes.data as MaintenanceLog[]);
+    if (profilesRes.data) setProfiles(profilesRes.data);
 
     setLoading(false);
   };
@@ -127,6 +189,17 @@ const Admin = () => {
     if (error) {
       toast({ title: "Error", description: "No se pudo actualizar el ticket", variant: "destructive" });
     } else {
+      // Create notification for user
+      const ticket = tickets.find(t => t.id === ticketId);
+      if (ticket?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: ticket.user_id,
+          title: 'Actualización de ticket',
+          message: `Tu ticket #${ticket.ticket_number} ha sido actualizado a: ${status}`,
+          type: 'ticket',
+          link: '/dashboard'
+        });
+      }
       toast({ title: "Actualizado", description: "Estado del ticket actualizado" });
       fetchData();
     }
@@ -141,7 +214,116 @@ const Admin = () => {
     if (error) {
       toast({ title: "Error", description: "No se pudo actualizar el proyecto", variant: "destructive" });
     } else {
+      // Create notification for user
+      const project = projects.find(p => p.id === projectId);
+      if (project?.user_id) {
+        const statusLabels: Record<string, string> = {
+          review: 'Proyecto en revisión',
+          quote_done: 'Presupuesto finalizado',
+          in_progress: 'Inicio del proyecto',
+          revision: 'Fase de revisión',
+          delivered: 'Entregado'
+        };
+        await supabase.from('notifications').insert({
+          user_id: project.user_id,
+          title: 'Actualización de proyecto',
+          message: `Tu proyecto "${project.name}" ha cambiado a: ${statusLabels[status] || status}`,
+          type: 'project',
+          link: '/dashboard'
+        });
+      }
       toast({ title: "Actualizado", description: "Estado del proyecto actualizado" });
+      fetchData();
+    }
+  };
+
+  const createProject = async () => {
+    // Find user by email
+    const profile = profiles.find(p => p.email === newProject.user_email);
+    
+    const { error } = await supabase.from('projects').insert({
+      name: newProject.name,
+      service_type: newProject.service_type,
+      user_id: profile?.user_id || null,
+      notes: newProject.notes || null,
+      start_date: newProject.start_date || null,
+      estimated_end_date: newProject.estimated_end_date || null,
+      status: 'review'
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo crear el proyecto", variant: "destructive" });
+    } else {
+      toast({ title: "Creado", description: "Proyecto creado correctamente" });
+      setShowCreateProject(false);
+      setNewProject({ name: '', service_type: 'web', user_email: '', notes: '', start_date: '', estimated_end_date: '' });
+      fetchData();
+    }
+  };
+
+  const createMilestone = async () => {
+    if (!selectedProjectForMilestone) return;
+
+    const { error } = await supabase.from('project_milestones').insert({
+      project_id: selectedProjectForMilestone,
+      title: newMilestone.title,
+      milestone_type: newMilestone.milestone_type,
+      status: newMilestone.status,
+      start_date: newMilestone.start_date || null,
+      end_date: newMilestone.end_date || null,
+      notes: newMilestone.notes || null
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo crear el hito", variant: "destructive" });
+    } else {
+      // Notify user
+      const project = projects.find(p => p.id === selectedProjectForMilestone);
+      if (project?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: project.user_id,
+          title: 'Nuevo hito en tu proyecto',
+          message: `Se ha añadido un nuevo hito "${newMilestone.title}" a tu proyecto "${project.name}"`,
+          type: 'milestone',
+          link: '/dashboard'
+        });
+      }
+      toast({ title: "Creado", description: "Hito creado correctamente" });
+      setShowCreateMilestone(false);
+      setSelectedProjectForMilestone('');
+      setNewMilestone({ title: '', milestone_type: 'design', status: 'pending', start_date: '', end_date: '', notes: '' });
+      fetchData();
+    }
+  };
+
+  const createMaintenanceLog = async () => {
+    if (!selectedProjectForMaintenance) return;
+
+    const { error } = await supabase.from('maintenance_logs').insert({
+      project_id: selectedProjectForMaintenance,
+      type: newMaintenance.type,
+      date: newMaintenance.date,
+      notes: newMaintenance.notes || null
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo crear el log", variant: "destructive" });
+    } else {
+      // Notify user
+      const project = projects.find(p => p.id === selectedProjectForMaintenance);
+      if (project?.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: project.user_id,
+          title: 'Mantenimiento realizado',
+          message: `Se ha realizado mantenimiento ${newMaintenance.type} en tu proyecto "${project.name}"`,
+          type: 'maintenance',
+          link: '/dashboard'
+        });
+      }
+      toast({ title: "Creado", description: "Log de mantenimiento creado" });
+      setShowCreateMaintenance(false);
+      setSelectedProjectForMaintenance('');
+      setNewMaintenance({ type: 'routine', date: new Date().toISOString().split('T')[0], notes: '' });
       fetchData();
     }
   };
@@ -247,50 +429,370 @@ const Admin = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="leads">
-          <TabsList className="mb-4">
-            <TabsTrigger value="leads">Leads</TabsTrigger>
-            <TabsTrigger value="tickets">Tickets</TabsTrigger>
+        <Tabs defaultValue="projects">
+          <TabsList className="mb-4 flex-wrap h-auto gap-1">
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
+            <TabsTrigger value="milestones">Hitos</TabsTrigger>
+            <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
+            <TabsTrigger value="tickets">Tickets</TabsTrigger>
+            <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="appointments">Citas</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="leads">
+          {/* Projects Tab */}
+          <TabsContent value="projects">
             <Card>
-              <CardHeader>
-                <CardTitle>Leads ({leads.length})</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Proyectos ({projects.length})</CardTitle>
+                  <CardDescription>Gestiona los proyectos de clientes</CardDescription>
+                </div>
+                <Dialog open={showCreateProject} onOpenChange={setShowCreateProject}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" /> Nuevo proyecto
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Crear nuevo proyecto</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Nombre del proyecto</Label>
+                        <Input 
+                          value={newProject.name} 
+                          onChange={(e) => setNewProject({...newProject, name: e.target.value})}
+                          placeholder="Ej: Web para Restaurante Sol"
+                        />
+                      </div>
+                      <div>
+                        <Label>Tipo de servicio</Label>
+                        <Select value={newProject.service_type} onValueChange={(v) => setNewProject({...newProject, service_type: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="web">Página Web</SelectItem>
+                            <SelectItem value="app">Aplicación Móvil</SelectItem>
+                            <SelectItem value="branding">Branding</SelectItem>
+                            <SelectItem value="social">Redes Sociales</SelectItem>
+                            <SelectItem value="marketing">Marketing Digital</SelectItem>
+                            <SelectItem value="sem">SEM</SelectItem>
+                            <SelectItem value="pkg-pro">Paquete Pro</SelectItem>
+                            <SelectItem value="pkg-plus">Paquete Plus</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Email del cliente (opcional)</Label>
+                        <Input 
+                          value={newProject.user_email} 
+                          onChange={(e) => setNewProject({...newProject, user_email: e.target.value})}
+                          placeholder="cliente@email.com"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Fecha inicio</Label>
+                          <Input 
+                            type="date"
+                            value={newProject.start_date} 
+                            onChange={(e) => setNewProject({...newProject, start_date: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label>Fecha estimada fin</Label>
+                          <Input 
+                            type="date"
+                            value={newProject.estimated_end_date} 
+                            onChange={(e) => setNewProject({...newProject, estimated_end_date: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Notas</Label>
+                        <Textarea 
+                          value={newProject.notes} 
+                          onChange={(e) => setNewProject({...newProject, notes: e.target.value})}
+                          placeholder="Notas adicionales..."
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateProject(false)}>Cancelar</Button>
+                      <Button onClick={createProject} disabled={!newProject.name}>Crear proyecto</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {leads.map((lead) => (
-                    <div key={lead.id} className="border rounded-lg p-4">
+                  {projects.map((project) => (
+                    <div key={project.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <p className="font-medium">{lead.name}</p>
-                          <p className="text-sm text-muted-foreground">{lead.email}</p>
-                          {lead.phone && <p className="text-sm text-muted-foreground">{lead.phone}</p>}
+                          <p className="font-medium">{project.name}</p>
+                          <p className="text-sm text-muted-foreground">{project.service_type}</p>
+                          {project.start_date && (
+                            <p className="text-xs text-muted-foreground">
+                              Inicio: {new Date(project.start_date).toLocaleDateString('es-ES')}
+                              {project.estimated_end_date && ` → Fin: ${new Date(project.estimated_end_date).toLocaleDateString('es-ES')}`}
+                            </p>
+                          )}
                         </div>
-                        <div className="text-right">
-                          {getStatusBadge(lead.status)}
-                          <p className="text-xs text-muted-foreground mt-1">{formatDate(lead.created_at)}</p>
+                        <Select 
+                          value={project.status} 
+                          onValueChange={(value) => updateProjectStatus(project.id, value)}
+                        >
+                          <SelectTrigger className="w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="review">Proyecto en revisión</SelectItem>
+                            <SelectItem value="quote_done">Presupuesto finalizado</SelectItem>
+                            <SelectItem value="in_progress">Inicio del Proyecto</SelectItem>
+                            <SelectItem value="revision">Fase de revisión</SelectItem>
+                            <SelectItem value="delivered">Entrega</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {project.notes && <p className="text-sm bg-muted p-2 rounded mt-2">{project.notes}</p>}
+                      
+                      {/* Show milestones for this project */}
+                      {milestones.filter(m => m.project_id === project.id).length > 0 && (
+                        <div className="mt-3 pt-3 border-t">
+                          <p className="text-xs font-medium text-muted-foreground mb-2">Hitos:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {milestones.filter(m => m.project_id === project.id).map(m => (
+                              <Badge key={m.id} variant={m.status === 'completed' ? 'default' : 'secondary'}>
+                                {m.title}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                        <div><span className="text-muted-foreground">Servicio:</span> {lead.service_type}</div>
-                        <div><span className="text-muted-foreground">Negocio:</span> {lead.business_type || '-'}</div>
-                        <div><span className="text-muted-foreground">Presupuesto:</span> {lead.budget_range || '-'}</div>
-                        <div><span className="text-muted-foreground">Urgencia:</span> {lead.urgency}</div>
-                      </div>
-                      {lead.message && <p className="text-sm mt-2 bg-muted p-2 rounded">{lead.message}</p>}
+                      )}
                     </div>
                   ))}
-                  {leads.length === 0 && <p className="text-muted-foreground">No hay leads aún.</p>}
+                  {projects.length === 0 && <p className="text-muted-foreground">No hay proyectos aún.</p>}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Milestones Tab */}
+          <TabsContent value="milestones">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><Milestone className="w-5 h-5" /> Hitos</CardTitle>
+                  <CardDescription>Gestiona los hitos de cada proyecto</CardDescription>
+                </div>
+                <Dialog open={showCreateMilestone} onOpenChange={setShowCreateMilestone}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" /> Nuevo hito
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Crear nuevo hito</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Proyecto</Label>
+                        <Select value={selectedProjectForMilestone} onValueChange={setSelectedProjectForMilestone}>
+                          <SelectTrigger><SelectValue placeholder="Selecciona proyecto" /></SelectTrigger>
+                          <SelectContent>
+                            {projects.map(p => (
+                              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Título</Label>
+                        <Input 
+                          value={newMilestone.title} 
+                          onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
+                          placeholder="Ej: Diseño aprobado"
+                        />
+                      </div>
+                      <div>
+                        <Label>Tipo</Label>
+                        <Select value={newMilestone.milestone_type} onValueChange={(v) => setNewMilestone({...newMilestone, milestone_type: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="design">Diseño</SelectItem>
+                            <SelectItem value="development">Desarrollo</SelectItem>
+                            <SelectItem value="testing">Testing</SelectItem>
+                            <SelectItem value="review">Revisión</SelectItem>
+                            <SelectItem value="deployment">Despliegue</SelectItem>
+                            <SelectItem value="other">Otro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Estado</Label>
+                        <Select value={newMilestone.status} onValueChange={(v) => setNewMilestone({...newMilestone, status: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pendiente</SelectItem>
+                            <SelectItem value="in_progress">En progreso</SelectItem>
+                            <SelectItem value="completed">Completado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Fecha inicio</Label>
+                          <Input 
+                            type="date"
+                            value={newMilestone.start_date} 
+                            onChange={(e) => setNewMilestone({...newMilestone, start_date: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label>Fecha fin</Label>
+                          <Input 
+                            type="date"
+                            value={newMilestone.end_date} 
+                            onChange={(e) => setNewMilestone({...newMilestone, end_date: e.target.value})}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Notas</Label>
+                        <Textarea 
+                          value={newMilestone.notes} 
+                          onChange={(e) => setNewMilestone({...newMilestone, notes: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateMilestone(false)}>Cancelar</Button>
+                      <Button onClick={createMilestone} disabled={!selectedProjectForMilestone || !newMilestone.title}>Crear hito</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {milestones.map((milestone) => {
+                    const project = projects.find(p => p.id === milestone.project_id);
+                    return (
+                      <div key={milestone.id} className="border rounded-lg p-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{milestone.title}</p>
+                            <p className="text-sm text-muted-foreground">{project?.name || 'Proyecto no encontrado'}</p>
+                          </div>
+                          {getStatusBadge(milestone.status || 'pending')}
+                        </div>
+                        <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                          <span>Tipo: {milestone.milestone_type}</span>
+                          {milestone.start_date && <span>Inicio: {new Date(milestone.start_date).toLocaleDateString('es-ES')}</span>}
+                          {milestone.end_date && <span>Fin: {new Date(milestone.end_date).toLocaleDateString('es-ES')}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {milestones.length === 0 && <p className="text-muted-foreground">No hay hitos aún.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Maintenance Tab */}
+          <TabsContent value="maintenance">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><Wrench className="w-5 h-5" /> Mantenimiento</CardTitle>
+                  <CardDescription>Registra los mantenimientos realizados</CardDescription>
+                </div>
+                <Dialog open={showCreateMaintenance} onOpenChange={setShowCreateMaintenance}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" /> Nuevo log
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Crear log de mantenimiento</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Proyecto</Label>
+                        <Select value={selectedProjectForMaintenance} onValueChange={setSelectedProjectForMaintenance}>
+                          <SelectTrigger><SelectValue placeholder="Selecciona proyecto" /></SelectTrigger>
+                          <SelectContent>
+                            {projects.map(p => (
+                              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Tipo</Label>
+                        <Select value={newMaintenance.type} onValueChange={(v) => setNewMaintenance({...newMaintenance, type: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="routine">Rutinario</SelectItem>
+                            <SelectItem value="security">Seguridad</SelectItem>
+                            <SelectItem value="backup">Backup</SelectItem>
+                            <SelectItem value="update">Actualización</SelectItem>
+                            <SelectItem value="emergency">Urgente</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Fecha</Label>
+                        <Input 
+                          type="date"
+                          value={newMaintenance.date} 
+                          onChange={(e) => setNewMaintenance({...newMaintenance, date: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <Label>Notas</Label>
+                        <Textarea 
+                          value={newMaintenance.notes} 
+                          onChange={(e) => setNewMaintenance({...newMaintenance, notes: e.target.value})}
+                          placeholder="Describe el mantenimiento realizado..."
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateMaintenance(false)}>Cancelar</Button>
+                      <Button onClick={createMaintenanceLog} disabled={!selectedProjectForMaintenance}>Crear log</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {maintenanceLogs.map((log) => {
+                    const project = projects.find(p => p.id === log.project_id);
+                    return (
+                      <div key={log.id} className="border rounded-lg p-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium">{project?.name || 'Proyecto no encontrado'}</p>
+                            <p className="text-sm text-muted-foreground capitalize">{log.type}</p>
+                          </div>
+                          <span className="text-sm text-muted-foreground">{new Date(log.date).toLocaleDateString('es-ES')}</span>
+                        </div>
+                        {log.notes && <p className="text-sm bg-muted p-2 rounded mt-2">{log.notes}</p>}
+                      </div>
+                    );
+                  })}
+                  {maintenanceLogs.length === 0 && <p className="text-muted-foreground">No hay logs de mantenimiento.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Tickets Tab */}
           <TabsContent value="tickets">
             <Card>
               <CardHeader>
@@ -336,45 +838,43 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="projects">
+          {/* Leads Tab */}
+          <TabsContent value="leads">
             <Card>
               <CardHeader>
-                <CardTitle>Proyectos ({projects.length})</CardTitle>
+                <CardTitle>Leads ({leads.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {projects.map((project) => (
-                    <div key={project.id} className="border rounded-lg p-4">
+                  {leads.map((lead) => (
+                    <div key={lead.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <p className="font-medium">{project.name}</p>
-                          <p className="text-sm text-muted-foreground">{project.service_type}</p>
+                          <p className="font-medium">{lead.name}</p>
+                          <p className="text-sm text-muted-foreground">{lead.email}</p>
+                          {lead.phone && <p className="text-sm text-muted-foreground">{lead.phone}</p>}
                         </div>
-                        <Select 
-                          value={project.status} 
-                          onValueChange={(value) => updateProjectStatus(project.id, value)}
-                        >
-                          <SelectTrigger className="w-48">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="review">Proyecto en revisión</SelectItem>
-                            <SelectItem value="quote_done">Presupuesto finalizado</SelectItem>
-                            <SelectItem value="in_progress">Inicio del Proyecto</SelectItem>
-                            <SelectItem value="revision">Fase de revisión</SelectItem>
-                            <SelectItem value="delivered">Entrega</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="text-right">
+                          {getStatusBadge(lead.status)}
+                          <p className="text-xs text-muted-foreground mt-1">{formatDate(lead.created_at)}</p>
+                        </div>
                       </div>
-                      {project.notes && <p className="text-sm bg-muted p-2 rounded mt-2">{project.notes}</p>}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                        <div><span className="text-muted-foreground">Servicio:</span> {lead.service_type}</div>
+                        <div><span className="text-muted-foreground">Negocio:</span> {lead.business_type || '-'}</div>
+                        <div><span className="text-muted-foreground">Presupuesto:</span> {lead.budget_range || '-'}</div>
+                        <div><span className="text-muted-foreground">Urgencia:</span> {lead.urgency}</div>
+                      </div>
+                      {lead.message && <p className="text-sm mt-2 bg-muted p-2 rounded">{lead.message}</p>}
                     </div>
                   ))}
-                  {projects.length === 0 && <p className="text-muted-foreground">No hay proyectos aún.</p>}
+                  {leads.length === 0 && <p className="text-muted-foreground">No hay leads aún.</p>}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Emails Tab */}
           <TabsContent value="emails">
             <Card>
               <CardHeader>
@@ -403,6 +903,7 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* Appointments Tab */}
           <TabsContent value="appointments">
             <Card>
               <CardHeader>

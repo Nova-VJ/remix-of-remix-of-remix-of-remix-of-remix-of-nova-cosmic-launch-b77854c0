@@ -49,7 +49,7 @@ const ShoppingCart = () => {
     message += '\n';
     
     if (isPromoApplied) {
-      message += `*Código aplicado:* NOVA30 (-30%)\n`;
+      message += `*Código aplicado:* NOVA20 (-20%)\n`;
       message += `*Descuento:* -${getDiscount().toFixed(0)}€\n`;
     }
     
@@ -215,12 +215,12 @@ const ShoppingCart = () => {
                 {isPromoApplied && (
                   <p className="text-primary text-sm mb-2 flex items-center gap-2">
                     <Check className="w-4 h-4" />
-                    ¡Código NOVA30 aplicado! -30% de descuento
+                    ¡Código NOVA20 aplicado! -20% de descuento
                   </p>
                 )}
                 {isPromoApplied && freeItems.length === 0 && (
                   <p className="text-muted-foreground text-xs mb-2">
-                    * Con el código NOVA30 no se aplican servicios gratuitos adicionales
+                    * Con el código NOVA20 no se aplican servicios gratuitos adicionales
                   </p>
                 )}
 
@@ -228,7 +228,7 @@ const ShoppingCart = () => {
                 <div className="space-y-2 mb-4">
                   {isPromoApplied && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Descuento (30%)</span>
+                      <span className="text-muted-foreground">Descuento (20%)</span>
                       <span className="text-primary">-{getDiscount().toFixed(0)}€</span>
                     </div>
                   )}
