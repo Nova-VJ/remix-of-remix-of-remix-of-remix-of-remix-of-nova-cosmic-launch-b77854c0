@@ -462,7 +462,7 @@ const VirtualAssistant = () => {
       <ChatButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
-        <div className="fixed bottom-36 md:bottom-24 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
           <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">

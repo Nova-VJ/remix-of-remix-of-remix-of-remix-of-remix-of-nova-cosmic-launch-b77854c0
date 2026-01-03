@@ -91,10 +91,10 @@ const ShoppingCart = () => {
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetTrigger asChild>
-          <button className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all">
+          <button className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
             <CartIcon className="w-5 h-5" />
             {itemCount > 0 && (
-              <span className="bg-background text-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
                 {itemCount}
               </span>
             )}
@@ -125,10 +125,10 @@ const ShoppingCart = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <button className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all">
+        <button className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
           <CartIcon className="w-5 h-5" />
           {itemCount > 0 && (
-            <span className="bg-background text-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
               {itemCount}
             </span>
           )}
@@ -236,6 +236,21 @@ const ShoppingCart = () => {
                     <span className="text-foreground">Total</span>
                     <span className="text-primary">{getTotal().toFixed(0)}€</span>
                   </div>
+                </div>
+
+                {/* Account prompt */}
+                <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border/50">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    💡 <strong>¿Sabías que puedes crear una cuenta?</strong>
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1 mb-2">
+                    <li>• Comprueba el status de tu proyecto</li>
+                    <li>• Revisa auditorías de ciberseguridad</li>
+                    <li>• Comprueba tickets de soporte</li>
+                    <li>• Solicita cambios en tu proyecto (2 por plan)</li>
+                    <li>• Calendario de mantenimientos</li>
+                    <li>• Sistema de referidos con recompensas</li>
+                  </ul>
                 </div>
 
                 <Button 
