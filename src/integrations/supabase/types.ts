@@ -88,6 +88,57 @@ export type Database = {
           },
         ]
       }
+      budgets: {
+        Row: {
+          admin_id: string | null
+          approved_at: string | null
+          client_email: string
+          client_name: string | null
+          client_user_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payment_id: string | null
+          services: Json
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          admin_id?: string | null
+          approved_at?: string | null
+          client_email: string
+          client_name?: string | null
+          client_user_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_id?: string | null
+          services?: Json
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string | null
+          approved_at?: string | null
+          client_email?: string
+          client_name?: string | null
+          client_user_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_id?: string | null
+          services?: Json
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_messages: {
         Row: {
           category: string | null
@@ -593,6 +644,48 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      success_stories: {
+        Row: {
+          author: string | null
+          content: string | null
+          created_at: string
+          description: string
+          featured: boolean | null
+          id: string
+          image_url: string | null
+          published: boolean | null
+          slug: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          description: string
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          published?: boolean | null
+          slug?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          description?: string
+          featured?: boolean | null
+          id?: string
+          image_url?: string | null
+          published?: boolean | null
+          slug?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       tickets: {
         Row: {

@@ -30,7 +30,9 @@ import {
   Clock,
   FileText,
   Copy,
-  Send
+  Send,
+  DollarSign,
+  Check
 } from 'lucide-react';
 
 interface Payment {
@@ -130,6 +132,17 @@ interface AssetLink {
   type: string;
 }
 
+interface Budget {
+  id: string;
+  client_email: string;
+  client_name: string | null;
+  services: unknown;
+  total_amount: number;
+  notes: string | null;
+  status: string;
+  created_at: string;
+}
+
 const PROJECT_STATUSES = [
   { key: 'review', label: 'Proyecto en revisión' },
   { key: 'quote_done', label: 'Presupuesto finalizado' },
@@ -152,6 +165,7 @@ const Dashboard = () => {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [securityAssessments, setSecurityAssessments] = useState<SecurityAssessment[]>([]);
   const [assetLinks, setAssetLinks] = useState<AssetLink[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [newTicket, setNewTicket] = useState({
@@ -181,7 +195,7 @@ const Dashboard = () => {
     setLoading(true);
     
     try {
-      const [profileRes, paymentsRes, projectsRes, milestonesRes, ticketsRes, notificationsRes, referralsRes, securityRes, assetsRes] = await Promise.all([
+      const [profileRes, paymentsRes, projectsRes, milestonesRes, ticketsRes, notificationsRes, referralsRes, securityRes, assetsRes, budgetsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
         supabase.from('payments').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('projects').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
@@ -190,7 +204,8 @@ const Dashboard = () => {
         supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
         supabase.from('referrals').select('*').or(`referrer_id.eq.${user.id},referred_user_id.eq.${user.id}`),
         supabase.from('security_assessments').select('*').eq('user_id', user.id),
-        supabase.from('assets_links').select('*')
+        supabase.from('assets_links').select('*'),
+        supabase.from('budgets').select('*').order('created_at', { ascending: false })
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -202,6 +217,7 @@ const Dashboard = () => {
       if (referralsRes.data) setReferrals(referralsRes.data);
       if (securityRes.data) setSecurityAssessments(securityRes.data);
       if (assetsRes.data) setAssetLinks(assetsRes.data);
+      if (budgetsRes.data) setBudgets(budgetsRes.data as Budget[]);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -317,6 +333,22 @@ const Dashboard = () => {
     setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
   };
 
+  const approveBudget = async (budgetId: string) => {
+    const { error } = await supabase
+      .from('budgets')
+      .update({ status: 'approved', approved_at: new Date().toISOString() })
+      .eq('id', budgetId);
+    
+    if (error) {
+      toast({ title: 'Error', description: 'No se pudo aprobar el presupuesto.', variant: 'destructive' });
+    } else {
+      toast({ title: 'Presupuesto aprobado', description: 'Procede al pago para confirmar tu servicio.' });
+      fetchData();
+      // Navigate to payment or show payment option
+    }
+  };
+
+  const pendingBudgets = budgets.filter(b => b.status === 'pending');
   const unreadCount = notifications.filter(n => !n.read).length;
 
   if (authLoading || loading) {
@@ -358,8 +390,14 @@ const Dashboard = () => {
           <p className="text-muted-foreground">Bienvenido a tu panel de cliente</p>
         </div>
 
-        <Tabs defaultValue="projects" className="space-y-6">
+        <Tabs defaultValue={pendingBudgets.length > 0 ? "budgets" : "projects"} className="space-y-6">
           <TabsList className="flex flex-wrap h-auto gap-1">
+            {pendingBudgets.length > 0 && (
+              <TabsTrigger value="budgets" className="gap-2">
+                <DollarSign className="w-4 h-4" />Presupuestos
+                <Badge variant="destructive" className="ml-1 h-5 px-1">{pendingBudgets.length}</Badge>
+              </TabsTrigger>
+            )}
             <TabsTrigger value="projects" className="gap-2"><Folder className="w-4 h-4" />Proyectos</TabsTrigger>
             <TabsTrigger value="tickets" className="gap-2"><Ticket className="w-4 h-4" />Soporte</TabsTrigger>
             <TabsTrigger value="referrals" className="gap-2"><Gift className="w-4 h-4" />Referidos</TabsTrigger>
@@ -370,6 +408,66 @@ const Dashboard = () => {
               {unreadCount > 0 && <Badge variant="destructive" className="ml-1 h-5 px-1">{unreadCount}</Badge>}
             </TabsTrigger>
           </TabsList>
+
+          {/* Budgets Tab */}
+          <TabsContent value="budgets" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-primary" />Presupuestos pendientes
+                </CardTitle>
+                <CardDescription>Revisa y aprueba los presupuestos para comenzar tu proyecto</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pendingBudgets.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No tienes presupuestos pendientes</p>
+                ) : pendingBudgets.map(budget => {
+                  const services = Array.isArray(budget.services) ? budget.services as { name: string; price: number }[] : [];
+                  return (
+                    <div key={budget.id} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-lg">Propuesta de servicios</p>
+                          <p className="text-sm text-muted-foreground">{formatDate(budget.created_at)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-primary">€{budget.total_amount.toFixed(2)}</p>
+                          <Badge variant="secondary">Pendiente de aprobación</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                        <p className="font-medium text-sm mb-2">Servicios incluidos:</p>
+                        {services.map((service, index) => (
+                          <div key={index} className="flex justify-between text-sm">
+                            <span>{service.name}</span>
+                            <span className="font-medium">€{service.price.toFixed(2)}</span>
+                          </div>
+                        ))}
+                        <div className="flex justify-between pt-2 border-t font-bold">
+                          <span>Total</span>
+                          <span>€{budget.total_amount.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
+                      {budget.notes && (
+                        <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded">
+                          <p className="font-medium mb-1">Notas:</p>
+                          {budget.notes}
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-3 pt-2">
+                        <Button onClick={() => approveBudget(budget.id)} className="flex-1">
+                          <Check className="w-4 h-4 mr-2" />Aprobar y proceder al pago
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="projects" className="space-y-6">
             {projects.length === 0 ? (
