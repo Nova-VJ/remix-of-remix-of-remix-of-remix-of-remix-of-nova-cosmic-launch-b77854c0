@@ -60,21 +60,18 @@ const ResultsSection = () => {
         </div>
 
         {/* Casos de éxito CTA */}
-        <div className={`mt-12 text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
+        <div className={`mt-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
           <Link to="/casos-exito">
             <Button 
-              variant="outline" 
-              className="group px-6 py-3 border-primary/30 hover:border-primary hover:bg-primary/5 transition-all"
+              variant="ghost" 
+              className="group w-full max-w-sm mx-auto h-auto py-3 px-4 flex items-center justify-center gap-2 border border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all rounded-xl"
             >
-              <Sparkles className="w-5 h-5 mr-3 text-primary group-hover:animate-pulse" />
-              <span className="text-sm md:text-base text-foreground/80 group-hover:text-foreground transition-colors">
-                ¿Necesitas inspiración? Conoce historias de éxito reales
+              <Sparkles className="w-4 h-4 text-primary group-hover:animate-pulse flex-shrink-0" />
+              <span className="text-sm text-foreground/80 group-hover:text-foreground transition-colors text-center">
+                ¿Necesitas inspiración? Descubre casos de éxito
               </span>
             </Button>
           </Link>
-          <p className="text-xs text-muted-foreground mt-3 max-w-md mx-auto">
-            Descubre cómo otros negocios dieron el salto digital y multiplicaron sus ventas. ¡Sé el siguiente!
-          </p>
         </div>
       </div>
     </section>

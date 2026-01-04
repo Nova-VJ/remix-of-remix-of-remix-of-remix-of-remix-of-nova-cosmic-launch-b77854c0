@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import referralPopupImage from '@/assets/referral-popup.svg';
+import referralPopupImage from '@/assets/referral-popup.png';
 
 const POPUP_CLOSED_KEY = 'referral_popup_closed';
 const POPUP_CTA_KEY = 'referral_popup_cta_clicked';
@@ -13,28 +13,25 @@ const ReferralPopup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user has already dismissed or clicked CTA
     const closedAt = localStorage.getItem(POPUP_CLOSED_KEY);
     const ctaClickedAt = localStorage.getItem(POPUP_CTA_KEY);
 
     const now = Date.now();
 
-    // If CTA clicked within 30 days, don't show
     if (ctaClickedAt) {
       const ctaDate = parseInt(ctaClickedAt);
       if (now - ctaDate < 30 * 24 * 60 * 60 * 1000) return;
     }
 
-    // If closed within 7 days, don't show
     if (closedAt) {
       const closeDate = parseInt(closedAt);
       if (now - closeDate < 7 * 24 * 60 * 60 * 1000) return;
     }
 
-    // Show popup after 10 seconds
+    // Show popup after 2 minutes (120 seconds)
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 10000);
+    }, 120000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -65,18 +62,16 @@ const ReferralPopup = () => {
           <img 
             src={referralPopupImage} 
             alt="Gana un 10% de descuento invitando amigos" 
-            className="w-full max-w-sm rounded-t-lg"
+            className="w-full max-w-sm rounded-lg"
           />
           
-          <div className="w-full bg-background p-4 rounded-b-lg">
-            <Button 
-              onClick={handleCTAClick}
-              className="w-full"
-              size="lg"
-            >
-              Conoce más de esta promoción
-            </Button>
-          </div>
+          <Button 
+            onClick={handleCTAClick}
+            variant="ghost"
+            className="mt-2 text-sm text-primary hover:text-primary/80 underline underline-offset-4"
+          >
+            Conoce más de esta promoción
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
