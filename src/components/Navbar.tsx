@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, Trophy, Gift } from 'lucide-react';
+import { Menu, X, User, Trophy, Gift, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
+
+const ADMIN_EMAIL = 'info@solutionsnova.es';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +12,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const isHome = location.pathname === '/';
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   const scrollToSection = (id: string) => {
     if (!isHome) {
@@ -63,6 +66,16 @@ const Navbar = () => {
             >
               Contacto
             </button>
+
+            {isAdmin && (
+              <Link 
+                to="/admin"
+                className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-medium"
+              >
+                <Shield className="w-4 h-4" />
+                Admin
+              </Link>
+            )}
             
             {user ? (
               <Link
@@ -130,6 +143,17 @@ const Navbar = () => {
               >
                 Contacto
               </button>
+
+              {isAdmin && (
+                <Link 
+                  to="/admin"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors py-2 font-medium"
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+              )}
               
               {user ? (
                 <Link
