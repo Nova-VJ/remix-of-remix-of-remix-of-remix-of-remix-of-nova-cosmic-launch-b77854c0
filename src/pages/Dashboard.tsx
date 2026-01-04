@@ -32,8 +32,11 @@ import {
   Copy,
   Send,
   DollarSign,
-  Check
+  Check,
+  Settings
 } from 'lucide-react';
+
+const ADMIN_EMAIL = 'info@solutionsnova.es';
 
 interface Payment {
   id: string;
@@ -368,6 +371,14 @@ const Dashboard = () => {
             <span className="font-bold text-foreground">Mi Panel</span>
           </Link>
           <div className="flex items-center gap-4">
+            {user?.email === ADMIN_EMAIL && (
+              <Link to="/admin">
+                <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/30 hover:bg-primary/10">
+                  <Settings className="w-4 h-4" />
+                  Admin
+                </Button>
+              </Link>
+            )}
             <div className="relative">
               <Bell className="w-5 h-5 text-muted-foreground" />
               {unreadCount > 0 && (
