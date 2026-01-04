@@ -181,24 +181,27 @@ const ServicesSection = () => {
             {additionalServices.map((service, index) => (
               <div
                 key={service.id}
-                className="glass-card p-5 flex items-center gap-4"
+                className="glass-card p-4 flex items-center gap-3"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <service.icon className="w-6 h-6 text-primary" />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <service.icon className="w-5 h-5 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-bold text-foreground">{service.title}</h4>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">{service.badge}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                    <h4 className="font-bold text-foreground text-sm">{service.title}</h4>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium whitespace-nowrap">
+                      {service.badge}
+                    </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{service.subtitle}</p>
-                  <p className="text-primary font-bold">{service.priceLabel}</p>
+                  <p className="text-xs text-muted-foreground truncate">{service.subtitle}</p>
+                  <p className="text-primary font-bold text-sm">{service.priceLabel}</p>
                 </div>
                 <Button
                   onClick={() => handleAddAdditionalService(service)}
                   disabled={isInCart(service.id)}
                   variant="outline"
                   size="sm"
+                  className="flex-shrink-0"
                 >
                   {isInCart(service.id) ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
                 </Button>

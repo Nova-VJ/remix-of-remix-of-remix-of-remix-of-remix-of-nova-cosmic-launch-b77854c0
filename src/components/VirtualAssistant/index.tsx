@@ -15,6 +15,7 @@ import AgentForm from './forms/AgentForm';
 import ServicePackViewer from './ServicePackViewer';
 import FAQViewer from './FAQViewer';
 import { FAQ_CATEGORIES, SERVICES_DATA, WHATSAPP_NUMBER } from '@/data/chatFlowData';
+import saraAvatar from '@/assets/sara-avatar.png';
 import { 
   HelpCircle, 
   Briefcase, 
@@ -67,7 +68,7 @@ const VirtualAssistant = () => {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      addBotMessage('Hola 👋 Soy el asistente virtual de Nova Marketing Solutions.\n\nPuedo ayudarte a resolver dudas, ver servicios y precios, o hacer seguimiento de tu proyecto.');
+      addBotMessage('¡Hola! 👋 Soy Sara, tu asistente virtual de Nova Marketing Solutions.\n\nPuedo ayudarte a resolver dudas, ver servicios y precios, o hacer seguimiento de tu proyecto.');
     }
   }, [isOpen]);
 
@@ -462,26 +463,30 @@ const VirtualAssistant = () => {
       <ChatButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-          {/* Header */}
-          <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5" />
+        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+          {/* Header with Sara avatar */}
+          <div className="bg-primary text-primary-foreground p-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <img 
+                  src={saraAvatar} 
+                  alt="Sara" 
+                  className="w-12 h-12 rounded-full object-cover border-2 border-primary-foreground/30"
+                />
+                <div>
+                  <h3 className="font-semibold text-sm">Sara</h3>
+                  <p className="text-xs opacity-80">Asistente Virtual Nova</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-sm">Asistente Nova</h3>
-                <p className="text-xs opacity-80">Siempre disponible</p>
-              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsOpen(false)}
+                className="text-primary-foreground hover:bg-primary-foreground/20"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsOpen(false)}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              <X className="w-5 h-5" />
-            </Button>
           </div>
 
           {/* Messages */}

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell } from 'lucide-react';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -91,6 +91,17 @@ const Admin = () => {
   const [milestones, setMilestones] = useState<MilestoneType[]>([]);
   const [maintenanceLogs, setMaintenanceLogs] = useState<MaintenanceLog[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
+  const [referrals, setReferrals] = useState<any[]>([]);
+
+  // Budget creation dialog
+  const [showCreateBudget, setShowCreateBudget] = useState(false);
+  const [budgetData, setBudgetData] = useState({
+    clientEmail: '',
+    clientName: '',
+    selectedServices: [] as { id: string; name: string; price: number }[],
+    customPrice: '',
+    notes: ''
+  });
 
   // Create project dialog
   const [showCreateProject, setShowCreateProject] = useState(false);
@@ -157,7 +168,7 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -165,7 +176,8 @@ const Admin = () => {
       supabase.from('appointments').select('*').order('created_at', { ascending: false }),
       supabase.from('project_milestones').select('*').order('created_at', { ascending: false }),
       supabase.from('maintenance_logs').select('*').order('date', { ascending: false }),
-      supabase.from('profiles').select('*')
+      supabase.from('profiles').select('*'),
+      supabase.from('referrals').select('*').order('created_at', { ascending: false })
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -176,6 +188,7 @@ const Admin = () => {
     if (milestonesRes.data) setMilestones(milestonesRes.data as MilestoneType[]);
     if (maintenanceRes.data) setMaintenanceLogs(maintenanceRes.data as MaintenanceLog[]);
     if (profilesRes.data) setProfiles(profilesRes.data);
+    if (referralsRes.data) setReferrals(referralsRes.data);
 
     setLoading(false);
   };
@@ -434,6 +447,7 @@ const Admin = () => {
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
             <TabsTrigger value="milestones">Hitos</TabsTrigger>
             <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
+            <TabsTrigger value="referrals">Referidos</TabsTrigger>
             <TabsTrigger value="tickets">Tickets</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
@@ -792,7 +806,56 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          {/* Tickets Tab */}
+          {/* Referrals Tab */}
+          <TabsContent value="referrals">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-5 h-5" /> Referidos ({referrals.length})
+                </CardTitle>
+                <CardDescription>Usuarios que se registraron por referencia de otros</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {referrals.map((referral) => {
+                    const referrer = profiles.find(p => p.user_id === referral.referrer_id);
+                    const referred = profiles.find(p => p.user_id === referral.referred_user_id);
+                    return (
+                      <div key={referral.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-sm text-muted-foreground">Código usado:</p>
+                            <p className="font-mono font-bold text-primary">{referral.referral_code}</p>
+                          </div>
+                          <Badge variant={referral.status === 'converted' ? 'default' : 'secondary'}>
+                            {referral.status === 'converted' ? 'Convertido' : 'Pendiente'}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Referidor:</p>
+                            <p className="font-medium">{referrer?.full_name || referrer?.email || 'Desconocido'}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Referido:</p>
+                            <p className="font-medium">{referred?.full_name || referral.referred_email || 'Pendiente de registro'}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                          <span>Creado: {formatDate(referral.created_at)}</span>
+                          {referral.converted_at && <span>Convertido: {formatDate(referral.converted_at)}</span>}
+                          {referral.discount_earned && <span>Descuento: {referral.discount_earned}%</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {referrals.length === 0 && <p className="text-muted-foreground">No hay referidos aún.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+
           <TabsContent value="tickets">
             <Card>
               <CardHeader>

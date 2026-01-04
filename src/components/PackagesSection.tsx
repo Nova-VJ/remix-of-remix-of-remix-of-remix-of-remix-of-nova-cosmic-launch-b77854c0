@@ -91,8 +91,8 @@ const PackagesSection = () => {
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {pkg.highlight && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-full whitespace-nowrap shadow-lg">
-                  MEJOR VALOR
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full whitespace-nowrap shadow-lg z-10">
+                  ⭐ MEJOR VALOR
                 </div>
               )}
 
