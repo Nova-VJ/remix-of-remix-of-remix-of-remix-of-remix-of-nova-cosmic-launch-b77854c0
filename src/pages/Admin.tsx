@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send } from 'lucide-react';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -77,6 +77,46 @@ interface MaintenanceLog {
   notes: string | null;
 }
 
+interface Budget {
+  id: string;
+  client_email: string;
+  client_name: string | null;
+  client_user_id: string | null;
+  services: unknown;
+  total_amount: number;
+  notes: string | null;
+  status: string;
+  created_at: string;
+}
+
+interface SuccessStory {
+  id: string;
+  title: string;
+  description: string;
+  content: string | null;
+  image_url: string | null;
+  featured: boolean;
+  published: boolean;
+  slug: string | null;
+  created_at: string;
+}
+
+const AVAILABLE_SERVICES = [
+  { id: 'web-basic', name: 'Página Web Básica', basePrice: 497 },
+  { id: 'web-pro', name: 'Página Web Profesional', basePrice: 997 },
+  { id: 'app-basic', name: 'Aplicación Móvil Básica', basePrice: 1497 },
+  { id: 'app-pro', name: 'Aplicación Móvil Profesional', basePrice: 2997 },
+  { id: 'branding', name: 'Branding Completo', basePrice: 697 },
+  { id: 'social', name: 'Gestión Redes Sociales', basePrice: 297 },
+  { id: 'marketing', name: 'Marketing Digital', basePrice: 497 },
+  { id: 'sem', name: 'SEM/Google Ads', basePrice: 397 },
+  { id: 'pkg-pro', name: 'Paquete Pro', basePrice: 1997 },
+  { id: 'pkg-plus', name: 'Paquete Plus', basePrice: 2997 },
+  { id: 'maintenance', name: 'Mantenimiento Mensual', basePrice: 97 },
+  { id: 'seo', name: 'Optimización SEO', basePrice: 397 },
+  { id: 'custom', name: 'Servicio Personalizado', basePrice: 0 },
+];
+
 const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -92,15 +132,28 @@ const Admin = () => {
   const [maintenanceLogs, setMaintenanceLogs] = useState<MaintenanceLog[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [referrals, setReferrals] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
 
   // Budget creation dialog
   const [showCreateBudget, setShowCreateBudget] = useState(false);
-  const [budgetData, setBudgetData] = useState({
-    clientEmail: '',
-    clientName: '',
-    selectedServices: [] as { id: string; name: string; price: number }[],
-    customPrice: '',
-    notes: ''
+  const [budgetServices, setBudgetServices] = useState<{ name: string; price: number }[]>([]);
+  const [budgetClientType, setBudgetClientType] = useState<'email' | 'registered'>('email');
+  const [budgetClientEmail, setBudgetClientEmail] = useState('');
+  const [budgetClientName, setBudgetClientName] = useState('');
+  const [budgetSelectedUserId, setBudgetSelectedUserId] = useState('');
+  const [budgetNotes, setBudgetNotes] = useState('');
+  const [newServiceName, setNewServiceName] = useState('');
+  const [newServicePrice, setNewServicePrice] = useState('');
+
+  // Success story dialog
+  const [showCreateStory, setShowCreateStory] = useState(false);
+  const [newStory, setNewStory] = useState({
+    title: '',
+    description: '',
+    content: '',
+    image_url: '',
+    featured: false
   });
 
   // Create project dialog
@@ -168,7 +221,7 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -177,7 +230,9 @@ const Admin = () => {
       supabase.from('project_milestones').select('*').order('created_at', { ascending: false }),
       supabase.from('maintenance_logs').select('*').order('date', { ascending: false }),
       supabase.from('profiles').select('*'),
-      supabase.from('referrals').select('*').order('created_at', { ascending: false })
+      supabase.from('referrals').select('*').order('created_at', { ascending: false }),
+      supabase.from('budgets').select('*').order('created_at', { ascending: false }),
+      supabase.from('success_stories').select('*').order('created_at', { ascending: false })
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -189,6 +244,8 @@ const Admin = () => {
     if (maintenanceRes.data) setMaintenanceLogs(maintenanceRes.data as MaintenanceLog[]);
     if (profilesRes.data) setProfiles(profilesRes.data);
     if (referralsRes.data) setReferrals(referralsRes.data);
+    if (budgetsRes.data) setBudgets(budgetsRes.data as Budget[]);
+    if (storiesRes.data) setSuccessStories(storiesRes.data as SuccessStory[]);
 
     setLoading(false);
   };
@@ -341,6 +398,131 @@ const Admin = () => {
     }
   };
 
+  const addServiceToBudget = () => {
+    if (!newServiceName || !newServicePrice) return;
+    setBudgetServices([...budgetServices, { name: newServiceName, price: parseFloat(newServicePrice) }]);
+    setNewServiceName('');
+    setNewServicePrice('');
+  };
+
+  const addPresetServiceToBudget = (service: typeof AVAILABLE_SERVICES[0], customPrice?: number) => {
+    const price = customPrice !== undefined ? customPrice : service.basePrice;
+    setBudgetServices([...budgetServices, { name: service.name, price }]);
+  };
+
+  const removeServiceFromBudget = (index: number) => {
+    setBudgetServices(budgetServices.filter((_, i) => i !== index));
+  };
+
+  const getBudgetTotal = () => budgetServices.reduce((sum, s) => sum + s.price, 0);
+
+  const createBudget = async () => {
+    if (budgetServices.length === 0) {
+      toast({ title: "Error", description: "Añade al menos un servicio", variant: "destructive" });
+      return;
+    }
+
+    let clientEmail = '';
+    let clientName = '';
+    let clientUserId: string | null = null;
+
+    if (budgetClientType === 'registered' && budgetSelectedUserId) {
+      const selectedProfile = profiles.find(p => p.user_id === budgetSelectedUserId);
+      if (selectedProfile) {
+        clientEmail = selectedProfile.email || '';
+        clientName = selectedProfile.full_name || '';
+        clientUserId = selectedProfile.user_id;
+      }
+    } else {
+      clientEmail = budgetClientEmail;
+      clientName = budgetClientName;
+    }
+
+    if (!clientEmail) {
+      toast({ title: "Error", description: "Indica el email del cliente", variant: "destructive" });
+      return;
+    }
+
+    const { error } = await supabase.from('budgets').insert({
+      admin_id: user?.id,
+      client_email: clientEmail,
+      client_name: clientName || null,
+      client_user_id: clientUserId,
+      services: budgetServices,
+      total_amount: getBudgetTotal(),
+      notes: budgetNotes || null,
+      status: 'pending'
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo crear el presupuesto", variant: "destructive" });
+    } else {
+      // Create notification for user if registered
+      if (clientUserId) {
+        await supabase.from('notifications').insert({
+          user_id: clientUserId,
+          title: 'Nuevo presupuesto disponible',
+          message: `Tienes un nuevo presupuesto por €${getBudgetTotal().toFixed(2)} pendiente de aprobación`,
+          type: 'budget',
+          link: '/dashboard'
+        });
+      }
+      toast({ title: "Creado", description: "Presupuesto enviado correctamente" });
+      setShowCreateBudget(false);
+      setBudgetServices([]);
+      setBudgetClientEmail('');
+      setBudgetClientName('');
+      setBudgetSelectedUserId('');
+      setBudgetNotes('');
+      fetchData();
+    }
+  };
+
+  const createSuccessStory = async () => {
+    if (!newStory.title || !newStory.description) {
+      toast({ title: "Error", description: "Completa título y descripción", variant: "destructive" });
+      return;
+    }
+
+    const slug = newStory.title.toLowerCase()
+      .replace(/[áàäâ]/g, 'a')
+      .replace(/[éèëê]/g, 'e')
+      .replace(/[íìïî]/g, 'i')
+      .replace(/[óòöô]/g, 'o')
+      .replace(/[úùüû]/g, 'u')
+      .replace(/ñ/g, 'n')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    const { error } = await supabase.from('success_stories').insert({
+      title: newStory.title,
+      description: newStory.description,
+      content: newStory.content || null,
+      image_url: newStory.image_url || null,
+      featured: newStory.featured,
+      slug
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo crear el caso de éxito", variant: "destructive" });
+    } else {
+      toast({ title: "Creado", description: "Caso de éxito publicado" });
+      setShowCreateStory(false);
+      setNewStory({ title: '', description: '', content: '', image_url: '', featured: false });
+      fetchData();
+    }
+  };
+
+  const deleteSuccessStory = async (id: string) => {
+    const { error } = await supabase.from('success_stories').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Error", description: "No se pudo eliminar", variant: "destructive" });
+    } else {
+      toast({ title: "Eliminado", description: "Caso de éxito eliminado" });
+      fetchData();
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
       new: 'default',
@@ -442,8 +624,10 @@ const Admin = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="projects">
+        <Tabs defaultValue="budgets">
           <TabsList className="mb-4 flex-wrap h-auto gap-1">
+            <TabsTrigger value="budgets">Presupuestos</TabsTrigger>
+            <TabsTrigger value="stories">Casos de éxito</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
             <TabsTrigger value="milestones">Hitos</TabsTrigger>
             <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
@@ -453,6 +637,285 @@ const Admin = () => {
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="appointments">Citas</TabsTrigger>
           </TabsList>
+
+          {/* Budgets Tab */}
+          <TabsContent value="budgets">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><DollarSign className="w-5 h-5" /> Presupuestos ({budgets.length})</CardTitle>
+                  <CardDescription>Crea y gestiona presupuestos para clientes</CardDescription>
+                </div>
+                <Dialog open={showCreateBudget} onOpenChange={setShowCreateBudget}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" /> Nuevo presupuesto
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Crear presupuesto</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      {/* Client selection */}
+                      <div>
+                        <Label>Tipo de cliente</Label>
+                        <Select value={budgetClientType} onValueChange={(v: 'email' | 'registered') => setBudgetClientType(v)}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="email">Nuevo cliente (email)</SelectItem>
+                            <SelectItem value="registered">Usuario registrado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {budgetClientType === 'email' ? (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Email del cliente</Label>
+                            <Input 
+                              value={budgetClientEmail} 
+                              onChange={(e) => setBudgetClientEmail(e.target.value)}
+                              placeholder="cliente@email.com"
+                            />
+                          </div>
+                          <div>
+                            <Label>Nombre (opcional)</Label>
+                            <Input 
+                              value={budgetClientName} 
+                              onChange={(e) => setBudgetClientName(e.target.value)}
+                              placeholder="Nombre del cliente"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <Label>Seleccionar usuario</Label>
+                          <Select value={budgetSelectedUserId} onValueChange={setBudgetSelectedUserId}>
+                            <SelectTrigger><SelectValue placeholder="Selecciona un usuario registrado" /></SelectTrigger>
+                            <SelectContent>
+                              {profiles.filter(p => p.email).map(p => (
+                                <SelectItem key={p.user_id} value={p.user_id}>
+                                  {p.full_name || 'Sin nombre'} - {p.email}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Services */}
+                      <div>
+                        <Label>Servicios incluidos</Label>
+                        <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                          {AVAILABLE_SERVICES.map(service => (
+                            <Button 
+                              key={service.id} 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => addPresetServiceToBudget(service)}
+                            >
+                              {service.name} (€{service.basePrice})
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 mt-3">
+                          <Input 
+                            placeholder="Servicio personalizado" 
+                            value={newServiceName}
+                            onChange={(e) => setNewServiceName(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Input 
+                            placeholder="Precio" 
+                            type="number"
+                            value={newServicePrice}
+                            onChange={(e) => setNewServicePrice(e.target.value)}
+                            className="w-24"
+                          />
+                          <Button variant="secondary" onClick={addServiceToBudget}>Añadir</Button>
+                        </div>
+                      </div>
+
+                      {/* Selected services */}
+                      {budgetServices.length > 0 && (
+                        <div className="border rounded-lg p-3 space-y-2">
+                          <Label>Servicios seleccionados:</Label>
+                          {budgetServices.map((service, index) => (
+                            <div key={index} className="flex justify-between items-center bg-muted/50 p-2 rounded">
+                              <span>{service.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">€{service.price.toFixed(2)}</span>
+                                <Button variant="ghost" size="sm" onClick={() => removeServiceFromBudget(index)}>
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          <div className="flex justify-between pt-2 border-t font-bold">
+                            <span>Total:</span>
+                            <span>€{getBudgetTotal().toFixed(2)}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <Label>Notas</Label>
+                        <Textarea 
+                          value={budgetNotes}
+                          onChange={(e) => setBudgetNotes(e.target.value)}
+                          placeholder="Notas adicionales para el cliente..."
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateBudget(false)}>Cancelar</Button>
+                      <Button onClick={createBudget} disabled={budgetServices.length === 0}>
+                        <Send className="w-4 h-4 mr-2" /> Enviar presupuesto
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {budgets.map((budget) => {
+                    const services = Array.isArray(budget.services) ? budget.services as { name: string; price: number }[] : [];
+                    return (
+                      <div key={budget.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium">{budget.client_name || budget.client_email}</p>
+                            <p className="text-sm text-muted-foreground">{budget.client_email}</p>
+                          </div>
+                          <div className="text-right">
+                            <Badge variant={budget.status === 'approved' ? 'default' : budget.status === 'paid' ? 'outline' : 'secondary'}>
+                              {budget.status === 'pending' ? 'Pendiente' : budget.status === 'approved' ? 'Aprobado' : budget.status === 'paid' ? 'Pagado' : budget.status}
+                            </Badge>
+                            <p className="text-lg font-bold mt-1">€{budget.total_amount.toFixed(2)}</p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {services.map((s, i) => (
+                            <span key={i}>{s.name}{i < services.length - 1 ? ', ' : ''}</span>
+                          ))}
+                        </div>
+                        {budget.notes && <p className="text-sm bg-muted p-2 rounded">{budget.notes}</p>}
+                        <p className="text-xs text-muted-foreground mt-2">{formatDate(budget.created_at)}</p>
+                      </div>
+                    );
+                  })}
+                  {budgets.length === 0 && <p className="text-muted-foreground">No hay presupuestos aún.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Success Stories Tab */}
+          <TabsContent value="stories">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><Star className="w-5 h-5" /> Casos de éxito ({successStories.length})</CardTitle>
+                  <CardDescription>Gestiona los casos de éxito publicados</CardDescription>
+                </div>
+                <Dialog open={showCreateStory} onOpenChange={setShowCreateStory}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" /> Nuevo caso
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Crear caso de éxito</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Título</Label>
+                        <Input 
+                          value={newStory.title} 
+                          onChange={(e) => setNewStory({...newStory, title: e.target.value})}
+                          placeholder="Ej: Transformación digital de Empresa X"
+                        />
+                      </div>
+                      <div>
+                        <Label>Descripción corta</Label>
+                        <Textarea 
+                          value={newStory.description} 
+                          onChange={(e) => setNewStory({...newStory, description: e.target.value})}
+                          placeholder="Resumen del caso de éxito..."
+                        />
+                      </div>
+                      <div>
+                        <Label>Contenido completo (opcional)</Label>
+                        <Textarea 
+                          value={newStory.content} 
+                          onChange={(e) => setNewStory({...newStory, content: e.target.value})}
+                          placeholder="Historia completa del caso..."
+                          className="min-h-[100px]"
+                        />
+                      </div>
+                      <div>
+                        <Label>URL de imagen (opcional)</Label>
+                        <Input 
+                          value={newStory.image_url} 
+                          onChange={(e) => setNewStory({...newStory, image_url: e.target.value})}
+                          placeholder="https://..."
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="featured"
+                          checked={newStory.featured}
+                          onChange={(e) => setNewStory({...newStory, featured: e.target.checked})}
+                          className="rounded border-border"
+                        />
+                        <Label htmlFor="featured">Destacar en portada</Label>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCreateStory(false)}>Cancelar</Button>
+                      <Button onClick={createSuccessStory} disabled={!newStory.title || !newStory.description}>Publicar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {successStories.map((story) => (
+                    <div key={story.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex gap-3">
+                          {story.image_url && (
+                            <img src={story.image_url} alt={story.title} className="w-16 h-16 object-cover rounded" />
+                          )}
+                          <div>
+                            <p className="font-medium flex items-center gap-2">
+                              {story.title}
+                              {story.featured && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+                            </p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{story.description}</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => deleteSuccessStory(story.id)}>
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Badge variant={story.published ? 'default' : 'secondary'}>
+                          {story.published ? 'Publicado' : 'Borrador'}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{formatDate(story.created_at)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {successStories.length === 0 && <p className="text-muted-foreground">No hay casos de éxito aún.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Projects Tab */}
           <TabsContent value="projects">
