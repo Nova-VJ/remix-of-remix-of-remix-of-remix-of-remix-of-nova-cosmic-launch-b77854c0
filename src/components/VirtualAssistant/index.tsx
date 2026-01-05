@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, ArrowLeft, User } from 'lucide-react';
+import { X, ArrowLeft, User, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ import TicketForm from './forms/TicketForm';
 import AgentForm from './forms/AgentForm';
 import ServicePackViewer from './ServicePackViewer';
 import FAQViewer from './FAQViewer';
+import AIChatMode from './AIChatMode';
 import { FAQ_CATEGORIES, SERVICES_DATA, WHATSAPP_NUMBER } from '@/data/chatFlowData';
 import saraAvatar from '@/assets/sara-avatar.png';
 import { 
@@ -28,7 +29,8 @@ import {
   Globe,
   Smartphone,
   Share2,
-  Palette
+  Palette,
+  Bot
 } from 'lucide-react';
 
 type FlowState = 
@@ -45,7 +47,8 @@ type FlowState =
   | 'agent'
   | 'quote'
   | 'ticket'
-  | 'client-portal';
+  | 'client-portal'
+  | 'ai-chat';
 
 interface Message {
   id: string;
@@ -98,8 +101,12 @@ const VirtualAssistant = () => {
 
   const handleMainOption = (optionId: string) => {
     switch (optionId) {
+      case 'ai-chat':
+        addUserMessage('Chat con Sara (IA)');
+        setFlowState('ai-chat');
+        break;
       case 'faq':
-        addUserMessage('Asistente virtual (FAQ)');
+        addUserMessage('Preguntas frecuentes');
         addBotMessage('Selecciona una categoría para ver las preguntas frecuentes:');
         setFlowState('faq');
         break;
@@ -187,6 +194,7 @@ const VirtualAssistant = () => {
       case 'email':
       case 'agent':
       case 'client-portal':
+      case 'ai-chat':
         setFlowState('welcome');
         break;
       case 'faq-category':
@@ -221,7 +229,8 @@ const VirtualAssistant = () => {
   };
 
   const mainOptions: ChatOption[] = [
-    { id: 'faq', label: 'Asistente virtual (FAQ)', icon: <HelpCircle className="w-4 h-4" /> },
+    { id: 'ai-chat', label: 'Chat con Sara (IA)', icon: <Bot className="w-4 h-4" /> },
+    { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'services', label: 'Ver servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
     { id: 'schedule', label: 'Agendar una cita', icon: <Calendar className="w-4 h-4" /> },
@@ -450,6 +459,13 @@ const VirtualAssistant = () => {
                 </Button>
               </div>
             </div>
+          </div>
+        );
+
+      case 'ai-chat':
+        return (
+          <div className="h-[400px]">
+            <AIChatMode onBack={handleBack} />
           </div>
         );
 

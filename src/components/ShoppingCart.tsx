@@ -91,7 +91,7 @@ const ShoppingCart = () => {
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetTrigger asChild>
-          <button className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
+          <button className="fixed bottom-44 sm:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
             <CartIcon className="w-5 h-5" />
             {itemCount > 0 && (
               <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
@@ -125,7 +125,7 @@ const ShoppingCart = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <button className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
+        <button className="fixed bottom-44 sm:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
           <CartIcon className="w-5 h-5" />
           {itemCount > 0 && (
             <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">

@@ -10,7 +10,7 @@ const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-24 sm:bottom-4 right-4 z-50 flex items-center gap-2 transition-all duration-300 hover:scale-105"
+      className="fixed bottom-24 sm:bottom-4 right-4 z-40 flex items-center gap-2 transition-all duration-300 hover:scale-105"
       aria-label={isOpen ? 'Cerrar asistente' : 'Abrir asistente virtual Sara'}
     >
       {isOpen ? (
@@ -20,12 +20,12 @@ const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
       ) : (
         <>
           <span className="hidden sm:block text-sm font-medium text-foreground bg-background/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-md border border-border/50">
-            Asistente Virtual
+            Pregúntame lo que quieras
           </span>
           <img 
             src={saraIcon} 
             alt="Sara - Asistente Virtual" 
-            className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover shadow-lg border-2 border-primary/30"
+            className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
           />
         </>
       )}
