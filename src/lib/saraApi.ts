@@ -1,35 +1,50 @@
-const SARA_ENDPOINT = 'https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat';
+const SARA_ENDPOINT =
+  "https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat";
 
-export async function sendToSara(
-  message: string,
-  accessToken?: string
-): Promise<{ reply: string }> {
+function getOrCreateAnonId() {
+  const key = "sara_anon_id";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id =
+      (crypto as any).randomUUID?.() ??
+      `anon_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+export async function sendToSara(message: string, accessToken?: string) {
+  const anonId = getOrCreateAnonId();
+
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
+    "x-anon-id": anonId,
   };
 
-  if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
-  }
+  if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
 
-  const response = await fetch(SARA_ENDPOINT, {
-    method: 'POST',
+  const res = await fetch(SARA_ENDPOINT, {
+    method: "POST",
     headers,
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({
+      message,
+      anon_id: anonId,
+    }),
   });
 
-  if (!response.ok) {
-    let errorMessage = `Error ${response.status}`;
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData.error || errorData.message || errorMessage;
-    } catch {
-      const text = await response.text();
-      if (text) errorMessage = text;
-    }
-    throw new Error(errorMessage);
+  const text = await res.text();
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { raw: text };
   }
 
-  const data = await response.json();
-  return { reply: data.reply || data.response || data.message || '' };
+  if (!res.ok) {
+    throw new Error(
+      typeof data === "string" ? data : JSON.stringify(data, null, 2)
+    );
+  }
+
+  return { reply: data.reply as string };
 }
