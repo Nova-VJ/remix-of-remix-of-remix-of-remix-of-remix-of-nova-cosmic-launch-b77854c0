@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { sendToSara } from '@/lib/saraApi';
 
 interface Message {
   id: string;
@@ -25,7 +26,7 @@ const DEMO_MESSAGES_KEY = 'sara_demo_messages';
 const DEMO_COUNT_KEY = 'sara_demo_count';
 
 export const useSaraChat = (): UseSaraChatReturn => {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -141,112 +142,75 @@ export const useSaraChat = (): UseSaraChatReturn => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
+      // Obtener token de acceso si existe sesión
+      const accessToken = session?.access_token;
+
+      // Llamar a la Edge Function externa
+      const { reply } = await sendToSara(content, accessToken);
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: reply || 'Ahora mismo no puedo responder. Intenta de nuevo.',
+        createdAt: new Date()
+      };
+
       if (isDemo) {
         // Modo demo: guardar en localStorage
         const newCount = demoCount + 1;
         setDemoCount(newCount);
-
-        // Llamar a la Edge Function
-        const response = await supabase.functions.invoke('sara-chat', {
-          body: {
-            messages: [...messages, userMessage].map(m => ({
-              role: m.role,
-              content: m.content
-            })),
-            isDemo: true
-          }
-        });
-
-        if (response.error) {
-          throw new Error(response.error.message);
-        }
-
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: response.data.message,
-          createdAt: new Date()
-        };
-
         const newMessages = [...messages, userMessage, assistantMessage];
         setMessages(newMessages);
         saveDemoMessage(newMessages, newCount);
       } else {
         // Modo logueado: guardar en Supabase
-        if (!conversationId || !user) {
-          throw new Error('No hay conversación activa');
+        if (conversationId && user) {
+          // Guardar mensaje del usuario en DB
+          await supabase
+            .from('chat_messages')
+            .insert({
+              conversation_id: conversationId,
+              user_id: user.id,
+              role: 'user',
+              content
+            });
+
+          // Guardar respuesta en DB
+          await supabase
+            .from('chat_messages')
+            .insert({
+              conversation_id: conversationId,
+              user_id: user.id,
+              role: 'assistant',
+              content: assistantMessage.content
+            });
+
+          // Actualizar timestamp de la conversación
+          await supabase
+            .from('conversations')
+            .update({ updated_at: new Date().toISOString() })
+            .eq('id', conversationId);
         }
-
-        // Guardar mensaje del usuario en DB
-        const { error: insertError } = await supabase
-          .from('chat_messages')
-          .insert({
-            conversation_id: conversationId,
-            user_id: user.id,
-            role: 'user',
-            content
-          });
-
-        if (insertError) throw insertError;
-
-        // Actualizar timestamp de la conversación
-        await supabase
-          .from('conversations')
-          .update({ updated_at: new Date().toISOString() })
-          .eq('id', conversationId);
-
-        // Llamar a la Edge Function
-        const response = await supabase.functions.invoke('sara-chat', {
-          body: {
-            messages: [...messages, userMessage].map(m => ({
-              role: m.role,
-              content: m.content
-            })),
-            isDemo: false
-          }
-        });
-
-        if (response.error) {
-          throw new Error(response.error.message);
-        }
-
-        const assistantContent = response.data.message;
-
-        // Guardar respuesta en DB
-        const { data: savedAssistant, error: assistantError } = await supabase
-          .from('chat_messages')
-          .insert({
-            conversation_id: conversationId,
-            user_id: user.id,
-            role: 'assistant',
-            content: assistantContent
-          })
-          .select()
-          .single();
-
-        if (assistantError) throw assistantError;
-
-        const assistantMessage: Message = {
-          id: savedAssistant.id,
-          role: 'assistant',
-          content: assistantContent,
-          createdAt: new Date(savedAssistant.created_at)
-        };
 
         setMessages(prev => [...prev, assistantMessage]);
       }
     } catch (e) {
       console.error('Error sending message:', e);
+      
+      // Añadir burbuja de error como mensaje de Sara
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Ahora mismo no puedo responder. Intenta de nuevo.',
+        createdAt: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
       setError(e instanceof Error ? e.message : 'Error al enviar mensaje');
-      // Remover mensaje del usuario si falló
-      setMessages(prev => prev.filter(m => m.id !== userMessage.id));
-      if (isDemo) {
-        setDemoCount(prev => Math.max(0, prev - 1));
-      }
     } finally {
       setIsLoading(false);
     }
-  }, [messages, isDemo, demoCount, demoLimitReached, conversationId, user]);
+  }, [messages, isDemo, demoCount, demoLimitReached, conversationId, user, session]);
 
   return {
     messages,
