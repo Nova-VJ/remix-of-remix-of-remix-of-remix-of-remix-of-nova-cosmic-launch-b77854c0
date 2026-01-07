@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import loopVideo from '@/assets/loop.mp4';
 import { MessageCircle, Zap, TrendingUp, BarChart3, ArrowDown, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
 const benefits = [{
   icon: Zap,
@@ -17,8 +16,9 @@ const benefits = [{
 }];
 const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { user } = useAuth();
-  
+  const {
+    user
+  } = useAuth();
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.play().catch(() => {
@@ -41,14 +41,12 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/40" />
 
       {/* Content */}
-      <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 my-[170px] mt-[190px]">
+      <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 my-[170px] mt-[270px]">
         {/* Main headline */}
         
 
         {/* Subheadline */}
-        <p className="text-lg sm:text-xl md:text-2xl text-foreground/90 mb-8 font-light">
-          Diseño, estrategia y tecnología para hacer crecer tu negocio online.
-        </p>
+        
 
         {/* Benefits */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10">
