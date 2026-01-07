@@ -1,17 +1,17 @@
-import serviceWeb from '@/assets/service-web.png';
-import serviceApps from '@/assets/service-apps.png';
-import serviceBranding from '@/assets/service-branding.png';
-import serviceSocial from '@/assets/service-social.png';
+import serviceWebIcon from '@/assets/service-web-icon.svg';
+import serviceAppsIcon from '@/assets/service-apps-icon.svg';
+import serviceBrandingIcon from '@/assets/service-branding-icon.svg';
+import serviceSocialIcon from '@/assets/service-social-icon.svg';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles } from 'lucide-react';
+import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
+import { useState, useEffect } from 'react';
 const services = [
   {
     id: 'web',
-    image: serviceWeb,
+    image: serviceWebIcon,
     alt: "Páginas web que convierten",
     title: "Páginas web que convierten",
     description: "Diseño + velocidad + SEO para vender más",
@@ -22,7 +22,7 @@ const services = [
   },
   {
     id: 'apps',
-    image: serviceApps,
+    image: serviceAppsIcon,
     alt: "Aplicaciones móviles",
     title: "Aplicaciones móviles",
     description: "Tu app a medida, lista para publicar.",
@@ -33,7 +33,7 @@ const services = [
   },
   {
     id: 'social',
-    image: serviceSocial,
+    image: serviceSocialIcon,
     alt: "Contenido para redes sociales",
     title: "Contenido para redes sociales",
     description: "Estrategia basada en algoritmo",
@@ -44,7 +44,7 @@ const services = [
   },
   {
     id: 'branding',
-    image: serviceBranding,
+    image: serviceBrandingIcon,
     alt: "Branding profesional",
     title: "Branding profesional",
     description: "Creación de identidad visual premium y manual de marca",
@@ -114,6 +114,7 @@ const additionalServices = [
 const ServicesSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const { addItem, items } = useCart();
+  const [expandedAssistants, setExpandedAssistants] = useState<Record<string, boolean>>({});
 
   const handleAddToCart = (service: typeof services[0]) => {
     const cartItem = {
@@ -125,6 +126,14 @@ const ServicesSection = () => {
     };
     addItem(cartItem);
     toast.success(`${service.title} añadido al carrito`);
+    
+    // Auto-expand virtual assistant options when adding web or apps to cart
+    if (service.hasVirtualAssistant) {
+      virtualAssistants.forEach(assistant => {
+        const key = `${service.id}-${assistant.id}`;
+        setExpandedAssistants(prev => ({ ...prev, [key]: true }));
+      });
+    }
   };
 
   const handleAddVirtualAssistant = (assistant: typeof virtualAssistants[0]) => {
@@ -151,6 +160,16 @@ const ServicesSection = () => {
   };
 
   const isInCart = (id: string) => items.some(item => item.id === id);
+
+  const toggleAssistantExpand = (serviceId: string, assistantId: string) => {
+    const key = `${serviceId}-${assistantId}`;
+    setExpandedAssistants(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const isAssistantExpanded = (serviceId: string, assistantId: string) => {
+    const key = `${serviceId}-${assistantId}`;
+    return expandedAssistants[key] || false;
+  };
 
   return (
     <section id="servicios" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6 pt-24">
@@ -223,51 +242,77 @@ const ServicesSection = () => {
                   <p className="text-xs text-muted-foreground text-center font-medium uppercase tracking-wide">
                     Potencia tu {service.id === 'web' ? 'web' : 'app'} con IA
                   </p>
-                  {virtualAssistants.map((assistant) => (
-                    <div
-                      key={assistant.id}
-                      className="bg-background/50 rounded-lg p-3 border border-border/30"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <assistant.icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="text-sm font-bold text-foreground">{assistant.title}</h4>
-                          <p className="text-primary font-bold text-xs">{assistant.priceLabel}</p>
-                        </div>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-2">{assistant.subtitle}</p>
-                      <ul className="space-y-1 mb-2">
-                        {assistant.features.slice(0, 2).map((feature, i) => (
-                          <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/70">
-                            <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                            <span className="line-clamp-1">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <p className="text-[10px] text-muted-foreground italic mb-2">{assistant.useCase}</p>
-                      <Button
-                        onClick={() => handleAddVirtualAssistant(assistant)}
-                        disabled={isInCart(assistant.id)}
-                        variant="outline"
-                        size="sm"
-                        className="w-full h-7 text-xs"
+                  {virtualAssistants.map((assistant) => {
+                    const isExpanded = isAssistantExpanded(service.id, assistant.id);
+                    return (
+                      <div
+                        key={assistant.id}
+                        className="bg-background/50 rounded-lg p-3 border border-border/30 transition-all duration-300"
                       >
-                        {isInCart(assistant.id) ? (
-                          <>
-                            <Check className="w-3 h-3 mr-1" />
-                            Añadido
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-3 h-3 mr-1" />
-                            Añadir
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  ))}
+                        <button
+                          type="button"
+                          onClick={() => toggleAssistantExpand(service.id, assistant.id)}
+                          className="w-full text-left"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <assistant.icon className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-bold text-foreground">{assistant.title}</h4>
+                              <p className="text-primary font-bold text-xs">{assistant.priceLabel}</p>
+                            </div>
+                            <div className="flex-shrink-0">
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                        
+                        <p className="text-xs text-muted-foreground mb-2">{assistant.subtitle}</p>
+                        
+                        <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                          <ul className="space-y-1.5 mb-3">
+                            {assistant.features.map((feature, i) => (
+                              <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
+                                <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="text-[11px] text-muted-foreground italic mb-3 bg-muted/30 p-2 rounded">
+                            {assistant.useCase}
+                          </p>
+                        </div>
+                        
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddVirtualAssistant(assistant);
+                          }}
+                          disabled={isInCart(assistant.id)}
+                          variant="outline"
+                          size="sm"
+                          className="w-full h-7 text-xs"
+                        >
+                          {isInCart(assistant.id) ? (
+                            <>
+                              <Check className="w-3 h-3 mr-1" />
+                              Añadido
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="w-3 h-3 mr-1" />
+                              Añadir
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
