@@ -83,15 +83,15 @@ const PackagesSection = () => {
         </div>
 
         {/* Packages grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
           {packages.map((pkg, index) => (
             <div
               key={pkg.id}
-              className={`relative glass-card p-6 flex flex-col transition-all duration-700 hover-lift ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? 'border-primary/50 ring-2 ring-primary/20' : ''}`}
+              className={`relative glass-card p-6 flex flex-col transition-all duration-700 hover-lift overflow-visible ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? 'border-primary/50 ring-2 ring-primary/20' : ''}`}
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {pkg.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full whitespace-nowrap shadow-lg z-10">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-full whitespace-nowrap shadow-lg shadow-primary/30 z-20">
                   ⭐ MEJOR VALOR
                 </div>
               )}
@@ -144,7 +144,7 @@ const PackagesSection = () => {
                 onClick={() => handleAddPackage(pkg)}
                 disabled={isInCart(pkg.id) || (hasPackage && !isInCart(pkg.id))}
                 variant={pkg.highlight ? "default" : "outline"}
-                className="w-full mt-auto"
+                className={`w-full mt-auto ${pkg.highlight ? 'shadow-lg shadow-primary/40 hover:shadow-primary/60 hover:scale-[1.02] transition-all' : ''}`}
                 size="lg"
               >
                 {isInCart(pkg.id) ? (
