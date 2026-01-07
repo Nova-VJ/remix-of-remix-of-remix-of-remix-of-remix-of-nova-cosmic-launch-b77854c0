@@ -194,7 +194,12 @@ const Auth = () => {
               {isSubmitting ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
             </button>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              {isLogin && (
+                <Link to="/forgot-password" className="block text-muted-foreground hover:text-primary text-sm transition-colors">
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              )}
               <button type="button" onClick={() => {
               setIsLogin(!isLogin);
               setErrors({});

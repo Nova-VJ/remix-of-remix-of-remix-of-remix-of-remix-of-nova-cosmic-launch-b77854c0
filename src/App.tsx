@@ -14,6 +14,8 @@ import InvitaAmigo from "./pages/InvitaAmigo";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import LegalNotice from "./pages/LegalNotice";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 
@@ -37,6 +39,8 @@ const App = () => (
               <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
               <Route path="/politica-de-cookies" element={<CookiePolicy />} />
               <Route path="/aviso-legal" element={<LegalNotice />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
