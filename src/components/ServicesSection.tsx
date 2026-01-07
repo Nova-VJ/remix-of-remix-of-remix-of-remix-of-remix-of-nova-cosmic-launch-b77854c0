@@ -3,8 +3,8 @@ import serviceApps from '@/assets/service-apps.png';
 import serviceBranding from '@/assets/service-branding.png';
 import serviceSocial from '@/assets/service-social.png';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, ShoppingCart, TrendingUp, Search } from 'lucide-react';
-import { useCart, SERVICES } from '@/contexts/CartContext';
+import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -14,10 +14,11 @@ const services = [
     image: serviceWeb,
     alt: "Páginas web que convierten",
     title: "Páginas web que convierten",
-    description: "Diseño + velocidad + SEO para vender más.",
-    includes: ["SEO base y estructura", "Embudos y landing pages", "Medición y optimización"],
+    description: "Diseño + velocidad + SEO para vender más",
+    includes: ["SEM base y estructura", "Embudos de venta", "Medición y optimización"],
     price: 1000,
     priceLabel: "desde 1.000€",
+    hasVirtualAssistant: true,
   },
   {
     id: 'apps',
@@ -28,6 +29,7 @@ const services = [
     includes: ["Guía en estructura, análisis y mejora", "App Store & Play Store", "Experiencia de usuario optimizada"],
     price: 1700,
     priceLabel: "desde 1.700€",
+    hasVirtualAssistant: true,
   },
   {
     id: 'social',
@@ -49,6 +51,39 @@ const services = [
     includes: ["Logotipo (variantes)", "Papelería corporativa", "Elementos gráficos"],
     price: 300,
     priceLabel: "desde 300€",
+  }
+];
+
+const virtualAssistants = [
+  {
+    id: 'assistant-pro',
+    icon: Bot,
+    title: "Asistente Virtual PRO",
+    subtitle: "Ideal para negocios que quieren automatizar lo repetitivo.",
+    features: [
+      "Agenda citas automáticamente (Google Calendar / formularios / WhatsApp)",
+      "Responde preguntas frecuentes predefinidas (horarios, precios base, servicios, ubicación, etc.)",
+      "Captura datos del cliente (nombre, teléfono, necesidad)",
+      "Deriva a humano cuando haga falta"
+    ],
+    useCase: "Uso típico: peluquerías, clínicas, restaurantes, servicios locales, academias.",
+    price: 300,
+    priceLabel: "300€",
+  },
+  {
+    id: 'assistant-plus',
+    icon: Sparkles,
+    title: "Asistente Virtual PLUS",
+    subtitle: "Para atención completa, 24/7, con IA avanzada.",
+    features: [
+      "Responde casi cualquier pregunta del cliente con contexto (servicios, procesos, dudas)",
+      "Aprende de tu contenido: web / PDFs / catálogos / documentos",
+      "Conversación más natural y personalizada",
+      "Puede calificar leads y guiar a \"Solicitar presupuesto\" o \"Comprar\""
+    ],
+    useCase: "Uso típico: empresas con muchos servicios, ventas consultivas, soporte y captación constante.",
+    price: 500,
+    priceLabel: "500€",
   }
 ];
 
@@ -90,6 +125,17 @@ const ServicesSection = () => {
     };
     addItem(cartItem);
     toast.success(`${service.title} añadido al carrito`);
+  };
+
+  const handleAddVirtualAssistant = (assistant: typeof virtualAssistants[0]) => {
+    const cartItem = {
+      id: assistant.id,
+      name: assistant.title,
+      price: assistant.price,
+      type: 'service' as const,
+    };
+    addItem(cartItem);
+    toast.success(`${assistant.title} añadido al carrito`);
   };
 
   const handleAddAdditionalService = (service: typeof additionalServices[0]) => {
@@ -156,7 +202,7 @@ const ServicesSection = () => {
                 onClick={() => handleAddToCart(service)}
                 disabled={isInCart(service.id)}
                 variant={isInCart(service.id) ? "secondary" : "default"}
-                className="w-full"
+                className="w-full mb-4"
               >
                 {isInCart(service.id) ? (
                   <>
@@ -170,6 +216,60 @@ const ServicesSection = () => {
                   </>
                 )}
               </Button>
+
+              {/* Virtual Assistant sub-categories for web and apps */}
+              {service.hasVirtualAssistant && (
+                <div className="border-t border-border/50 pt-4 mt-auto space-y-3">
+                  <p className="text-xs text-muted-foreground text-center font-medium uppercase tracking-wide">
+                    Potencia tu {service.id === 'web' ? 'web' : 'app'} con IA
+                  </p>
+                  {virtualAssistants.map((assistant) => (
+                    <div
+                      key={assistant.id}
+                      className="bg-background/50 rounded-lg p-3 border border-border/30"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <assistant.icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-bold text-foreground">{assistant.title}</h4>
+                          <p className="text-primary font-bold text-xs">{assistant.priceLabel}</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">{assistant.subtitle}</p>
+                      <ul className="space-y-1 mb-2">
+                        {assistant.features.slice(0, 2).map((feature, i) => (
+                          <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/70">
+                            <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="line-clamp-1">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="text-[10px] text-muted-foreground italic mb-2">{assistant.useCase}</p>
+                      <Button
+                        onClick={() => handleAddVirtualAssistant(assistant)}
+                        disabled={isInCart(assistant.id)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full h-7 text-xs"
+                      >
+                        {isInCart(assistant.id) ? (
+                          <>
+                            <Check className="w-3 h-3 mr-1" />
+                            Añadido
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-3 h-3 mr-1" />
+                            Añadir
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
