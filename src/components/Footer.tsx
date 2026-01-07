@@ -14,8 +14,8 @@ const Footer = () => {
             <a href="mailto:hola@solutionsnova.es" className="hover:text-primary transition-colors">info@solutionsnova.es</a>
             <span className="hidden sm:block">·</span>
             <a href="https://wa.me/34659343822" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">+34 659 343 822</a>
-            <span className="hidden sm:block">·</span>
-            <span>España</span>
+            
+            
           </div>
 
           {/* Legal links */}
@@ -31,7 +31,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} NOVA Marketing Solutions · España
+            © {new Date().getFullYear()} NOVA Marketing Solutions · Valladolid, España
           </p>
         </div>
       </div>
