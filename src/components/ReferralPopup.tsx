@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import referralPopupImage from '@/assets/referral-popup.png';
+import referralPopupImage from '@/assets/referral-popup-new.svg';
 
 const POPUP_CLOSED_KEY = 'referral_popup_closed';
 const POPUP_CTA_KEY = 'referral_popup_cta_clicked';
@@ -67,10 +67,9 @@ const ReferralPopup = () => {
           
           <Button 
             onClick={handleCTAClick}
-            variant="ghost"
-            className="mt-2 text-sm text-primary hover:text-primary/80 underline underline-offset-4"
+            className="mt-4 px-8 py-3 bg-primary text-primary-foreground font-bold text-lg rounded-xl shadow-lg hover:bg-primary/90 hover:scale-105 transition-all duration-300 animate-pulse"
           >
-            Conoce más de esta promoción
+            🎁 ¡Descubre esta promo!
           </Button>
         </div>
       </DialogContent>

@@ -18,8 +18,16 @@ import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
 import ReferralPopup from '@/components/ReferralPopup';
 
+const INTRO_LAST_SEEN_KEY = 'intro_last_seen';
+const INTRO_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
 const Index = () => {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    const lastSeen = localStorage.getItem(INTRO_LAST_SEEN_KEY);
+    if (!lastSeen) return true; // First visit, show intro
+    const elapsed = Date.now() - parseInt(lastSeen);
+    return elapsed >= INTRO_INTERVAL_MS; // Show again if 5+ minutes passed
+  });
   const [mainVisible, setMainVisible] = useState(false);
 
   useEffect(() => {
@@ -27,6 +35,7 @@ const Index = () => {
   }, []);
 
   const handleIntroEnd = () => {
+    localStorage.setItem(INTRO_LAST_SEEN_KEY, Date.now().toString());
     setShowIntro(false);
   };
 
