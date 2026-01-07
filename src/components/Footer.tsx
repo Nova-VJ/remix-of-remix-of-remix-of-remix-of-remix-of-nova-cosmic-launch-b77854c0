@@ -1,12 +1,9 @@
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
   const openCookieSettings = () => {
     window.dispatchEvent(new CustomEvent('openCookieSettings'));
   };
-
-  return (
-    <footer className="relative py-12 px-6 border-t border-border/30">
+  return <footer className="relative py-12 px-6 border-t border-border/30">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-6">
           {/* Logo */}
@@ -14,7 +11,7 @@ const Footer = () => {
 
           {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
-            <a href="mailto:hola@solutionsnova.es" className="hover:text-primary transition-colors">hola@solutionsnova.es</a>
+            <a href="mailto:hola@solutionsnova.es" className="hover:text-primary transition-colors">info@solutionsnova.es</a>
             <span className="hidden sm:block">·</span>
             <a href="https://wa.me/34659343822" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">+34 659 343 822</a>
             <span className="hidden sm:block">·</span>
@@ -38,8 +35,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
