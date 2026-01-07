@@ -21,9 +21,6 @@ const faqs = [{
   question: "¿Se puede ampliar el proyecto después?",
   answer: "Sí. Todos los proyectos están diseñados para crecer: nuevas funcionalidades, más contenido, mejoras o automatización."
 }, {
-  question: "¿Trabajáis con contrato y factura?",
-  answer: "Sí. Cada proyecto incluye una propuesta clara, condiciones definidas y facturación."
-}, {
   question: "¿Puedo pedir una propuesta sin compromiso?",
   answer: "Por supuesto. Respondemos en 24 horas con una propuesta personalizada."
 }];
