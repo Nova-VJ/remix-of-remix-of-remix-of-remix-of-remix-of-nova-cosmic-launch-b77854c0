@@ -13,7 +13,12 @@ function getOrCreateAnonId() {
   return id;
 }
 
-export async function sendToSara(message: string, accessToken?: string) {
+// ✅ Ahora acepta sessionId y devuelve también session_id
+export async function sendToSara(
+  message: string,
+  accessToken?: string,
+  sessionId?: string
+): Promise<{ reply: string; session_id?: string }> {
   const anonId = getOrCreateAnonId();
 
   const headers: Record<string, string> = {
@@ -29,6 +34,7 @@ export async function sendToSara(message: string, accessToken?: string) {
     body: JSON.stringify({
       message,
       anon_id: anonId,
+      session_id: sessionId, // ✅ importante para memoria
     }),
   });
 
@@ -46,5 +52,8 @@ export async function sendToSara(message: string, accessToken?: string) {
     );
   }
 
-  return { reply: data.reply as string };
+  return {
+    reply: (data.reply as string) ?? "",
+    session_id: data.session_id as string | undefined, // ✅ por si el backend lo devuelve
+  };
 }
