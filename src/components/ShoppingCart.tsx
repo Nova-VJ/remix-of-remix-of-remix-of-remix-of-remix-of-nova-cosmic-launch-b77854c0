@@ -1,12 +1,22 @@
 import { useState } from 'react';
-import { ShoppingCart as CartIcon, X, Trash2, Tag, Check, Mail, MessageCircle, ChevronRight, Gift } from 'lucide-react';
+import { ShoppingCart as CartIcon, X, Trash2, Tag, Check, Mail, MessageCircle, ChevronRight, Gift, FileText } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
+import { ServiceType } from '@/components/BriefingForm/types';
 
 const WHATSAPP_NUMBER = '34659343822';
 const EMAIL = 'info@solutionsnova.es';
+
+// Map cart item names to service types
+const SERVICE_MAP: Record<string, ServiceType> = {
+  'Branding profesional': 'branding',
+  'Páginas web que convierten': 'web',
+  'Aplicaciones móviles': 'apps',
+  'Contenido para redes sociales': 'rrss',
+};
 
 const ShoppingCart = () => {
   const { 
@@ -187,6 +197,32 @@ const ShoppingCart = () => {
                   ))}
                 </div>
               )}
+
+              {/* Briefing form CTA */}
+              {hasRelevantServices && (
+                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mb-4">
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground text-sm mb-1">
+                        Presupuesto más personalizado
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Completa un breve formulario y afinamos el presupuesto según tus necesidades.
+                      </p>
+                      <Button 
+                        size="sm" 
+                        variant="secondary"
+                        onClick={() => setShowBriefingModal(true)}
+                        className="w-full"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Responder formulario
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Promo code section */}
@@ -303,6 +339,13 @@ const ShoppingCart = () => {
           </div>
         )}
       </SheetContent>
+
+      <BriefingFormModal
+        open={showBriefingModal}
+        onOpenChange={setShowBriefingModal}
+        preselectedServices={detectedServices}
+        fromCart
+      />
     </Sheet>
   );
 };
