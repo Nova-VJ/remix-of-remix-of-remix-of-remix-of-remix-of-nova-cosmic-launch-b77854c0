@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Sparkles } from 'lucide-react';
 import BriefingFormModal from './BriefingForm/BriefingFormModal';
 
-const BriefingCTASection = () => {
+interface BriefingCTASectionProps {
+  autoOpen?: boolean;
+}
+
+const BriefingCTASection = ({ autoOpen = false }: BriefingCTASectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Auto-open modal when returning from auth
+  useEffect(() => {
+    if (autoOpen) {
+      setIsModalOpen(true);
+    }
+  }, [autoOpen]);
 
   return (
     <>

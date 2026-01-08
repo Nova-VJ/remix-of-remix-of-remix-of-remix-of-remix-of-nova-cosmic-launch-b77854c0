@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import IntroSection from '@/components/IntroSection';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
@@ -23,7 +24,12 @@ const INTRO_LAST_SEEN_KEY = 'intro_last_seen';
 const INTRO_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const shouldOpenBriefing = searchParams.get('openBriefing') === 'true';
+  
   const [showIntro, setShowIntro] = useState(() => {
+    // Skip intro if coming from auth redirect
+    if (shouldOpenBriefing) return false;
     const lastSeen = localStorage.getItem(INTRO_LAST_SEEN_KEY);
     if (!lastSeen) return true; // First visit, show intro
     const elapsed = Date.now() - parseInt(lastSeen);
@@ -34,6 +40,14 @@ const Index = () => {
   useEffect(() => {
     setMainVisible(true);
   }, []);
+
+  // Clear the openBriefing param after it's been read
+  useEffect(() => {
+    if (shouldOpenBriefing) {
+      // Remove the param from URL without refresh
+      setSearchParams({}, { replace: true });
+    }
+  }, [shouldOpenBriefing, setSearchParams]);
 
   const handleIntroEnd = () => {
     localStorage.setItem(INTRO_LAST_SEEN_KEY, Date.now().toString());
@@ -54,7 +68,7 @@ const Index = () => {
         <ResultsSection />
         <TestimonialsSection />
         <FAQSection />
-        <BriefingCTASection />
+        <BriefingCTASection autoOpen={shouldOpenBriefing} />
         <ContactSection />
         <TrustSection />
         <FinalCTASection />

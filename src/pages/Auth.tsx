@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
+
 const emailSchema = z.string().email({
   message: "Email inválido"
 }).max(255);
@@ -14,7 +15,11 @@ const passwordSchema = z.string().min(6, {
 const nameSchema = z.string().max(100, {
   message: "El nombre es demasiado largo"
 }).optional();
+
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
+  
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,11 +41,17 @@ const Auth = () => {
   const {
     toast
   } = useToast();
+  
   useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard');
+      // If coming from briefing form, go back to home with briefing flag
+      if (redirectTo === 'briefing') {
+        navigate('/?openBriefing=true');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, redirectTo]);
   const validateForm = () => {
     const newErrors: {
       email?: string;
