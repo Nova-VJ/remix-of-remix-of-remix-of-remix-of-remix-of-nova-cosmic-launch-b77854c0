@@ -26,13 +26,134 @@ interface BriefingFormModalProps {
 
 const FORMSPREE_URL = 'https://formspree.io/f/mojvgloz';
 
+// Helper to generate readable summary
+const generateSummary = (data: BriefingFormData): string => {
+  const lines: string[] = [];
+  
+  lines.push('═══════════════════════════════════════');
+  lines.push('📋 RESUMEN DEL FORMULARIO DE BRIEFING');
+  lines.push('═══════════════════════════════════════');
+  
+  // CONTACTO
+  lines.push('\n📞 DATOS DE CONTACTO');
+  lines.push('───────────────────');
+  lines.push(`• Nombre: ${data.contacto_nombre || '-'}`);
+  lines.push(`• Email: ${data.contacto_email || '-'}`);
+  lines.push(`• Teléfono: ${data.contacto_telefono || '-'}`);
+  lines.push(`• Negocio: ${data.contacto_negocio || '-'}`);
+  lines.push(`• Sector: ${data.contacto_sector || '-'}`);
+  lines.push(`• Web actual: ${data.contacto_web || '-'}`);
+  
+  // SERVICIOS
+  const serviciosMap: Record<string, string> = {
+    'branding': 'Branding',
+    'web': 'Páginas Web',
+    'apps': 'Aplicaciones',
+    'rrss': 'Redes Sociales'
+  };
+  const serviciosTexto = data.servicios.map(s => serviciosMap[s] || s).join(', ');
+  lines.push('\n🎯 SERVICIOS SELECCIONADOS');
+  lines.push('───────────────────');
+  lines.push(`• ${serviciosTexto || 'Ninguno'}`);
+  if (data.cart_services) {
+    lines.push(`• Desde carrito: ${data.cart_services}`);
+  }
+  
+  // GENERAL
+  lines.push('\n📊 INFORMACIÓN GENERAL');
+  lines.push('───────────────────');
+  lines.push(`• Etapa del proyecto: ${data.gen_etapa}${data.gen_etapa_otro ? ` (${data.gen_etapa_otro})` : ''}`);
+  lines.push(`• Objetivo principal: ${data.gen_objetivo}${data.gen_objetivo_otro ? ` (${data.gen_objetivo_otro})` : ''}`);
+  lines.push(`• Tipo de cliente: ${data.gen_tipo_cliente}${data.gen_tipo_cliente_otro ? ` (${data.gen_tipo_cliente_otro})` : ''}`);
+  lines.push(`• Urgencia: ${data.gen_urgencia}${data.gen_urgencia_otro ? ` (${data.gen_urgencia_otro})` : ''}`);
+  lines.push(`• Presupuesto: ${data.gen_presupuesto}${data.gen_presupuesto_otro ? ` (${data.gen_presupuesto_otro})` : ''}`);
+  lines.push(`• Contenido disponible: ${data.gen_contenido}${data.gen_contenido_otro ? ` (${data.gen_contenido_otro})` : ''}`);
+  lines.push(`• Competencia analizada: ${data.gen_competencia}${data.gen_competencia_otro ? ` (${data.gen_competencia_otro})` : ''}`);
+  lines.push(`• Canal principal: ${data.gen_canal}${data.gen_canal_otro ? ` (${data.gen_canal_otro})` : ''}`);
+  lines.push(`• Prioridad de marca: ${data.gen_prioridad_marca}${data.gen_prioridad_marca_otro ? ` (${data.gen_prioridad_marca_otro})` : ''}`);
+  lines.push(`• Siguiente paso deseado: ${data.gen_siguiente_paso}${data.gen_siguiente_paso_otro ? ` (${data.gen_siguiente_paso_otro})` : ''}`);
+  
+  // BRANDING
+  if (data.servicios.includes('branding')) {
+    lines.push('\n🎨 BRANDING');
+    lines.push('───────────────────');
+    lines.push(`• Tipo de trabajo: ${data.branding_tipo}${data.branding_tipo_otro ? ` (${data.branding_tipo_otro})` : ''}`);
+    lines.push(`• Urgencia: ${data.branding_urgencia}${data.branding_urgencia_otro ? ` (${data.branding_urgencia_otro})` : ''}`);
+    lines.push(`• Estilo visual: ${data.branding_estilo}${data.branding_estilo_otro ? ` (${data.branding_estilo_otro})` : ''}`);
+    lines.push(`• Personalidad: ${data.branding_personalidad}${data.branding_personalidad_otro ? ` (${data.branding_personalidad_otro})` : ''}`);
+    lines.push(`• Público principal: ${data.branding_publico}${data.branding_publico_otro ? ` (${data.branding_publico_otro})` : ''}`);
+    lines.push(`• Diferenciación: ${data.branding_diferenciacion}${data.branding_diferenciacion_otro ? ` (${data.branding_diferenciacion_otro})` : ''}`);
+    lines.push(`• Uso principal: ${data.branding_uso}${data.branding_uso_otro ? ` (${data.branding_uso_otro})` : ''}`);
+    lines.push(`• Colores preferidos: ${data.branding_colores}${data.branding_colores_otro ? ` (${data.branding_colores_otro})` : ''}`);
+    lines.push(`• Entregables: ${data.branding_entregables}${data.branding_entregables_otro ? ` (${data.branding_entregables_otro})` : ''}`);
+    lines.push(`• Referencias: ${data.branding_referencias}${data.branding_referencias_otro ? ` (${data.branding_referencias_otro})` : ''}`);
+  }
+  
+  // WEB
+  if (data.servicios.includes('web')) {
+    lines.push('\n🌐 PÁGINAS WEB');
+    lines.push('───────────────────');
+    lines.push(`• Tipo de web: ${data.web_tipo}${data.web_tipo_otro ? ` (${data.web_tipo_otro})` : ''}`);
+    lines.push(`• Objetivo: ${data.web_objetivo}${data.web_objetivo_otro ? ` (${data.web_objetivo_otro})` : ''}`);
+    lines.push(`• Contenidos: ${data.web_contenidos}${data.web_contenidos_otro ? ` (${data.web_contenidos_otro})` : ''}`);
+    lines.push(`• Diseño: ${data.web_diseno}${data.web_diseno_otro ? ` (${data.web_diseno_otro})` : ''}`);
+    lines.push(`• SEO: ${data.web_seo}${data.web_seo_otro ? ` (${data.web_seo_otro})` : ''}`);
+    lines.push(`• Funcionalidad clave: ${data.web_funcion}${data.web_funcion_otro ? ` (${data.web_funcion_otro})` : ''}`);
+    lines.push(`• Idiomas: ${data.web_idiomas}${data.web_idiomas_otro ? ` (${data.web_idiomas_otro})` : ''}`);
+    lines.push(`• Hosting: ${data.web_hosting}${data.web_hosting_otro ? ` (${data.web_hosting_otro})` : ''}`);
+    lines.push(`• Mantenimiento: ${data.web_mantenimiento}${data.web_mantenimiento_otro ? ` (${data.web_mantenimiento_otro})` : ''}`);
+    lines.push(`• Urgencia: ${data.web_urgencia}${data.web_urgencia_otro ? ` (${data.web_urgencia_otro})` : ''}`);
+  }
+  
+  // APPS
+  if (data.servicios.includes('apps')) {
+    lines.push('\n📱 APLICACIONES');
+    lines.push('───────────────────');
+    lines.push(`• Plataforma: ${data.app_plataforma}${data.app_plataforma_otro ? ` (${data.app_plataforma_otro})` : ''}`);
+    lines.push(`• Etapa: ${data.app_etapa}${data.app_etapa_otro ? ` (${data.app_etapa_otro})` : ''}`);
+    lines.push(`• Login: ${data.app_login}${data.app_login_otro ? ` (${data.app_login_otro})` : ''}`);
+    lines.push(`• Pagos: ${data.app_pagos}${data.app_pagos_otro ? ` (${data.app_pagos_otro})` : ''}`);
+    lines.push(`• Panel admin: ${data.app_admin}${data.app_admin_otro ? ` (${data.app_admin_otro})` : ''}`);
+    lines.push(`• Notificaciones: ${data.app_notif}${data.app_notif_otro ? ` (${data.app_notif_otro})` : ''}`);
+    lines.push(`• Complejidad: ${data.app_complejidad}${data.app_complejidad_otro ? ` (${data.app_complejidad_otro})` : ''}`);
+    lines.push(`• Usuarios esperados: ${data.app_usuarios}${data.app_usuarios_otro ? ` (${data.app_usuarios_otro})` : ''}`);
+    lines.push(`• Referencias: ${data.app_refs}${data.app_refs_otro ? ` (${data.app_refs_otro})` : ''}`);
+    lines.push(`• Mantenimiento: ${data.app_mant}${data.app_mant_otro ? ` (${data.app_mant_otro})` : ''}`);
+  }
+  
+  // RRSS
+  if (data.servicios.includes('rrss')) {
+    lines.push('\n📲 REDES SOCIALES');
+    lines.push('───────────────────');
+    lines.push(`• Redes a trabajar: ${data.rrss_redes}${data.rrss_redes_otro ? ` (${data.rrss_redes_otro})` : ''}`);
+    lines.push(`• Objetivo: ${data.rrss_objetivo}${data.rrss_objetivo_otro ? ` (${data.rrss_objetivo_otro})` : ''}`);
+    lines.push(`• Estado actual: ${data.rrss_estado}${data.rrss_estado_otro ? ` (${data.rrss_estado_otro})` : ''}`);
+    lines.push(`• Formato: ${data.rrss_formato}${data.rrss_formato_otro ? ` (${data.rrss_formato_otro})` : ''}`);
+    lines.push(`• Frecuencia: ${data.rrss_freq}${data.rrss_freq_otro ? ` (${data.rrss_freq_otro})` : ''}`);
+    lines.push(`• Material: ${data.rrss_material}${data.rrss_material_otro ? ` (${data.rrss_material_otro})` : ''}`);
+    lines.push(`• Estilo: ${data.rrss_estilo}${data.rrss_estilo_otro ? ` (${data.rrss_estilo_otro})` : ''}`);
+    lines.push(`• Ads: ${data.rrss_ads}${data.rrss_ads_otro ? ` (${data.rrss_ads_otro})` : ''}`);
+    lines.push(`• Competencia: ${data.rrss_competencia}${data.rrss_competencia_otro ? ` (${data.rrss_competencia_otro})` : ''}`);
+    lines.push(`• Entrega: ${data.rrss_entrega}${data.rrss_entrega_otro ? ` (${data.rrss_entrega_otro})` : ''}`);
+  }
+  
+  // NOTAS
+  lines.push('\n📝 NOTAS FINALES');
+  lines.push('───────────────────');
+  lines.push(`• Nota de cierre: ${data.cierre_nota}${data.cierre_nota_otro ? ` - ${data.cierre_nota_otro}` : ''}`);
+  
+  lines.push('\n═══════════════════════════════════════');
+  
+  return lines.join('\n');
+};
+
 const BriefingFormModal = ({ 
   open, 
   onOpenChange, 
   preselectedServices = [],
   fromCart = false 
 }: BriefingFormModalProps) => {
-  const { items } = useCart();
+  const { items, addItem } = useCart();
   const { user } = useAuth();
   const [formData, setFormData] = useState<BriefingFormData>({
     ...initialFormData,
@@ -165,8 +286,14 @@ const BriefingFormModal = ({
     setSubmitStatus('idle');
 
     try {
+      // Generate readable summary
+      const resumen = generateSummary(formData);
+      
       // Prepare form data for Formspree
       const submitData = new FormData();
+      
+      // Add summary as first field for readability
+      submitData.append('resumen_formulario', resumen);
       
       // Add all form fields
       Object.entries(formData).forEach(([key, value]) => {
@@ -189,6 +316,20 @@ const BriefingFormModal = ({
 
       if (response.ok) {
         setSubmitStatus('success');
+        
+        // If from cart, add briefing to cart
+        if (fromCart) {
+          const briefingItem = {
+            id: 'briefing-completed',
+            name: 'Formulario de briefing completado',
+            price: 0,
+            type: 'service' as const,
+          };
+          // Only add if not already in cart
+          if (!items.some(item => item.id === 'briefing-completed')) {
+            addItem(briefingItem);
+          }
+        }
       } else {
         setSubmitStatus('error');
       }
