@@ -51,27 +51,55 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('full_name, email, phone, business_name, sector, website, social_media, has_app')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (data) {
+      if (error) throw error;
+
+      // If profile doesn't exist yet, create a minimal one so updates work.
+      if (!data) {
+        const fullNameFromMeta = (user.user_metadata as any)?.full_name as string | undefined;
         setProfileData({
-          full_name: data.full_name || '',
-          email: data.email || user.email || '',
-          phone: data.phone || '',
-          business_name: data.business_name || '',
-          sector: data.sector || '',
-          website: data.website || '',
-          social_media: data.social_media || '',
-          has_app: data.has_app || '',
+          full_name: fullNameFromMeta || '',
+          email: user.email || '',
+          phone: '',
+          business_name: '',
+          sector: '',
+          website: '',
+          social_media: '',
+          has_app: '',
         });
+
+        await supabase
+          .from('profiles')
+          .upsert(
+            {
+              user_id: user.id,
+              email: user.email ?? null,
+              full_name: fullNameFromMeta ?? null,
+            },
+            { onConflict: 'user_id' }
+          );
+
+        return;
       }
+
+      setProfileData({
+        full_name: data.full_name || (user.user_metadata as any)?.full_name || '',
+        email: data.email || user.email || '',
+        phone: data.phone || '',
+        business_name: data.business_name || '',
+        sector: data.sector || '',
+        website: data.website || '',
+        social_media: data.social_media || '',
+        has_app: data.has_app || '',
+      });
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -80,15 +108,17 @@ const Profile = () => {
   };
 
   const handleChange = (field: keyof ProfileData, value: string) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
+    setProfileData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
     if (!user) return;
-    
+
     setSaving(true);
     try {
-      const updateData = {
+      const payload = {
+        user_id: user.id,
+        email: user.email ?? null,
         full_name: profileData.full_name || null,
         phone: profileData.phone || null,
         business_name: profileData.business_name || null,
@@ -97,29 +127,16 @@ const Profile = () => {
         social_media: profileData.social_media || null,
         has_app: profileData.has_app || null,
       };
-      
+
       const { data, error } = await supabase
         .from('profiles')
-        .update(updateData)
-        .eq('user_id', user.id)
-        .select();
+        .upsert(payload, { onConflict: 'user_id' })
+        .select('*')
+        .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      if (!data || data.length === 0) {
-        console.error('No rows updated. User ID:', user.id);
-        toast({
-          title: 'Error',
-          description: 'No se encontró el perfil para actualizar.',
-          variant: 'destructive',
-        });
-        return;
-      }
+      if (error) throw error;
 
-      console.log('Profile updated successfully:', data);
+      console.log('Profile saved:', data);
       toast({
         title: 'Perfil actualizado',
         description: 'Tus datos se han guardado correctamente.',
