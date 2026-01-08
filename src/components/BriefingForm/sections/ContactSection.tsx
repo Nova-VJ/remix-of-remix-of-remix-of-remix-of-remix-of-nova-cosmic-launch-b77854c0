@@ -127,6 +127,28 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
             placeholder="https://..."
           />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contacto_rrss">Redes sociales actuales</Label>
+          <Input
+            id="contacto_rrss"
+            name="contacto_rrss"
+            value={data.contacto_rrss || ''}
+            onChange={(e) => onChange('contacto_rrss', e.target.value)}
+            placeholder="Ej: @tunegocio en Instagram, Facebook..."
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contacto_app">App actual (si tienes)</Label>
+          <Input
+            id="contacto_app"
+            name="contacto_app"
+            value={data.contacto_app || ''}
+            onChange={(e) => onChange('contacto_app', e.target.value)}
+            placeholder="Ej: Nombre de tu app o link a tienda"
+          />
+        </div>
       </div>
     </div>
   );

@@ -43,6 +43,8 @@ const generateSummary = (data: BriefingFormData): string => {
   lines.push(`• Negocio: ${data.contacto_negocio || '-'}`);
   lines.push(`• Sector: ${data.contacto_sector || '-'}`);
   lines.push(`• Web actual: ${data.contacto_web || '-'}`);
+  lines.push(`• Redes sociales: ${data.contacto_rrss || '-'}`);
+  lines.push(`• App actual: ${data.contacto_app || '-'}`);
   
   // SERVICIOS
   const serviciosMap: Record<string, string> = {
@@ -178,7 +180,7 @@ const BriefingFormModal = ({
         // Then fetch profile for additional data
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name, email')
+          .select('full_name, email, phone, business_name, sector, website, social_media, has_app')
           .eq('user_id', user.id)
           .single();
         
@@ -187,6 +189,12 @@ const BriefingFormModal = ({
             ...prev,
             contacto_nombre: profile.full_name || prev.contacto_nombre,
             contacto_email: profile.email || user.email || prev.contacto_email,
+            contacto_telefono: profile.phone || prev.contacto_telefono,
+            contacto_negocio: profile.business_name || prev.contacto_negocio,
+            contacto_sector: profile.sector || prev.contacto_sector,
+            contacto_web: profile.website || prev.contacto_web,
+            contacto_rrss: profile.social_media || prev.contacto_rrss,
+            contacto_app: profile.has_app || prev.contacto_app,
           }));
         }
       }
@@ -286,6 +294,21 @@ const BriefingFormModal = ({
     setSubmitStatus('idle');
 
     try {
+      // Save profile data if user is logged in
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({
+            phone: formData.contacto_telefono || null,
+            business_name: formData.contacto_negocio || null,
+            sector: formData.contacto_sector || null,
+            website: formData.contacto_web || null,
+            social_media: formData.contacto_rrss || null,
+            has_app: formData.contacto_app || null,
+          })
+          .eq('user_id', user.id);
+      }
+
       // Generate readable summary
       const resumen = generateSummary(formData);
       

@@ -11,6 +11,8 @@ export interface FormData {
   contacto_negocio: string;
   contacto_sector: string;
   contacto_web: string;
+  contacto_rrss: string;
+  contacto_app: string;
   
   // Services selected
   servicios: string[];
@@ -141,6 +143,8 @@ export const initialFormData: FormData = {
   contacto_negocio: '',
   contacto_sector: '',
   contacto_web: '',
+  contacto_rrss: '',
+  contacto_app: '',
   servicios: [],
   gen_etapa: '',
   gen_etapa_otro: '',
