@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
-import { LogOut, Folder, CreditCard, Bell, Calendar, Ticket, Gift, Download, Shield, Server, Globe, Lock, RefreshCw, CheckCircle, Clock, FileText, Copy, Send, DollarSign, Check, Settings } from 'lucide-react';
+import { LogOut, Folder, CreditCard, Bell, Calendar, Ticket, Gift, Download, Shield, Server, Globe, Lock, RefreshCw, CheckCircle, Clock, FileText, Copy, Send, DollarSign, Check, Settings, User } from 'lucide-react';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 interface Payment {
   id: string;
@@ -382,6 +382,12 @@ const Dashboard = () => {
                   Admin
                 </Button>
               </Link>}
+            <Link to="/profile">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <User className="w-4 h-4" />
+                Mi Perfil
+              </Button>
+            </Link>
             <div className="relative">
               <Bell className="w-5 h-5 text-muted-foreground" />
               {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">

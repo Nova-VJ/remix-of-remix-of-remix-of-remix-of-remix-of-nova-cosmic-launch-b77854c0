@@ -8,6 +8,7 @@ import { CartProvider } from "./contexts/CartContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import CasosExito from "./pages/CasosExito";
 import InvitaAmigo from "./pages/InvitaAmigo";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/casos-exito" element={<CasosExito />} />
               <Route path="/invita-a-un-amigo" element={<InvitaAmigo />} />
