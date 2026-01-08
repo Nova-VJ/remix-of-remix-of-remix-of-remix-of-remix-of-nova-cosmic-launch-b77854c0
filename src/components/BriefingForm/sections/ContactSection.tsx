@@ -2,7 +2,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FormData } from '../types';
 import { Link } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ContactSectionProps {
   data: FormData;
@@ -10,6 +11,9 @@ interface ContactSectionProps {
 }
 
 const ContactSection = ({ data, onChange }: ContactSectionProps) => {
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -17,21 +21,39 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
         <p className="text-sm text-muted-foreground">Para poder enviarte el presupuesto</p>
       </div>
 
-      {/* Account prompt */}
-      <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
-        <UserPlus className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-        <div>
-          <p className="text-sm text-foreground font-medium">
-            ¿Sabías que puedes crear una cuenta?
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Así solo tendrás que rellenar los datos del contacto una vez.{' '}
-            <Link to="/auth" className="text-primary hover:underline">
-              Crear cuenta
-            </Link>
-          </p>
+      {/* Logged in confirmation */}
+      {isLoggedIn ? (
+        <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
+          <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm text-foreground font-medium">
+              Sesión iniciada
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tus datos de contacto están pre-rellenados. Puedes modificarlos si lo necesitas.
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Account prompt for non-logged users */
+        <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
+          <UserPlus className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm text-foreground font-medium">
+              ¿Sabías que puedes crear una cuenta?
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Así solo tendrás que rellenar los datos del contacto una vez.{' '}
+              <Link 
+                to="/auth?redirect=briefing" 
+                className="text-primary hover:underline"
+              >
+                Crear cuenta
+              </Link>
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-4">
         <div className="space-y-2">

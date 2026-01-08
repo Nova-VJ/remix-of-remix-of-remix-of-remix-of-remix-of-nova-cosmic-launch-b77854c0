@@ -14,6 +14,8 @@ import SocialSection from './sections/SocialSection';
 import ClosingSection from './sections/ClosingSection';
 import { useCart } from '@/contexts/CartContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BriefingFormModalProps {
   open: boolean;
@@ -31,6 +33,7 @@ const BriefingFormModal = ({
   fromCart = false 
 }: BriefingFormModalProps) => {
   const { items } = useCart();
+  const { user } = useAuth();
   const [formData, setFormData] = useState<BriefingFormData>({
     ...initialFormData,
     page_url: typeof window !== 'undefined' ? window.location.href : '',
@@ -39,6 +42,39 @@ const BriefingFormModal = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Pre-fill user data if logged in
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        // First set email from auth user
+        setFormData(prev => ({
+          ...prev,
+          contacto_email: user.email || prev.contacto_email,
+          contacto_nombre: user.user_metadata?.full_name || prev.contacto_nombre,
+        }));
+        
+        // Then fetch profile for additional data
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (profile) {
+          setFormData(prev => ({
+            ...prev,
+            contacto_nombre: profile.full_name || prev.contacto_nombre,
+            contacto_email: profile.email || user.email || prev.contacto_email,
+          }));
+        }
+      }
+    };
+    
+    if (open && user) {
+      fetchUserProfile();
+    }
+  }, [user, open]);
 
   // Calculate cart services
   useEffect(() => {
