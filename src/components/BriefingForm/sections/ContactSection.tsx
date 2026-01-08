@@ -20,30 +20,27 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
 
   const handleFillFromProfile = async () => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('full_name, email, phone, business_name, sector, website, social_media, has_app')
         .eq('user_id', user.id)
-        .single();
-      
-      if (profile) {
-        if (profile.full_name) onChange('contacto_nombre', profile.full_name);
-        if (profile.email) onChange('contacto_email', profile.email);
-        if (profile.phone) onChange('contacto_telefono', profile.phone);
-        if (profile.business_name) onChange('contacto_negocio', profile.business_name);
-        if (profile.sector) onChange('contacto_sector', profile.sector);
-        if (profile.website) onChange('contacto_web', profile.website);
-        if (profile.social_media) onChange('contacto_rrss', profile.social_media);
-        if (profile.has_app) onChange('contacto_app', profile.has_app);
-      }
-      
-      // Also use email from auth if not in profile
-      if (!profile?.email && user.email) {
-        onChange('contacto_email', user.email);
-      }
+        .maybeSingle();
+
+      if (error) throw error;
+
+      const metaFullName = (user.user_metadata as any)?.full_name as string | undefined;
+
+      if (profile?.full_name || metaFullName) onChange('contacto_nombre', profile?.full_name || metaFullName || '');
+      if (profile?.email || user.email) onChange('contacto_email', profile?.email || user.email || '');
+      if (profile?.phone) onChange('contacto_telefono', profile.phone);
+      if (profile?.business_name) onChange('contacto_negocio', profile.business_name);
+      if (profile?.sector) onChange('contacto_sector', profile.sector);
+      if (profile?.website) onChange('contacto_web', profile.website);
+      if (profile?.social_media) onChange('contacto_rrss', profile.social_media);
+      if (profile?.has_app) onChange('contacto_app', profile.has_app);
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {

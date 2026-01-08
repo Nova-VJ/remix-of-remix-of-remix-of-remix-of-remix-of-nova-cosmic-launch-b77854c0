@@ -88,21 +88,25 @@ const Auth = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const saveOptionalProfileData = async (userId: string) => {
-    // Only save if user filled some optional fields
-    if (phone || businessName || sector || website || socialMedia || hasApp) {
-      await supabase
-        .from('profiles')
-        .update({
-          phone: phone || null,
-          business_name: businessName || null,
-          sector: sector || null,
-          website: website || null,
-          social_media: socialMedia || null,
-          has_app: hasApp || null,
-        })
-        .eq('user_id', userId);
-    }
+  const saveOptionalProfileData = async (userId: string, userEmail?: string | null) => {
+    // Create/ensure profile row exists, then apply optional fields if provided
+    const payload: any = {
+      user_id: userId,
+      email: userEmail ?? null,
+      full_name: fullName || null,
+      phone: phone || null,
+      business_name: businessName || null,
+      sector: sector || null,
+      website: website || null,
+      social_media: socialMedia || null,
+      has_app: hasApp || null,
+    };
+
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(payload, { onConflict: 'user_id' });
+
+    if (error) throw error;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -154,14 +158,15 @@ const Auth = () => {
             });
           }
         } else {
-          // Wait a bit for the profile to be created, then save optional data
-          setTimeout(async () => {
+          try {
             const { data: { user: newUser } } = await supabase.auth.getUser();
             if (newUser) {
-              await saveOptionalProfileData(newUser.id);
+              await saveOptionalProfileData(newUser.id, newUser.email);
             }
-          }, 500);
-          
+          } catch (e) {
+            console.error('Error saving optional profile data:', e);
+          }
+
           toast({
             title: "¡Cuenta creada!",
             description: "Tu cuenta ha sido creada correctamente"
