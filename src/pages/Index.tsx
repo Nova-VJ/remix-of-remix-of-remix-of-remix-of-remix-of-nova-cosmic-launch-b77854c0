@@ -17,6 +17,7 @@ import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
 import ReferralPopup from '@/components/ReferralPopup';
+import BriefingCTASection from '@/components/BriefingCTASection';
 
 const INTRO_LAST_SEEN_KEY = 'intro_last_seen';
 const INTRO_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -53,6 +54,7 @@ const Index = () => {
         <ResultsSection />
         <TestimonialsSection />
         <FAQSection />
+        <BriefingCTASection />
         <ContactSection />
         <TrustSection />
         <FinalCTASection />
