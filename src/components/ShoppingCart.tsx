@@ -37,6 +37,13 @@ const ShoppingCart = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [promoError, setPromoError] = useState('');
+  const [showBriefingModal, setShowBriefingModal] = useState(false);
+
+  // Detect services for briefing form
+  const detectedServices = items
+    .map(item => SERVICE_MAP[item.name])
+    .filter((s): s is ServiceType => !!s);
+  const hasRelevantServices = detectedServices.length > 0;
 
   const handleApplyPromo = () => {
     if (applyPromo()) {
