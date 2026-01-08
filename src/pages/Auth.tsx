@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Mail, Lock, User, ArrowLeft, Eye, EyeOff, Building, Phone, Globe, AtSign, Smartphone, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
@@ -26,6 +27,16 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOptionalFields, setShowOptionalFields] = useState(false);
+  
+  // Optional profile fields
+  const [phone, setPhone] = useState('');
+  const [businessName, setBusinessName] = useState('');
+  const [sector, setSector] = useState('');
+  const [website, setWebsite] = useState('');
+  const [socialMedia, setSocialMedia] = useState('');
+  const [hasApp, setHasApp] = useState('');
+  
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -52,6 +63,7 @@ const Auth = () => {
       }
     }
   }, [user, loading, navigate, redirectTo]);
+
   const validateForm = () => {
     const newErrors: {
       email?: string;
@@ -75,6 +87,24 @@ const Auth = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const saveOptionalProfileData = async (userId: string) => {
+    // Only save if user filled some optional fields
+    if (phone || businessName || sector || website || socialMedia || hasApp) {
+      await supabase
+        .from('profiles')
+        .update({
+          phone: phone || null,
+          business_name: businessName || null,
+          sector: sector || null,
+          website: website || null,
+          social_media: socialMedia || null,
+          has_app: hasApp || null,
+        })
+        .eq('user_id', userId);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -124,6 +154,14 @@ const Auth = () => {
             });
           }
         } else {
+          // Wait a bit for the profile to be created, then save optional data
+          setTimeout(async () => {
+            const { data: { user: newUser } } = await supabase.auth.getUser();
+            if (newUser) {
+              await saveOptionalProfileData(newUser.id);
+            }
+          }, 500);
+          
           toast({
             title: "¡Cuenta creada!",
             description: "Tu cuenta ha sido creada correctamente"
@@ -135,11 +173,13 @@ const Auth = () => {
       setIsSubmitting(false);
     }
   };
+
   if (loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>;
   }
+
   return <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <div className="p-6">
@@ -201,6 +241,58 @@ const Auth = () => {
               {errors.password && <p className="text-destructive text-sm mt-1">{errors.password}</p>}
             </div>
 
+            {/* Optional fields for signup */}
+            {!isLogin && (
+              <div className="space-y-4">
+                <button
+                  type="button"
+                  onClick={() => setShowOptionalFields(!showOptionalFields)}
+                  className="w-full flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  <span>Datos de tu negocio (opcional)</span>
+                  {showOptionalFields ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                
+                {showOptionalFields && (
+                  <div className="space-y-4 pt-2 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground">
+                      Rellena estos datos ahora para no tener que hacerlo en cada formulario. Puedes editarlos en tu perfil.
+                    </p>
+                    
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Teléfono" />
+                    </div>
+                    
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="text" value={businessName} onChange={e => setBusinessName(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Nombre del negocio" />
+                    </div>
+                    
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="text" value={sector} onChange={e => setSector(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Sector (ej: Hostelería, Moda...)" />
+                    </div>
+                    
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="url" value={website} onChange={e => setWebsite(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Web actual (si tienes)" />
+                    </div>
+                    
+                    <div className="relative">
+                      <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="text" value={socialMedia} onChange={e => setSocialMedia(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Redes sociales actuales" />
+                    </div>
+                    
+                    <div className="relative">
+                      <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="text" value={hasApp} onChange={e => setHasApp(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="App actual (si tienes)" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <button type="submit" disabled={isSubmitting} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {isSubmitting ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
             </button>
@@ -214,6 +306,7 @@ const Auth = () => {
               <button type="button" onClick={() => {
               setIsLogin(!isLogin);
               setErrors({});
+              setShowOptionalFields(false);
             }} className="text-primary hover:underline text-sm">
                 {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
               </button>
