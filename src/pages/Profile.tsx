@@ -88,21 +88,38 @@ const Profile = () => {
     
     setSaving(true);
     try {
-      const { error } = await supabase
+      const updateData = {
+        full_name: profileData.full_name || null,
+        phone: profileData.phone || null,
+        business_name: profileData.business_name || null,
+        sector: profileData.sector || null,
+        website: profileData.website || null,
+        social_media: profileData.social_media || null,
+        has_app: profileData.has_app || null,
+      };
+      
+      const { data, error } = await supabase
         .from('profiles')
-        .update({
-          full_name: profileData.full_name || null,
-          phone: profileData.phone || null,
-          business_name: profileData.business_name || null,
-          sector: profileData.sector || null,
-          website: profileData.website || null,
-          social_media: profileData.social_media || null,
-          has_app: profileData.has_app || null,
-        })
-        .eq('user_id', user.id);
+        .update(updateData)
+        .eq('user_id', user.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        console.error('No rows updated. User ID:', user.id);
+        toast({
+          title: 'Error',
+          description: 'No se encontró el perfil para actualizar.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
+      console.log('Profile updated successfully:', data);
       toast({
         title: 'Perfil actualizado',
         description: 'Tus datos se han guardado correctamente.',
