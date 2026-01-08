@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { FormData } from '../types';
 import { Link } from 'react-router-dom';
-import { UserPlus, CheckCircle } from 'lucide-react';
+import { UserPlus, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ContactSectionProps {
   data: FormData;
@@ -13,6 +16,40 @@ interface ContactSectionProps {
 const ContactSection = ({ data, onChange }: ContactSectionProps) => {
   const { user } = useAuth();
   const isLoggedIn = !!user;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFillFromProfile = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, email, phone, business_name, sector, website, social_media, has_app')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (profile) {
+        if (profile.full_name) onChange('contacto_nombre', profile.full_name);
+        if (profile.email) onChange('contacto_email', profile.email);
+        if (profile.phone) onChange('contacto_telefono', profile.phone);
+        if (profile.business_name) onChange('contacto_negocio', profile.business_name);
+        if (profile.sector) onChange('contacto_sector', profile.sector);
+        if (profile.website) onChange('contacto_web', profile.website);
+        if (profile.social_media) onChange('contacto_rrss', profile.social_media);
+        if (profile.has_app) onChange('contacto_app', profile.has_app);
+      }
+      
+      // Also use email from auth if not in profile
+      if (!profile?.email && user.email) {
+        onChange('contacto_email', user.email);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -21,19 +58,22 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
         <p className="text-sm text-muted-foreground">Para poder enviarte el presupuesto</p>
       </div>
 
-      {/* Logged in confirmation */}
+      {/* Button to fill from profile or account prompt */}
       {isLoggedIn ? (
-        <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
-          <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm text-foreground font-medium">
-              Sesión iniciada
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Tus datos de contacto están pre-rellenados. Puedes modificarlos si lo necesitas.
-            </p>
-          </div>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleFillFromProfile}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <User className="w-4 h-4" />
+          )}
+          Rellenar con datos de tu perfil
+        </Button>
       ) : (
         /* Account prompt for non-logged users */
         <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3">
