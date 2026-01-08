@@ -25,6 +25,9 @@ const DEMO_LIMIT = 3;
 const DEMO_MESSAGES_KEY = 'sara_demo_messages';
 const DEMO_COUNT_KEY = 'sara_demo_count';
 
+// ✅ Session ID persistente para memoria del chat (por navegador/usuario)
+const SARA_SESSION_KEY = 'nova_chat_session_id';
+
 export const useSaraChat = (): UseSaraChatReturn => {
   const { user, session } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,7 +45,7 @@ export const useSaraChat = (): UseSaraChatReturn => {
       // Cargar mensajes de demo desde localStorage
       const storedMessages = localStorage.getItem(DEMO_MESSAGES_KEY);
       const storedCount = localStorage.getItem(DEMO_COUNT_KEY);
-      
+
       if (storedMessages) {
         try {
           const parsed = JSON.parse(storedMessages);
@@ -54,7 +57,7 @@ export const useSaraChat = (): UseSaraChatReturn => {
           console.error('Error parsing demo messages:', e);
         }
       }
-      
+
       if (storedCount) {
         setDemoCount(parseInt(storedCount, 10));
       }
@@ -145,8 +148,20 @@ export const useSaraChat = (): UseSaraChatReturn => {
       // Obtener token de acceso si existe sesión
       const accessToken = session?.access_token;
 
-      // Llamar a la Edge Function externa
-      const { reply } = await sendToSara(content, accessToken);
+      // ✅ Recuperar/crear session_id persistente
+      let sid = localStorage.getItem(SARA_SESSION_KEY);
+      if (!sid) {
+        sid = crypto.randomUUID();
+        localStorage.setItem(SARA_SESSION_KEY, sid);
+      }
+
+      // ✅ Llamar a la Edge Function pasando session_id (memoria)
+      const { reply, session_id } = await sendToSara(content, accessToken, sid);
+
+      // ✅ Si backend devuelve session_id, lo guardamos (por si cambia/primera vez)
+      if (session_id && session_id !== sid) {
+        localStorage.setItem(SARA_SESSION_KEY, session_id);
+      }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -196,7 +211,7 @@ export const useSaraChat = (): UseSaraChatReturn => {
       }
     } catch (e) {
       console.error('Error sending message:', e);
-      
+
       // Añadir burbuja de error como mensaje de Sara
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -204,7 +219,7 @@ export const useSaraChat = (): UseSaraChatReturn => {
         content: 'Ahora mismo no puedo responder. Intenta de nuevo.',
         createdAt: new Date()
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
       setError(e instanceof Error ? e.message : 'Error al enviar mensaje');
     } finally {
