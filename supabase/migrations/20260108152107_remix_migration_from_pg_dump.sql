@@ -275,7 +275,13 @@ CREATE TABLE public.profiles (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     is_admin boolean DEFAULT false,
-    referral_code text
+    referral_code text,
+    phone text,
+    business_name text,
+    sector text,
+    website text,
+    social_media text,
+    has_app text
 );
 
 
