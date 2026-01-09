@@ -435,7 +435,7 @@ const BriefingFormModal = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-0">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
           <DialogTitle className="text-lg font-semibold">
             Cuéntanos sobre tu proyecto
@@ -449,11 +449,11 @@ const BriefingFormModal = ({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6">
-          <div className="py-6">
+        <div className="flex-1 overflow-y-auto px-6">
+          <div className="py-6 min-h-0">
             {steps[currentStep]?.component}
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="px-6 py-4 border-t border-border flex justify-between gap-3">
           <Button

@@ -41,7 +41,6 @@ type FlowState =
   | 'service-category'
   | 'service-pack'
   | 'support'
-  | 'schedule'
   | 'whatsapp'
   | 'email'
   | 'agent'
@@ -120,10 +119,6 @@ const VirtualAssistant = () => {
         addBotMessage('¿Cómo podemos ayudarte?');
         setFlowState('support');
         break;
-      case 'schedule':
-        addUserMessage('Agendar una cita');
-        setFlowState('schedule');
-        break;
       case 'whatsapp':
         addUserMessage('WhatsApp');
         handleWhatsApp();
@@ -190,7 +185,6 @@ const VirtualAssistant = () => {
       case 'faq':
       case 'services':
       case 'support':
-      case 'schedule':
       case 'email':
       case 'agent':
       case 'client-portal':
@@ -233,7 +227,6 @@ const VirtualAssistant = () => {
     { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'services', label: 'Ver servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
-    { id: 'schedule', label: 'Agendar una cita', icon: <Calendar className="w-4 h-4" /> },
     { id: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle className="w-4 h-4" /> },
     { id: 'email', label: 'Enviar correo', icon: <Mail className="w-4 h-4" /> },
     { id: 'agent', label: 'Hablar con un agente', icon: <Phone className="w-4 h-4" /> },
@@ -297,7 +290,6 @@ const VirtualAssistant = () => {
           <FAQViewer
             categoryKey={selectedFaqCategory || undefined}
             onBack={handleBack}
-            onSchedule={() => setFlowState('schedule')}
             onAgent={() => setFlowState('agent')}
           />
         );
@@ -328,7 +320,6 @@ const VirtualAssistant = () => {
             serviceKey={selectedService}
             onBack={handleBack}
             onRequestQuote={handlePackSelect}
-            onSchedule={() => setFlowState('schedule')}
           />
         );
 
@@ -343,7 +334,6 @@ const VirtualAssistant = () => {
               setFlowState('service-category');
             }}
             onRequestQuote={(packName) => handleRequestQuote(packName)}
-            onSchedule={() => setFlowState('schedule')}
           />
         );
 
@@ -372,14 +362,6 @@ const VirtualAssistant = () => {
               }}
             />
           </div>
-        );
-
-      case 'schedule':
-        return (
-          <AppointmentForm
-            onComplete={handleFormComplete}
-            onCancel={handleFormCancel}
-          />
         );
 
       case 'email':

@@ -1,17 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { FAQ_CATEGORIES } from '@/data/chatFlowData';
-import { ArrowLeft, ChevronDown, ChevronUp, Calendar, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, MessageCircle, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { WHATSAPP_NUMBER } from '@/data/chatFlowData';
 
 interface FAQViewerProps {
   categoryKey?: string;
   onBack: () => void;
-  onSchedule: () => void;
   onAgent: () => void;
 }
 
-const FAQViewer = ({ categoryKey, onBack, onSchedule, onAgent }: FAQViewerProps) => {
+const FAQViewer = ({ categoryKey, onBack, onAgent }: FAQViewerProps) => {
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   const handleWhatsApp = () => {
@@ -99,15 +98,6 @@ const FAQViewer = ({ categoryKey, onBack, onSchedule, onAgent }: FAQViewerProps)
                   >
                     <Phone className="w-3 h-3 mr-1" />
                     Agente
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={onSchedule}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <Calendar className="w-3 h-3 mr-1" />
-                    Cita
                   </Button>
                   <Button 
                     size="sm" 
