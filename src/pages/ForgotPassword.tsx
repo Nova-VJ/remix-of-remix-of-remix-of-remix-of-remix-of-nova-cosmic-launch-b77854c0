@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { z } from 'zod';
+import { SITE_URL } from '@/config/env';
 
 const emailSchema = z.string().email({ message: "Email inválido" }).max(255);
 
@@ -24,9 +25,8 @@ const ForgotPassword = () => {
 
     setIsSubmitting(true);
     try {
-      const siteUrl = import.meta.env.VITE_SITE_URL ?? window.location.origin;
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${siteUrl}/reset-password`,
+        redirectTo: `${SITE_URL}/reset-password`,
       });
       setSubmitted(true);
     } catch (err) {

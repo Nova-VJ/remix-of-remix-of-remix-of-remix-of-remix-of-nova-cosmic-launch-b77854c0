@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { SERVICES_DATA } from '@/data/chatFlowData';
-import { ArrowLeft, Calendar, MessageCircle, Clock, Check } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Clock, Check } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '@/data/chatFlowData';
 
 interface ServicePackViewerProps {
@@ -8,15 +8,13 @@ interface ServicePackViewerProps {
   packId?: string;
   onBack: () => void;
   onRequestQuote: (packName: string) => void;
-  onSchedule: () => void;
 }
 
 const ServicePackViewer = ({ 
   serviceKey, 
   packId, 
   onBack, 
-  onRequestQuote,
-  onSchedule 
+  onRequestQuote
 }: ServicePackViewerProps) => {
   const service = SERVICES_DATA[serviceKey];
   const pack = packId ? service.packs.find(p => p.id === packId) : null;
@@ -75,14 +73,6 @@ const ServicePackViewer = ({
             className="h-10 text-sm"
           >
             Quiero presupuesto
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={onSchedule}
-            className="h-10 text-sm"
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Agendar cita
           </Button>
           <Button 
             variant="secondary"

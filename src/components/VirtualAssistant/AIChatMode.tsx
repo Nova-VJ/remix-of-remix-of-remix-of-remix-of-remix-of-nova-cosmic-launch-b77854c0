@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, ArrowLeft, Loader2, LogIn } from 'lucide-react';
+import { Send, ArrowLeft, Loader2, LogIn, ExternalLink, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNavigate } from 'react-router-dom';
 import { useSaraChat } from '@/hooks/useSaraChat';
 import { Badge } from '@/components/ui/badge';
+import Linkify from 'linkify-react';
+import { FORM_URL, WHATSAPP_URL } from '@/config/env';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,25 @@ import {
 interface AIChatModeProps {
   onBack: () => void;
 }
+
+// Normalize placeholders in Sara's responses to actual URLs
+const normalizeSaraReply = (text: string): string => {
+  return text
+    .replace(/\[LINK_FORMULARIO\]/gi, FORM_URL)
+    .replace(/\[FORMULARIO\]/gi, FORM_URL)
+    .replace(/\[LINK_WHATSAPP\]/gi, WHATSAPP_URL)
+    .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL);
+};
+
+// Check if URL is a WhatsApp link
+const isWhatsAppLink = (url: string): boolean => {
+  return url.includes('wa.me') || url.includes('whatsapp');
+};
+
+// Check if URL is the form link
+const isFormLink = (url: string): boolean => {
+  return url.includes('openBriefing=true');
+};
 
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
   const [inputValue, setInputValue] = useState('');
@@ -67,6 +88,60 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
     setShowLoginDialog(false);
   };
 
+  // Custom link renderer for Linkify
+  const renderLink = ({ attributes, content }: { attributes: any; content: string }) => {
+    const { href, ...props } = attributes;
+    const isWhatsApp = isWhatsAppLink(href);
+    const isForm = isFormLink(href);
+
+    if (isWhatsApp) {
+      return (
+        <a
+          href={href}
+          {...props}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-[#25D366] text-white font-medium text-xs hover:bg-[#20BD5A] transition-colors no-underline"
+        >
+          <MessageCircle className="w-3.5 h-3.5" />
+          Abrir WhatsApp
+        </a>
+      );
+    }
+
+    if (isForm) {
+      return (
+        <a
+          href={href}
+          {...props}
+          className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/90 transition-colors no-underline"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          Abrir formulario
+        </a>
+      );
+    }
+
+    // Default link style
+    return (
+      <a
+        href={href}
+        {...props}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primary underline hover:text-primary/80 transition-colors"
+      >
+        {content}
+      </a>
+    );
+  };
+
+  const linkifyOptions = {
+    render: renderLink,
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -96,25 +171,36 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           </div>
         )}
         
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`mb-3 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
+        {messages.map((msg) => {
+          const isBot = msg.role === 'assistant';
+          const displayContent = isBot ? normalizeSaraReply(msg.content) : msg.content;
+          
+          return (
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-foreground'
-              }`}
+              key={msg.id}
+              className={`mb-3 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
-              <span className="text-[10px] opacity-60 mt-1 block">
-                {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-              </span>
+              <div
+                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                  msg.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground'
+                }`}
+              >
+                <div className="whitespace-pre-wrap">
+                  {isBot ? (
+                    <Linkify options={linkifyOptions}>{displayContent}</Linkify>
+                  ) : (
+                    <p>{displayContent}</p>
+                  )}
+                </div>
+                <span className="text-[10px] opacity-60 mt-1 block">
+                  {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && (
           <div className="flex justify-start mb-3">

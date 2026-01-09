@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, ArrowLeft, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Lock, ArrowLeft, Eye, EyeOff, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 
@@ -13,6 +13,8 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [invalidLink, setInvalidLink] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -20,18 +22,37 @@ const ResetPassword = () => {
   useEffect(() => {
     // Check if we have a valid session from the reset link
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Enlace inválido",
-          description: "El enlace ha expirado o no es válido. Solicita uno nuevo.",
-          variant: "destructive"
-        });
-        navigate('/forgot-password');
-      }
+      // Wait for Supabase to process the hash in the URL
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      // Also listen for auth state change in case session is being established
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          // Session established from recovery link
+          setIsChecking(false);
+          setInvalidLink(false);
+        } else if (event === 'SIGNED_IN' && session) {
+          setIsChecking(false);
+          setInvalidLink(false);
+        }
+      });
+
+      // Give it a moment to process the URL hash
+      setTimeout(async () => {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!currentSession) {
+          setInvalidLink(true);
+        }
+        setIsChecking(false);
+      }, 1000);
+
+      return () => {
+        subscription.unsubscribe();
+      };
     };
+    
     checkSession();
-  }, [navigate, toast]);
+  }, []);
 
   const validateForm = () => {
     const newErrors: { password?: string; confirm?: string } = {};
@@ -65,12 +86,61 @@ const ResetPassword = () => {
         });
       } else {
         setSuccess(true);
+        // Sign out and redirect to login
+        await supabase.auth.signOut();
         setTimeout(() => navigate('/auth'), 3000);
       }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Loading state
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Invalid link state
+  if (invalidLink) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="p-6">
+          <Link to="/auth" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Volver al login
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-6 pb-12">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/lovable-uploads/17c987fe-5397-4a68-b9b0-ad2444852c78.png" />
+            </div>
+
+            <div className="glass-card p-8 text-center">
+              <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-foreground mb-2">
+                Enlace inválido o caducado
+              </h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                El enlace de recuperación ha expirado o no es válido. Por favor, solicita uno nuevo.
+              </p>
+              <Link 
+                to="/forgot-password" 
+                className="inline-block px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+              >
+                Solicitar nuevo enlace
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
