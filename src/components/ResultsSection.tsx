@@ -61,7 +61,7 @@ const ResultsSection = () => {
         </div>
 
         {/* Casos de éxito CTA - Image and Text */}
-        <div className={`mt-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
+        <div className={`mt-16 pt-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
           <Link to="/casos-exito" className="block mb-6">
             <div className="relative group cursor-pointer overflow-hidden rounded-xl">
               <img 
