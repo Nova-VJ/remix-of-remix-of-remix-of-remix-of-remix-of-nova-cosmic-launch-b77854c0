@@ -284,7 +284,6 @@ const Admin = () => {
     if (error) {
       toast({ title: "Error", description: "No se pudo actualizar el proyecto", variant: "destructive" });
     } else {
-      // Create notification for user
       const project = projects.find(p => p.id === projectId);
       if (project?.user_id) {
         const statusLabels: Record<string, string> = {
@@ -303,6 +302,47 @@ const Admin = () => {
         });
       }
       toast({ title: "Actualizado", description: "Estado del proyecto actualizado" });
+      fetchData();
+    }
+  };
+
+  const updateProjectStage = async (projectId: string, stage: string) => {
+    const isDelivered = stage === 'delivered';
+    const { error } = await supabase
+      .from('projects')
+      .update({ 
+        current_stage: stage, 
+        status: isDelivered ? 'delivered' : 'in_progress',
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', projectId);
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo actualizar la fase", variant: "destructive" });
+    } else {
+      const project = projects.find(p => p.id === projectId);
+      if (project?.user_id) {
+        const stageLabels: Record<string, string> = {
+          activation: 'Activación del proyecto',
+          brief: 'Brief recibido',
+          strategy: 'Estrategia y planificación',
+          design: 'Diseño creativo',
+          development: 'Programación / Implementación',
+          testing: 'Integración y pruebas',
+          review: 'Revisión del cliente',
+          adjustments: 'Ajustes finales',
+          launch: 'Lanzamiento',
+          delivered: 'Proyecto entregado'
+        };
+        await supabase.from('notifications').insert({
+          user_id: project.user_id,
+          title: 'Actualización de proyecto',
+          message: `Tu proyecto "${project.name}" ha avanzado a: ${stageLabels[stage] || stage}`,
+          type: 'project',
+          link: '/profile'
+        });
+      }
+      toast({ title: "Actualizado", description: "Fase del proyecto actualizada" });
       fetchData();
     }
   };

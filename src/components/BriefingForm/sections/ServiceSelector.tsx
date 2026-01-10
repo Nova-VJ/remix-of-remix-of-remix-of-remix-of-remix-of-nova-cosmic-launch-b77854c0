@@ -1,7 +1,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SERVICE_NAMES, ServiceType } from '../types';
-import { Palette, Globe, Smartphone, Share2 } from 'lucide-react';
+import { Palette, Globe, Smartphone, Share2, FileEdit } from 'lucide-react';
 
 interface ServiceSelectorProps {
   selected: string[];
@@ -14,6 +14,7 @@ const serviceIcons: Record<ServiceType, React.ReactNode> = {
   web: <Globe className="w-5 h-5" />,
   apps: <Smartphone className="w-5 h-5" />,
   rrss: <Share2 className="w-5 h-5" />,
+  content: <FileEdit className="w-5 h-5" />,
 };
 
 const ServiceSelector = ({ selected, onChange, preselected = [] }: ServiceSelectorProps) => {

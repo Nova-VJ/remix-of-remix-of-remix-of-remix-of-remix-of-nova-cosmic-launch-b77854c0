@@ -1,13 +1,15 @@
+import { useState } from 'react';
 import serviceWebIcon from '@/assets/service-web-icon.svg';
 import serviceAppsIcon from '@/assets/service-apps-icon.svg';
 import serviceBrandingIcon from '@/assets/service-branding-icon.svg';
 import serviceSocialIcon from '@/assets/service-social-icon.svg';
+import serviceContentIcon from '@/assets/service-content-icon.png';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles, ChevronDown, ChevronUp, FileEdit } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
+import ContentFormModal from '@/components/ContentFormModal';
 const services = [
   {
     id: 'web',
@@ -51,6 +53,17 @@ const services = [
     includes: ["Logotipo (variantes)", "Papelería corporativa", "Elementos gráficos"],
     price: 300,
     priceLabel: "desde 300€",
+  },
+  {
+    id: 'content',
+    image: serviceContentIcon,
+    alt: "Elaboración de contenido",
+    title: "Elaboración de contenido",
+    description: "Contenido para Instagram, TikTok, YouTube, LinkedIn y tu web/app. Creatividad + estrategia orientada a resultados.",
+    includes: ["Reels & Ads Creatives", "Guiones & Copywriting", "Calendario mensual"],
+    price: 400,
+    priceLabel: "desde 400€",
+    hasContentForm: true,
   }
 ];
 
@@ -115,6 +128,7 @@ const ServicesSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const { addItem, items } = useCart();
   const [expandedAssistants, setExpandedAssistants] = useState<Record<string, boolean>>({});
+  const [showContentForm, setShowContentForm] = useState(false);
 
   const handleAddToCart = (service: typeof services[0]) => {
     const cartItem = {
@@ -236,6 +250,18 @@ const ServicesSection = () => {
                 )}
               </Button>
 
+              {/* Content Form button for content service */}
+              {(service as any).hasContentForm && (
+                <Button
+                  onClick={() => setShowContentForm(true)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <FileEdit className="w-4 h-4 mr-2" />
+                  Rellenar formulario
+                </Button>
+              )}
+
               {/* Virtual Assistant sub-categories for web and apps */}
               {service.hasVirtualAssistant && (
                 <div className="border-t border-border/50 pt-4 mt-auto space-y-3">
@@ -355,6 +381,9 @@ const ServicesSection = () => {
           </div>
         </div>
       </div>
+
+      {/* Content Form Modal */}
+      <ContentFormModal isOpen={showContentForm} onClose={() => setShowContentForm(false)} />
     </section>
   );
 };
