@@ -167,6 +167,30 @@ CREATE TABLE public.chat_messages (
 
 
 --
+-- Name: content_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.content_requests (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid,
+    full_name text NOT NULL,
+    email text NOT NULL,
+    phone text,
+    business_name text,
+    platforms jsonb DEFAULT '[]'::jsonb,
+    goal text,
+    service_type text,
+    style jsonb DEFAULT '[]'::jsonb,
+    details text,
+    links text,
+    budget text,
+    status text DEFAULT 'Nuevo'::text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: conversations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -326,7 +350,8 @@ CREATE TABLE public.projects (
     ssl_status text DEFAULT 'active'::text,
     last_backup_date timestamp with time zone,
     revisions_used integer DEFAULT 0,
-    max_revisions integer DEFAULT 2
+    max_revisions integer DEFAULT 2,
+    current_stage text DEFAULT 'inactive'::text
 );
 
 
@@ -481,6 +506,14 @@ ALTER TABLE ONLY public.budgets
 
 ALTER TABLE ONLY public.chat_messages
     ADD CONSTRAINT chat_messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: content_requests content_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_requests
+    ADD CONSTRAINT content_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -677,6 +710,13 @@ CREATE TRIGGER update_budgets_updated_at BEFORE UPDATE ON public.budgets FOR EAC
 
 
 --
+-- Name: content_requests update_content_requests_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_content_requests_updated_at BEFORE UPDATE ON public.content_requests FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
 -- Name: conversations update_conversations_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -740,6 +780,14 @@ ALTER TABLE ONLY public.chat_messages
 
 ALTER TABLE ONLY public.chat_messages
     ADD CONSTRAINT chat_messages_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: content_requests content_requests_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content_requests
+    ADD CONSTRAINT content_requests_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL;
 
 
 --
@@ -1014,6 +1062,13 @@ CREATE POLICY "Anyone can create appointments" ON public.appointments FOR INSERT
 
 
 --
+-- Name: content_requests Anyone can create content requests; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Anyone can create content requests" ON public.content_requests FOR INSERT WITH CHECK (true);
+
+
+--
 -- Name: leads Anyone can create leads; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1098,6 +1153,13 @@ CREATE POLICY "Users can insert their own projects" ON public.projects FOR INSER
 
 
 --
+-- Name: content_requests Users can update own content requests; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Users can update own content requests" ON public.content_requests FOR UPDATE USING ((auth.uid() = user_id));
+
+
+--
 -- Name: notifications Users can update their notifications; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1139,6 +1201,13 @@ CREATE POLICY "Users can update their own projects" ON public.projects FOR UPDAT
 --
 
 CREATE POLICY "Users can update their own tickets" ON public.tickets FOR UPDATE USING ((user_id = auth.uid()));
+
+
+--
+-- Name: content_requests Users can view own content requests; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY "Users can view own content requests" ON public.content_requests FOR SELECT USING ((auth.uid() = user_id));
 
 
 --
@@ -1284,6 +1353,12 @@ ALTER TABLE public.budgets ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: content_requests; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.content_requests ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: conversations; Type: ROW SECURITY; Schema: public; Owner: -
