@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, User, Mail, Phone, Building, Globe, AtSign, Smartphone, Save, Loader2 } from 'lucide-react';
+import ProjectFlow from '@/components/ProjectFlow';
 
 interface ProfileData {
   full_name: string;
@@ -18,6 +19,13 @@ interface ProfileData {
   website: string;
   social_media: string;
   has_app: string;
+}
+
+interface ProjectData {
+  id: string;
+  name: string;
+  current_stage: string;
+  is_active: boolean;
 }
 
 const Profile = () => {
@@ -36,6 +44,7 @@ const Profile = () => {
     social_media: '',
     has_app: '',
   });
+  const [activeProject, setActiveProject] = useState<ProjectData | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -46,6 +55,7 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchActiveProject();
     }
   }, [user]);
 
@@ -104,6 +114,36 @@ const Profile = () => {
       console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActiveProject = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name, current_stage, maintenance_active')
+        .eq('user_id', user.id)
+        .eq('status', 'in_progress')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        setActiveProject({
+          id: data.id,
+          name: data.name,
+          current_stage: data.current_stage || 'activation',
+          is_active: true,
+        });
+      } else {
+        setActiveProject(null);
+      }
+    } catch (error) {
+      console.error('Error fetching active project:', error);
     }
   };
 
@@ -173,11 +213,18 @@ const Profile = () => {
         </div>
       </div>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-1">Mi Perfil</h1>
           <p className="text-muted-foreground">Actualiza tus datos para que se auto-rellenen en los formularios</p>
         </div>
+
+        {/* Project Flow Section */}
+        <ProjectFlow
+          currentStage={activeProject?.current_stage || 'inactive'}
+          isActive={!!activeProject}
+          projectName={activeProject?.name}
+        />
 
         <Card>
           <CardHeader>

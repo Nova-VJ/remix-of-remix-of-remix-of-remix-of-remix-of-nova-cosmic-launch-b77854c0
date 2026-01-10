@@ -251,11 +251,12 @@ export const initialFormData: FormData = {
   privacidad: false,
 };
 
-export type ServiceType = 'branding' | 'web' | 'apps' | 'rrss';
+export type ServiceType = 'branding' | 'web' | 'apps' | 'rrss' | 'content';
 
 export const SERVICE_NAMES: Record<ServiceType, string> = {
   branding: 'Branding',
   web: 'Páginas Web',
   apps: 'Aplicaciones',
   rrss: 'Redes Sociales',
+  content: 'Elaboración de Contenido',
 };

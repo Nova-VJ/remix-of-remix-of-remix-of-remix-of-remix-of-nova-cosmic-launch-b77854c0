@@ -174,6 +174,63 @@ export type Database = {
           },
         ]
       }
+      content_requests: {
+        Row: {
+          budget: string | null
+          business_name: string | null
+          created_at: string
+          details: string | null
+          email: string
+          full_name: string
+          goal: string | null
+          id: string
+          links: string | null
+          phone: string | null
+          platforms: Json | null
+          service_type: string | null
+          status: string | null
+          style: Json | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          budget?: string | null
+          business_name?: string | null
+          created_at?: string
+          details?: string | null
+          email: string
+          full_name: string
+          goal?: string | null
+          id?: string
+          links?: string | null
+          phone?: string | null
+          platforms?: Json | null
+          service_type?: string | null
+          status?: string | null
+          style?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          budget?: string | null
+          business_name?: string | null
+          created_at?: string
+          details?: string | null
+          email?: string
+          full_name?: string
+          goal?: string | null
+          id?: string
+          links?: string | null
+          phone?: string | null
+          platforms?: Json | null
+          service_type?: string | null
+          status?: string | null
+          style?: Json | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -492,6 +549,7 @@ export type Database = {
       projects: {
         Row: {
           created_at: string
+          current_stage: string | null
           domain_status: string | null
           estimated_end_date: string | null
           hosting_status: string | null
@@ -513,6 +571,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_stage?: string | null
           domain_status?: string | null
           estimated_end_date?: string | null
           hosting_status?: string | null
@@ -534,6 +593,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_stage?: string | null
           domain_status?: string | null
           estimated_end_date?: string | null
           hosting_status?: string | null
