@@ -62,8 +62,8 @@ const ResultsSection = () => {
 
         {/* Casos de éxito CTA - Image and Text */}
         <div className={`mt-16 pt-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
-          <Link to="/casos-exito" className="block mb-6">
-            <div className="relative group cursor-pointer overflow-hidden rounded-xl">
+          <Link to="/casos-exito" className="block mb-4 md:mb-6">
+            <div className="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl mx-auto max-w-[280px] sm:max-w-sm md:max-w-full">
               <img 
                 src={casosExitoBanner} 
                 alt="Casos de éxito - Aprende con nosotros" 
@@ -73,14 +73,14 @@ const ResultsSection = () => {
             </div>
           </Link>
 
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-4 max-w-xl mx-auto">
+          <div className="text-center px-2 md:px-0">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 md:mb-4 max-w-xl mx-auto leading-relaxed">
               Aprende con nosotros, utilizamos historias reales de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también ¡Para levantarse con más fuerza!
             </p>
             <Link to="/casos-exito">
               <Button 
-                size="lg"
-                className="rounded-full px-8 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0"
+                size="default"
+                className="rounded-full px-6 md:px-8 text-sm md:text-base bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0"
               >
                 Ver Casos de Éxito
                 <ArrowRight className="w-4 h-4 ml-2" />
