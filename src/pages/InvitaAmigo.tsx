@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, Mail, Link2, Copy, Check, Share2, Gift, Users, ArrowLeft, Lock, ArrowRight } from 'lucide-react';
+import { MessageCircle, Mail, Link2, Copy, Check, Share2, Gift, Users, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -10,8 +10,7 @@ import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import referralHeroBg from '@/assets/referral-hero-bg.svg';
-import referralBottomBg from '@/assets/referral-bottom-bg.png';
-import casosExitoBanner from '@/assets/casos-exito-banner.png';
+import invitaBottomBg from '@/assets/invita-bottom-bg.png';
 
 // Configuración centralizada
 const referralConfig = {
@@ -337,44 +336,16 @@ Contacto: +34659343822
                 </Button>
               </Link>
             </div>
-
-            {/* Success Stories CTA - Image clickable */}
-            <Link to="/casos-exito" className="block mb-6">
-              <div className="relative group cursor-pointer overflow-hidden rounded-xl">
-                <img 
-                  src={casosExitoBanner} 
-                  alt="Casos de éxito - Aprende con nosotros" 
-                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-              </div>
-            </Link>
-
-            {/* CTA Text with unique button style */}
-            <div className="text-center mb-8">
-              <p className="text-sm text-muted-foreground mb-4 max-w-xl mx-auto">
-                Aprende con nosotros, utilizamos historias reales de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también ¡Para levantarse con más fuerza!
-              </p>
-              <Link to="/casos-exito">
-                <Button 
-                  size="lg"
-                  className="rounded-full px-8 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0"
-                >
-                  Ver Casos de Éxito
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Bottom promotional image */}
-            <div className="mb-8">
-              <img 
-                src={referralBottomBg} 
-                alt="¡Digitaliza tu comercio ya!" 
-                className="w-full h-auto object-contain rounded-xl"
-              />
-            </div>
           </div>
+        </section>
+
+        {/* Bottom promotional image - Full width background */}
+        <section className="w-full">
+          <img 
+            src={invitaBottomBg} 
+            alt="¡Digitaliza tu comercio ya!" 
+            className="w-full h-auto object-cover"
+          />
         </section>
       </main>
 
