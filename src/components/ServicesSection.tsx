@@ -61,9 +61,10 @@ const services = [
     title: "Elaboración de contenido",
     description: "Contenido para Instagram, TikTok, YouTube, LinkedIn y tu web/app. Creatividad + estrategia orientada a resultados.",
     includes: ["Reels & Ads Creatives", "Guiones & Copywriting", "Calendario mensual"],
-    price: 400,
-    priceLabel: "desde 400€",
+    price: 0,
+    priceLabel: "Presupuesto enviado previo análisis",
     hasContentForm: true,
+    isFullWidth: true,
   }
 ];
 
@@ -203,11 +204,11 @@ const ServicesSection = () => {
           {services.map((service, index) => (
             <div
               key={index}
-              className={`glass-card p-6 flex flex-col transition-all duration-700 hover-lift ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              className={`glass-card p-6 flex flex-col transition-all duration-700 hover-lift ${(service as any).isFullWidth ? 'md:col-span-2 max-w-xl mx-auto w-full' : ''} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {/* Service image */}
-              <div className="w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden">
+              <div className={`${(service as any).isFullWidth ? 'w-28 h-28' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
                 <img
                   src={service.image}
                   alt={service.alt}

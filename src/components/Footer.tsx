@@ -31,7 +31,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} NOVA Marketing Solutions · Valladolid, España
+            © {new Date().getFullYear()} NOVA Marketing Solutions · España
           </p>
         </div>
       </div>

@@ -1,7 +1,8 @@
-import { TrendingUp, Rocket, Smartphone, Target, Sparkles } from 'lucide-react';
+import { TrendingUp, Rocket, Smartphone, Target, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import casosExitoBanner from '@/assets/casos-exito-banner.png';
 
 const results = [
   {
@@ -59,19 +60,33 @@ const ResultsSection = () => {
           ))}
         </div>
 
-        {/* Casos de éxito CTA */}
+        {/* Casos de éxito CTA - Image and Text */}
         <div className={`mt-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
-          <Link to="/casos-exito">
-            <Button 
-              variant="ghost" 
-              className="group w-full max-w-sm mx-auto h-auto py-3 px-4 flex items-center justify-center gap-2 border border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all rounded-xl"
-            >
-              <Sparkles className="w-4 h-4 text-primary group-hover:animate-pulse flex-shrink-0" />
-              <span className="text-sm text-foreground/80 group-hover:text-foreground transition-colors text-center">
-                ¿Necesitas inspiración? Descubre casos de éxito
-              </span>
-            </Button>
+          <Link to="/casos-exito" className="block mb-6">
+            <div className="relative group cursor-pointer overflow-hidden rounded-xl">
+              <img 
+                src={casosExitoBanner} 
+                alt="Casos de éxito - Aprende con nosotros" 
+                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+            </div>
           </Link>
+
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-4 max-w-xl mx-auto">
+              Aprende con nosotros, utilizamos historias reales de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también ¡Para levantarse con más fuerza!
+            </p>
+            <Link to="/casos-exito">
+              <Button 
+                size="lg"
+                className="rounded-full px-8 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0"
+              >
+                Ver Casos de Éxito
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
