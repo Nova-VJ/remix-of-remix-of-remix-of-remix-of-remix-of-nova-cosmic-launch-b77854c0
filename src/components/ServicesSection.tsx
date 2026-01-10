@@ -57,8 +57,8 @@ const services = [
   {
     id: 'content',
     image: serviceContentIcon,
-    alt: "Elaboración de contenido",
-    title: "Elaboración de contenido",
+    alt: "Creación de contenido",
+    title: "Creación de contenido",
     description: "Contenido para Instagram, TikTok, YouTube, LinkedIn y tu web/app. Creatividad + estrategia orientada a resultados.",
     includes: ["Reels & Ads Creatives", "Guiones & Copywriting", "Calendario mensual"],
     price: 0,
@@ -208,7 +208,7 @@ const ServicesSection = () => {
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {/* Service image */}
-              <div className={`${(service as any).isFullWidth ? 'w-28 h-28' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
+              <div className={`${(service as any).isFullWidth ? 'w-40 h-40' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
                 <img
                   src={service.image}
                   alt={service.alt}
