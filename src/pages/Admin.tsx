@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image } from 'lucide-react';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -134,6 +134,11 @@ const Admin = () => {
   const [referrals, setReferrals] = useState<any[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
+  const [saraConversations, setSaraConversations] = useState<any[]>([]);
+  const [saraMessages, setSaraMessages] = useState<any[]>([]);
+  const [registeredConversations, setRegisteredConversations] = useState<any[]>([]);
+  const [registeredMessages, setRegisteredMessages] = useState<any[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
 
   // Budget creation dialog
   const [showCreateBudget, setShowCreateBudget] = useState(false);
@@ -221,7 +226,7 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes, saraConvRes, saraMsgRes, regConvRes, regMsgRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -232,7 +237,11 @@ const Admin = () => {
       supabase.from('profiles').select('*'),
       supabase.from('referrals').select('*').order('created_at', { ascending: false }),
       supabase.from('budgets').select('*').order('created_at', { ascending: false }),
-      supabase.from('success_stories').select('*').order('created_at', { ascending: false })
+      supabase.from('success_stories').select('*').order('created_at', { ascending: false }),
+      supabase.from('sara_anonymous_conversations').select('*').order('updated_at', { ascending: false }),
+      supabase.from('sara_anonymous_messages').select('*').order('created_at', { ascending: true }),
+      supabase.from('conversations').select('*').order('updated_at', { ascending: false }),
+      supabase.from('chat_messages').select('*').order('created_at', { ascending: true })
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -246,6 +255,10 @@ const Admin = () => {
     if (referralsRes.data) setReferrals(referralsRes.data);
     if (budgetsRes.data) setBudgets(budgetsRes.data as Budget[]);
     if (storiesRes.data) setSuccessStories(storiesRes.data as SuccessStory[]);
+    if (saraConvRes.data) setSaraConversations(saraConvRes.data);
+    if (saraMsgRes.data) setSaraMessages(saraMsgRes.data);
+    if (regConvRes.data) setRegisteredConversations(regConvRes.data);
+    if (regMsgRes.data) setRegisteredMessages(regMsgRes.data);
 
     setLoading(false);
   };
@@ -666,6 +679,8 @@ const Admin = () => {
 
         <Tabs defaultValue="budgets">
           <TabsList className="mb-4 flex-wrap h-auto gap-1">
+            <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
+            <TabsTrigger value="sara-history">💬 Sara</TabsTrigger>
             <TabsTrigger value="budgets">Presupuestos</TabsTrigger>
             <TabsTrigger value="stories">Casos de éxito</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
@@ -677,6 +692,142 @@ const Admin = () => {
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="appointments">Citas</TabsTrigger>
           </TabsList>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2"><TrendingUp className="w-4 h-4 text-green-500" />Conversión Leads</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{leads.length > 0 ? Math.round((leads.filter(l => l.status === 'converted').length / leads.length) * 100) : 0}%</p>
+                  <p className="text-xs text-muted-foreground">{leads.filter(l => l.status === 'converted').length} de {leads.length} leads</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2"><DollarSign className="w-4 h-4 text-primary" />Presupuestos Aprobados</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">€{budgets.filter(b => b.status === 'approved' || b.status === 'paid').reduce((sum, b) => sum + b.total_amount, 0).toFixed(0)}</p>
+                  <p className="text-xs text-muted-foreground">{budgets.filter(b => b.status === 'approved' || b.status === 'paid').length} aprobados</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2"><UserCheck className="w-4 h-4 text-blue-500" />Usuarios Registrados</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{profiles.length}</p>
+                  <p className="text-xs text-muted-foreground">Total registrados</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2"><MessageSquare className="w-4 h-4 text-purple-500" />Conversaciones Sara</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{saraConversations.length + registeredConversations.length}</p>
+                  <p className="text-xs text-muted-foreground">{saraConversations.length} anónimas, {registeredConversations.length} registradas</p>
+                </CardContent>
+              </Card>
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BarChart3 className="w-5 h-5" />Resumen de Métricas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-3xl font-bold text-primary">{leads.length}</p>
+                    <p className="text-sm text-muted-foreground">Total Leads</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-3xl font-bold text-green-500">{projects.length}</p>
+                    <p className="text-sm text-muted-foreground">Proyectos</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-3xl font-bold text-blue-500">{tickets.filter(t => t.status === 'open').length}</p>
+                    <p className="text-sm text-muted-foreground">Tickets Abiertos</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-3xl font-bold text-purple-500">{referrals.filter(r => r.status === 'converted').length}</p>
+                    <p className="text-sm text-muted-foreground">Referidos Convertidos</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Sara History Tab */}
+          <TabsContent value="sara-history">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2"><MessageSquare className="w-5 h-5" />Conversaciones</CardTitle>
+                </CardHeader>
+                <CardContent className="max-h-[500px] overflow-y-auto space-y-2">
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">Usuarios Anónimos</p>
+                  {saraConversations.map(conv => (
+                    <div 
+                      key={conv.id} 
+                      onClick={() => setSelectedConversation(`anon-${conv.id}`)}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedConversation === `anon-${conv.id}` ? 'bg-primary/20 border-primary' : 'bg-muted/50 hover:bg-muted'} border`}
+                    >
+                      <p className="font-medium text-sm">Anónimo #{conv.anon_number}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(conv.updated_at)}</p>
+                    </div>
+                  ))}
+                  <p className="text-xs text-muted-foreground mt-4 mb-2 font-medium">Usuarios Registrados</p>
+                  {registeredConversations.map(conv => {
+                    const userProfile = profiles.find(p => p.user_id === conv.user_id);
+                    return (
+                      <div 
+                        key={conv.id} 
+                        onClick={() => setSelectedConversation(`reg-${conv.id}`)}
+                        className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedConversation === `reg-${conv.id}` ? 'bg-primary/20 border-primary' : 'bg-muted/50 hover:bg-muted'} border`}
+                      >
+                        <p className="font-medium text-sm">{userProfile?.full_name || userProfile?.email || 'Usuario'}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(conv.updated_at)}</p>
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              </Card>
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg">Mensajes</CardTitle>
+                </CardHeader>
+                <CardContent className="max-h-[500px] overflow-y-auto">
+                  {selectedConversation ? (
+                    <div className="space-y-3">
+                      {selectedConversation.startsWith('anon-') 
+                        ? saraMessages
+                            .filter(m => m.conversation_id === selectedConversation.replace('anon-', ''))
+                            .map(msg => (
+                              <div key={msg.id} className={`p-3 rounded-lg ${msg.role === 'user' ? 'bg-primary/10 ml-8' : 'bg-muted mr-8'}`}>
+                                <p className="text-xs text-muted-foreground mb-1">{msg.role === 'user' ? 'Usuario' : 'Sara'} - {formatDate(msg.created_at)}</p>
+                                <p className="text-sm">{msg.content}</p>
+                              </div>
+                            ))
+                        : registeredMessages
+                            .filter(m => m.conversation_id === selectedConversation.replace('reg-', ''))
+                            .map(msg => (
+                              <div key={msg.id} className={`p-3 rounded-lg ${msg.role === 'user' ? 'bg-primary/10 ml-8' : 'bg-muted mr-8'}`}>
+                                <p className="text-xs text-muted-foreground mb-1">{msg.role === 'user' ? 'Usuario' : 'Sara'} - {formatDate(msg.created_at)}</p>
+                                <p className="text-sm">{msg.content}</p>
+                              </div>
+                            ))
+                      }
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">Selecciona una conversación para ver los mensajes</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           {/* Budgets Tab */}
           <TabsContent value="budgets">
