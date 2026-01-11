@@ -81,8 +81,8 @@ const virtualAssistants = [
       "Deriva a humano cuando haga falta"
     ],
     useCase: "Uso típico: peluquerías, clínicas, restaurantes, servicios locales, academias.",
-    price: 300,
-    priceLabel: "300€",
+    price: 200,
+    priceLabel: "200€",
   },
   {
     id: 'assistant-plus',
@@ -96,8 +96,8 @@ const virtualAssistants = [
       "Puede calificar leads y guiar a \"Solicitar presupuesto\" o \"Comprar\""
     ],
     useCase: "Uso típico: empresas con muchos servicios, ventas consultivas, soporte y captación constante.",
-    price: 500,
-    priceLabel: "500€",
+    price: 400,
+    priceLabel: "400€",
   }
 ];
 
