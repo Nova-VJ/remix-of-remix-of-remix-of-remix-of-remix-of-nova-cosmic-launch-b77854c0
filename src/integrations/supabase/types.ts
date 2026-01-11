@@ -548,6 +548,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          budget_id: string | null
           created_at: string
           current_stage: string | null
           domain_status: string | null
@@ -570,6 +571,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          budget_id?: string | null
           created_at?: string
           current_stage?: string | null
           domain_status?: string | null
@@ -592,6 +594,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          budget_id?: string | null
           created_at?: string
           current_stage?: string | null
           domain_status?: string | null
@@ -614,6 +617,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "projects_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "projects_payment_id_fkey"
             columns: ["payment_id"]
@@ -722,6 +732,62 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      sara_anonymous_conversations: {
+        Row: {
+          anon_id: string
+          anon_number: number
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          anon_id: string
+          anon_number?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          anon_id?: string
+          anon_number?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sara_anonymous_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sara_anonymous_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "sara_anonymous_conversations"
+            referencedColumns: ["id"]
           },
         ]
       }

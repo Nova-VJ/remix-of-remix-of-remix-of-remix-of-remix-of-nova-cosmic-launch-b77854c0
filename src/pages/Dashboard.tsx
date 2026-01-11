@@ -340,26 +340,60 @@ const Dashboard = () => {
     } : n));
   };
   const approveBudget = async (budgetId: string) => {
-    const {
-      error
-    } = await supabase.from('budgets').update({
+    const budget = budgets.find(b => b.id === budgetId);
+    if (!budget) return;
+
+    // Get service types from budget
+    const services = Array.isArray(budget.services) ? budget.services as { name: string; price: number }[] : [];
+    const serviceNames = services.map(s => s.name).join(', ');
+
+    // Update budget status
+    const { error: budgetError } = await supabase.from('budgets').update({
       status: 'approved',
       approved_at: new Date().toISOString()
     }).eq('id', budgetId);
-    if (error) {
+
+    if (budgetError) {
       toast({
         title: 'Error',
         description: 'No se pudo aprobar el presupuesto.',
         variant: 'destructive'
       });
-    } else {
-      toast({
-        title: 'Presupuesto aprobado',
-        description: 'Procede al pago para confirmar tu servicio.'
-      });
-      fetchData();
-      // Navigate to payment or show payment option
+      return;
     }
+
+    // Create project with first stage active
+    const { error: projectError } = await supabase.from('projects').insert({
+      name: `Proyecto - ${budget.client_name || profile?.full_name || 'Cliente'}`,
+      service_type: serviceNames,
+      user_id: user?.id,
+      status: 'in_progress',
+      current_stage: 'activation',
+      budget_id: budgetId,
+      start_date: new Date().toISOString(),
+      notes: budget.notes
+    });
+
+    if (projectError) {
+      console.error('Error creating project:', projectError);
+    }
+
+    // Create notification
+    await supabase.from('notifications').insert({
+      user_id: user?.id,
+      title: 'Proyecto iniciado',
+      message: `Tu proyecto ha comenzado. Fase actual: Activación`,
+      type: 'project',
+      link: '/profile'
+    });
+
+    toast({
+      title: 'Presupuesto aprobado',
+      description: 'Tu proyecto ha comenzado. Puedes ver el flujo en tu perfil.'
+    });
+    
+    fetchData();
+    navigate('/profile');
   };
   const pendingBudgets = budgets.filter(b => b.status === 'pending');
   const unreadCount = notifications.filter(n => !n.read).length;
