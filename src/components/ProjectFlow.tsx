@@ -113,17 +113,25 @@ const ProjectFlow = ({ currentStage, isActive, projectName }: ProjectFlowProps) 
             ))}
           </div>
 
-          {/* Mobile: Vertical */}
-          <div className="md:hidden space-y-2">
-            {PROJECT_STAGES.slice(0, 4).map((stage, index) => (
-              <div key={stage.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                  <stage.icon className="w-4 h-4 text-muted-foreground/50" />
+          {/* Mobile: Horizontal scroll */}
+          <div className="md:hidden overflow-x-auto pb-2 -mx-2 px-2">
+            <div className="flex items-center gap-2 min-w-max">
+              {PROJECT_STAGES.map((stage, index) => (
+                <div key={stage.id} className="flex items-center">
+                  <div className="flex flex-col items-center min-w-[60px]">
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <stage.icon className="w-4 h-4 text-muted-foreground/50" />
+                    </div>
+                    <span className="text-[9px] text-muted-foreground/50 text-center mt-1 max-w-[55px] leading-tight">
+                      {stage.title}
+                    </span>
+                  </div>
+                  {index < PROJECT_STAGES.length - 1 && (
+                    <div className="w-4 h-0.5 bg-muted mx-0.5 flex-shrink-0" />
+                  )}
                 </div>
-                <span className="text-xs text-muted-foreground/50">{stage.title}</span>
-              </div>
-            ))}
-            <p className="text-xs text-muted-foreground/50 text-center">+6 fases más...</p>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -193,64 +201,53 @@ const ProjectFlow = ({ currentStage, isActive, projectName }: ProjectFlowProps) 
         </div>
       </div>
 
-      {/* Mobile: Vertical */}
-      <div className="md:hidden space-y-3">
-        {PROJECT_STAGES.map((stage, index) => {
-          const isCompleted = index < currentStageIndex;
-          const isCurrent = index === currentStageIndex;
-          const isFuture = index > currentStageIndex;
+      {/* Mobile: Horizontal scroll */}
+      <div className="md:hidden overflow-x-auto pb-4 -mx-2 px-2">
+        <div className="flex items-center min-w-max gap-1">
+          {PROJECT_STAGES.map((stage, index) => {
+            const isCompleted = index < currentStageIndex;
+            const isCurrent = index === currentStageIndex;
 
-          return (
-            <div
-              key={stage.id}
-              className={`flex items-start gap-3 p-3 rounded-xl transition-all ${
-                isCurrent
-                  ? 'bg-primary/10 border-2 border-primary'
-                  : isCompleted
-                  ? 'bg-primary/5 border border-primary/30'
-                  : 'bg-muted/30 border border-border/30'
-              }`}
-            >
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  isCurrent
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40'
-                    : isCompleted
-                    ? 'bg-primary/70 text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                <stage.icon className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4
-                  className={`text-sm font-medium ${
-                    isCurrent
-                      ? 'text-primary'
-                      : isCompleted
-                      ? 'text-foreground'
-                      : 'text-muted-foreground'
-                  }`}
-                >
-                  {stage.title}
-                </h4>
-                {(isCurrent || isCompleted) && (
-                  <p className="text-xs text-muted-foreground mt-0.5">{stage.description}</p>
+            return (
+              <div key={stage.id} className="flex items-center">
+                <div className="flex flex-col items-center min-w-[65px] group relative">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      isCurrent
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40 ring-2 ring-primary/20'
+                        : isCompleted
+                        ? 'bg-primary/80 text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    <stage.icon className="w-4 h-4" />
+                  </div>
+                  <span
+                    className={`text-[9px] text-center mt-1 max-w-[60px] leading-tight ${
+                      isCurrent
+                        ? 'text-primary font-medium'
+                        : isCompleted
+                        ? 'text-foreground'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {stage.title}
+                  </span>
+                  {isCurrent && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
+                  )}
+                </div>
+                {index < PROJECT_STAGES.length - 1 && (
+                  <div
+                    className={`w-4 h-0.5 mx-0.5 rounded-full flex-shrink-0 ${
+                      isCompleted ? 'bg-primary/80' : 'bg-muted'
+                    }`}
+                  />
                 )}
               </div>
-              {isCurrent && (
-                <span className="text-[10px] font-medium text-primary bg-primary/20 px-2 py-0.5 rounded-full">
-                  Actual
-                </span>
-              )}
-              {isCompleted && (
-                <span className="text-[10px] font-medium text-primary/70 bg-primary/10 px-2 py-0.5 rounded-full">
-                  ✓
-                </span>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
