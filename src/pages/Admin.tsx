@@ -50,11 +50,17 @@ interface Project {
   name: string;
   service_type: string;
   status: string;
+  current_stage: string | null;
   start_date: string | null;
   estimated_end_date: string | null;
   notes: string | null;
   maintenance_active: boolean;
   next_maintenance_date: string | null;
+  hosting_status: string | null;
+  domain_status: string | null;
+  ssl_status: string | null;
+  revisions_used: number | null;
+  max_revisions: number | null;
   created_at: string;
 }
 
@@ -356,6 +362,34 @@ const Admin = () => {
         });
       }
       toast({ title: "Actualizado", description: "Fase del proyecto actualizada" });
+      fetchData();
+    }
+  };
+
+  const toggleProjectSetting = async (projectId: string, field: 'hosting_status' | 'domain_status' | 'ssl_status', currentValue: string | null) => {
+    const newValue = currentValue === 'active' ? 'inactive' : 'active';
+    const { error } = await supabase
+      .from('projects')
+      .update({ [field]: newValue, updated_at: new Date().toISOString() })
+      .eq('id', projectId);
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo actualizar", variant: "destructive" });
+    } else {
+      toast({ title: "Actualizado", description: `${field.replace('_status', '')} ahora está ${newValue === 'active' ? 'activo' : 'inactivo'}` });
+      fetchData();
+    }
+  };
+
+  const updateProjectRevisions = async (projectId: string, revisionsUsed: number) => {
+    const { error } = await supabase
+      .from('projects')
+      .update({ revisions_used: revisionsUsed, updated_at: new Date().toISOString() })
+      .eq('id', projectId);
+
+    if (error) {
+      toast({ title: "Error", description: "No se pudo actualizar revisiones", variant: "destructive" });
+    } else {
       fetchData();
     }
   };
@@ -1195,9 +1229,26 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {projects.map((project) => (
-                    <div key={project.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
+                  {projects.map((project) => {
+                    const STAGE_LABELS: Record<string, string> = {
+                      activation: 'Activación',
+                      brief: 'Brief',
+                      strategy: 'Estrategia',
+                      design: 'Diseño',
+                      development: 'Desarrollo',
+                      testing: 'Pruebas',
+                      review: 'Revisión',
+                      adjustments: 'Ajustes',
+                      launch: 'Lanzamiento',
+                      delivered: 'Entregado'
+                    };
+                    const STAGES = ['activation', 'brief', 'strategy', 'design', 'development', 'testing', 'review', 'adjustments', 'launch', 'delivered'];
+                    const currentStageIdx = STAGES.indexOf(project.current_stage || 'activation');
+                    const stageProgress = project.current_stage ? Math.round(((currentStageIdx + 1) / STAGES.length) * 100) : 0;
+                    
+                    return (
+                    <div key={project.id} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">{project.name}</p>
                           <p className="text-sm text-muted-foreground">{project.service_type}</p>
@@ -1224,11 +1275,81 @@ const Admin = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      {project.notes && <p className="text-sm bg-muted p-2 rounded mt-2">{project.notes}</p>}
+                      
+                      {/* Stage & Flow progress */}
+                      <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Fase del flujo:</span>
+                          <Select 
+                            value={project.current_stage || 'activation'} 
+                            onValueChange={(value) => updateProjectStage(project.id, value)}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {STAGES.map(s => (
+                                <SelectItem key={s} value={s}>{STAGE_LABELS[s] || s}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary transition-all" style={{ width: `${stageProgress}%` }} />
+                          </div>
+                          <span className="text-xs text-muted-foreground">{stageProgress}%</span>
+                        </div>
+                      </div>
+                      
+                      {/* Revisiones + Hosting/Dominio/SSL */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div className="bg-muted/30 p-2 rounded">
+                          <p className="text-lg font-bold">{project.revisions_used ?? 0}/{project.max_revisions ?? 2}</p>
+                          <p className="text-xs text-muted-foreground">Revisiones</p>
+                        </div>
+                        <div 
+                          className={`p-2 rounded cursor-pointer ${project.hosting_status === 'active' ? 'bg-green-500/20' : 'bg-muted/30'}`}
+                          onClick={() => toggleProjectSetting(project.id, 'hosting_status', project.hosting_status)}
+                        >
+                          <p className="text-sm font-medium">{project.hosting_status === 'active' ? 'Activo' : 'Inactivo'}</p>
+                          <p className="text-xs text-muted-foreground">Hosting</p>
+                        </div>
+                        <div 
+                          className={`p-2 rounded cursor-pointer ${project.domain_status === 'active' ? 'bg-green-500/20' : 'bg-muted/30'}`}
+                          onClick={() => toggleProjectSetting(project.id, 'domain_status', project.domain_status)}
+                        >
+                          <p className="text-sm font-medium">{project.domain_status === 'active' ? 'Activo' : 'Inactivo'}</p>
+                          <p className="text-xs text-muted-foreground">Dominio</p>
+                        </div>
+                        <div 
+                          className={`p-2 rounded cursor-pointer ${project.ssl_status === 'active' ? 'bg-green-500/20' : 'bg-muted/30'}`}
+                          onClick={() => toggleProjectSetting(project.id, 'ssl_status', project.ssl_status)}
+                        >
+                          <p className="text-sm font-medium">{project.ssl_status === 'active' ? 'Activo' : 'Inactivo'}</p>
+                          <p className="text-xs text-muted-foreground">SSL</p>
+                        </div>
+                      </div>
+                      
+                      {/* Update revisions */}
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs">Revisiones usadas:</Label>
+                        <Input 
+                          type="number" 
+                          className="w-20 h-8" 
+                          value={project.revisions_used ?? 0}
+                          min={0}
+                          max={project.max_revisions ?? 2}
+                          onChange={(e) => updateProjectRevisions(project.id, parseInt(e.target.value) || 0)}
+                        />
+                        <span className="text-xs text-muted-foreground">/ {project.max_revisions ?? 2}</span>
+                      </div>
+                      
+                      {project.notes && <p className="text-sm bg-muted p-2 rounded">{project.notes}</p>}
                       
                       {/* Show milestones for this project */}
                       {milestones.filter(m => m.project_id === project.id).length > 0 && (
-                        <div className="mt-3 pt-3 border-t">
+                        <div className="pt-3 border-t">
                           <p className="text-xs font-medium text-muted-foreground mb-2">Hitos:</p>
                           <div className="flex flex-wrap gap-2">
                             {milestones.filter(m => m.project_id === project.id).map(m => (
@@ -1240,7 +1361,7 @@ const Admin = () => {
                         </div>
                       )}
                     </div>
-                  ))}
+                  );})}
                   {projects.length === 0 && <p className="text-muted-foreground">No hay proyectos aún.</p>}
                 </div>
               </CardContent>

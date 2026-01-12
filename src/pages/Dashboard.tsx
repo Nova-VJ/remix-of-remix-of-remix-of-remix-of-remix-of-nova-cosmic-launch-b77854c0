@@ -565,18 +565,18 @@ const Dashboard = () => {
                         <p className="text-xs text-muted-foreground">Revisiones</p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Server className={`w-5 h-5 mx-auto mb-1 ${project.hosting_status === 'active' ? 'text-green-500' : 'text-yellow-500'}`} />
-                        <p className="text-sm font-medium">{project.hosting_status === 'active' ? 'Activo' : 'Revisar'}</p>
+                        <Server className={`w-5 h-5 mx-auto mb-1 ${project.hosting_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        <p className="text-sm font-medium">{project.hosting_status === 'active' ? 'Activo' : 'Inactivo'}</p>
                         <p className="text-xs text-muted-foreground">Hosting</p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Globe className={`w-5 h-5 mx-auto mb-1 ${project.domain_status === 'active' ? 'text-green-500' : 'text-yellow-500'}`} />
-                        <p className="text-sm font-medium">{project.domain_status === 'active' ? 'Activo' : 'Revisar'}</p>
+                        <Globe className={`w-5 h-5 mx-auto mb-1 ${project.domain_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        <p className="text-sm font-medium">{project.domain_status === 'active' ? 'Activo' : 'Inactivo'}</p>
                         <p className="text-xs text-muted-foreground">Dominio</p>
                       </div>
                       <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Lock className={`w-5 h-5 mx-auto mb-1 ${project.ssl_status === 'active' ? 'text-green-500' : 'text-yellow-500'}`} />
-                        <p className="text-sm font-medium">{project.ssl_status === 'active' ? 'Activo' : 'Revisar'}</p>
+                        <Lock className={`w-5 h-5 mx-auto mb-1 ${project.ssl_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        <p className="text-sm font-medium">{project.ssl_status === 'active' ? 'Activo' : 'Inactivo'}</p>
                         <p className="text-xs text-muted-foreground">SSL</p>
                       </div>
                     </div>
