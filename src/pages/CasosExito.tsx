@@ -1,10 +1,31 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ChevronRight, MessageCircle, TrendingUp, Smartphone, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
 import dominosImage from '@/assets/dominos-presentation.jpg';
 
-const WHATSAPP_DIAGNOSTICO = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20solicitar%20mi%20diagn%C3%B3stico%20gratuito.%20Mi%20negocio%20es%3A%20_____";
-
 const CasosExito = () => {
+  const casos = [
+    {
+      id: 'hawkers',
+      title: 'Hawkers: de una idea simple a una marca global',
+      description: 'Un artículo para emprendedores que quieren empezar pero sienten que les falta el mapa. Descubre cómo Hawkers construyó una marca global con marketing digital.',
+      image: null,
+      tags: ['Caso real', 'Crecimiento', 'Lecciones prácticas'],
+      featured: true,
+      isNew: true,
+      link: '/casos-exito/hawkers',
+    },
+    {
+      id: 'dominos',
+      title: 'Domino\'s Pizza: Presencia no es igual a escalar',
+      description: 'Más del 90% de ventas hoy día son digitales. Descubre cómo Domino\'s convirtió el canal digital en su motor central de ventas y fidelización.',
+      image: dominosImage,
+      tags: ['Sistema digital', 'Fidelización', 'App móvil'],
+      featured: true,
+      isNew: false,
+      link: '/casos-exito/dominos',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -18,298 +39,101 @@ const CasosExito = () => {
         </div>
       </header>
 
-      {/* Article */}
-      <article className="pt-24 pb-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          {/* Hero */}
-          <header className="mb-12">
-            <div className="text-sm text-primary font-medium mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Caso de estudio
-            </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-              Presencia no es igual a escalar un sistema.
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Caso: Domino's Pizza
-            </p>
-          </header>
+      {/* Hero */}
+      <section className="pt-28 pb-12 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
+            <TrendingUp className="w-4 h-4" />
+            Casos de estudio
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
+            Historias reales de <span className="text-primary">crecimiento digital</span>
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Analizamos marcas que transformaron su negocio con estrategia digital. 
+            Cada caso incluye lecciones prácticas que puedes aplicar hoy.
+          </p>
+        </div>
+      </section>
 
-          {/* Featured image */}
-          <figure className="mb-12 rounded-2xl overflow-hidden">
-            <img 
-              src={dominosImage} 
-              alt="Domino's Pizza presentación - 15 formas de pedir"
-              className="w-full h-auto"
-            />
-            <figcaption className="text-sm text-muted-foreground mt-3 text-center">
-              Domino's: "15 Ways to Get Your Slice" - Múltiples canales digitales de venta
-            </figcaption>
-          </figure>
-
-          {/* Content */}
-          <div className="prose prose-invert max-w-none">
-            <p className="text-lg text-foreground/90 leading-relaxed mb-8">
-              En 2008, Domino's Pizza era una cadena de pizzerías con problemas de imagen y ventas estancadas.
-            </p>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Los dirigentes de esta conocida compañía vieron una oportunidad de evolucionar y expandir el negocio haciendo una propuesta clara digital, y al final la apuesta no salió mal: <strong className="text-primary">Más del 90% de ventas hoy día son de vía digital</strong>, y el 76,4% de los pedidos digitales son en su app. La propuesta es clara: Facilitación del producto y fidelización.
-            </p>
-
-            <blockquote className="border-l-4 border-primary pl-6 my-10 py-4 bg-primary/5 rounded-r-xl">
-              <p className="text-xl font-medium text-foreground italic">
-                "Domino's no ganó por hacer mejor pizza. Ganó por hacer más fácil comprarla."
-              </p>
-            </blockquote>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              En un mercado donde todos compiten por precio, promociones y sabor, Domino's decidió competir con algo más silencioso (y más poderoso): <strong>la fricción</strong>. Esa sensación de "qué pereza", "tengo que llamar", "me lío", "tardo", "mejor lo dejo para otro día".
-            </p>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Ellos entendieron una verdad simple: <strong className="text-primary">cuando comprar es fácil, el cliente vuelve</strong>. Y cuando vuelve, el negocio se expande.
-            </p>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">La idea que lo cambió todo</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-6">
-              Existe una frase que se repite en el mundo del emprendimiento:
-            </p>
-
-            <blockquote className="border-l-4 border-primary/50 pl-6 my-6">
-              <p className="text-lg text-foreground/90 italic">
-                "Cada compañía es una compañía tecnológica."
-              </p>
-            </blockquote>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Domino's lo llevó aún más lejos. Ellos mismos se describen como: <strong>"Una compañía de tecnología que hace pizzas."</strong>
-            </p>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              No lo dicen por postureo. Lo dicen porque construyeron un sistema que convierte una venta aislada en un hábito.
-            </p>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Contexto: el verdadero problema no era la competencia… era la repetición</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-6">
-              El mercado de comida rápida es brutal. Hay opciones por todos lados. La pregunta no es "¿quién tiene mejor producto?" sino:
-            </p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>¿Quién consigue que el cliente te elija otra vez?</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>¿Quién hace que pedir sea tan sencillo que parezca automático?</span>
-              </li>
-            </ul>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Domino's necesitaba aumentar: <strong>frecuencia</strong> (que te acuerdes más de ellos), <strong>valor por cliente</strong> (upsells sin molestar), y <strong>consistencia</strong> (que en móvil funcione perfecto siempre).
-            </p>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">La estrategia: convertir el pedido en una experiencia rápida y repetible</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Domino's no "hizo una app". Hizo un <strong>producto digital</strong>. Y eso es un mundo aparte.
-            </p>
-
-            <h3 className="text-xl font-bold text-foreground mt-10 mb-4">Acciones clave que marcaron la diferencia</h3>
-
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3 text-foreground/80">
-                <Smartphone className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Inversión sostenida en su producto digital:</strong> la app como canal principal, no como "extra".</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <Zap className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Optimización del "momento compra":</strong> menos pasos, más claridad, menos fricción.</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ArrowRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Reordenar rápido:</strong> cuando ya confías, quieres repetir sin pensar.</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <TrendingUp className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Personalización basada en datos:</strong> recomendaciones y mejoras constantes.</span>
-              </li>
-            </ul>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Nada de esto es una acción puntual. Es una cultura: <strong>iterar, medir, mejorar, repetir</strong>.
-            </p>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Resultados (y por qué importan)</h2>
-
-            <div className="grid grid-cols-2 gap-4 my-10">
-              <div className="glass-card p-6 text-center">
-                <p className="text-4xl font-bold text-primary mb-2">90%+</p>
-                <p className="text-sm text-muted-foreground">Ventas digitales</p>
-              </div>
-              <div className="glass-card p-6 text-center">
-                <p className="text-4xl font-bold text-primary mb-2">76.3%</p>
-                <p className="text-sm text-muted-foreground">Pedidos desde la app</p>
-              </div>
-            </div>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              ¿Lo importante? No es el porcentaje. Es lo que significa: <strong className="text-primary">Domino's convirtió el canal digital en su motor central de ventas y fidelización.</strong>
-            </p>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Por qué funcionó (la parte que te interesa si tienes un negocio)</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-6">
-              Porque el cliente no compra solo por ganas: <strong>compra por facilidad</strong>.
-            </p>
-
-            <div className="space-y-6 my-8">
-              <div className="glass-card p-6">
-                <h4 className="font-bold text-foreground mb-2">1) Menos pasos = menos abandono</h4>
-                <p className="text-muted-foreground">Cada clic de más es un cliente menos.</p>
-              </div>
-              <div className="glass-card p-6">
-                <h4 className="font-bold text-foreground mb-2">2) La app crea hábito (y hábito = ingresos estables)</h4>
-                <p className="text-muted-foreground">Cuando la compra es cómoda, repetir se vuelve natural. Eso aumenta el LTV (valor de vida del cliente).</p>
-              </div>
-              <div className="glass-card p-6">
-                <h4 className="font-bold text-foreground mb-2">3) La mejora continua crea ventaja compuesta</h4>
-                <p className="text-muted-foreground">Cada sprint, cada ajuste, cada mejora… suma. Y esa suma, con el tiempo, se vuelve inalcanzable para quien "solo hace presencia".</p>
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Lo que esto revela: tu negocio no compite solo con otros negocios</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-6">
-              Compites con:
-            </p>
-
-            <ul className="space-y-2 mb-8">
-              <li className="text-foreground/80">• la falta de tiempo,</li>
-              <li className="text-foreground/80">• la distracción,</li>
-              <li className="text-foreground/80">• la indecisión,</li>
-              <li className="text-foreground/80">• y la fricción.</li>
-            </ul>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Y si tu sistema digital no guía al cliente como una autopista, lo pierdes.
-            </p>
-
-            <blockquote className="border-l-4 border-destructive/50 pl-6 my-10 py-4 bg-destructive/5 rounded-r-xl">
-              <p className="text-lg text-foreground">
-                La mayoría de empresas creen que el problema es "no tener marketing". El problema real suele ser: <strong>no tener un sistema que convierta la atención en ventas</strong>.
-              </p>
-            </blockquote>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Playbook replicable (lo que haría SolutionsNova)</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              No necesitas ser Domino's para aplicar el principio. Necesitas pensar como ellos: <strong className="text-primary">reduce fricción, aumenta repetición</strong>.
-            </p>
-
-            <div className="space-y-4 mb-8">
-              <div className="flex gap-4 items-start">
-                <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">1</span>
-                <div>
-                  <h4 className="font-bold text-foreground">Definir 3 acciones core</h4>
-                  <p className="text-muted-foreground text-sm">Contactar / pedir presupuesto • Pagar / reservar • Seguimiento (WhatsApp / email / recordatorio)</p>
+      {/* Cases Grid */}
+      <section className="pb-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid gap-6 md:grid-cols-2">
+            {casos.map((caso) => (
+              <Link
+                key={caso.id}
+                to={caso.link}
+                className="group relative overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/50 transition-all duration-300"
+              >
+                {/* Image or Gradient */}
+                <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5">
+                  {caso.image ? (
+                    <img 
+                      src={caso.image} 
+                      alt={caso.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Sparkles className="w-16 h-16 text-primary/40" />
+                    </div>
+                  )}
+                  
+                  {/* New badge */}
+                  {caso.isNew && (
+                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                      NUEVO
+                    </div>
+                  )}
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
-              </div>
-              <div className="flex gap-4 items-start">
-                <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">2</span>
-                <div>
-                  <h4 className="font-bold text-foreground">Checkout o solicitud en máximo 3 pasos</h4>
-                  <p className="text-muted-foreground text-sm">Y, si se puede: "repetir" en 1 clic (o un formulario ultra rápido)</p>
+
+                {/* Content */}
+                <div className="p-6">
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {caso.tags.map((tag, idx) => (
+                      <span 
+                        key={idx}
+                        className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <h2 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                    {caso.title}
+                  </h2>
+                  
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                    {caso.description}
+                  </p>
+
+                  <div className="flex items-center gap-2 text-primary font-medium text-sm">
+                    <Eye className="w-4 h-4" />
+                    Leer caso completo
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-4 items-start">
-                <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">3</span>
-                <div>
-                  <h4 className="font-bold text-foreground">Upsells inteligentes (sin interrumpir)</h4>
-                  <p className="text-muted-foreground text-sm">Sugerencias que suman, no que molestan.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 items-start">
-                <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">4</span>
-                <div>
-                  <h4 className="font-bold text-foreground">Medición completa del embudo</h4>
-                  <p className="text-muted-foreground text-sm">Desde el anuncio o contenido → hasta la conversión. Y optimización quincenal.</p>
-                </div>
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">La conclusión incómoda (pero real)</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-6">
-              Si hoy tu negocio depende de: recomendaciones, temporadas, "cuando tengo tiempo publico", y la suerte…
-            </p>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              Entonces no tienes un sistema. <strong>Tienes presencia</strong>. Y presencia sin sistema no escala.
-            </p>
-
-            <div className="glass-card p-8 my-10 text-center">
-              <h3 className="text-xl font-bold text-foreground mb-4">El salto digital no es "tener una web"</h3>
-              <p className="text-lg text-muted-foreground mb-4">
-                Es tener un camino claro que haga esto:
-              </p>
-              <p className="text-2xl font-bold text-primary">
-                Atraer → Convencer → Convertir → Repetir
-              </p>
-              <p className="text-muted-foreground mt-4">
-                Eso es lo que crea negocios estables.
-              </p>
-            </div>
-
-            <h2 className="text-2xl font-bold text-foreground mt-12 mb-6">Si quieres aplicar esto en tu negocio</h2>
-
-            <p className="text-foreground/80 leading-relaxed mb-8">
-              En SolutionsNova no vendemos piezas sueltas. Diseñamos un sistema conectado:
-            </p>
-
-            <ul className="space-y-3 mb-8">
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Branding</strong> para confianza inmediata</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Contenido</strong> para atraer atención real</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Web/Landing</strong> para convertir visitas en clientes</span>
-              </li>
-              <li className="flex items-start gap-3 text-foreground/80">
-                <ChevronRight className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                <span><strong>Optimización</strong> para mejorar cada mes</span>
-              </li>
-            </ul>
-
-            <blockquote className="border-l-4 border-primary pl-6 my-10 py-4 bg-primary/5 rounded-r-xl">
-              <p className="text-xl font-medium text-foreground italic">
-                Si Domino's demostró algo, es esto: Cuando comprar es fácil, el cliente vuelve. Y cuando el cliente vuelve, el negocio crece.
-              </p>
-            </blockquote>
+              </Link>
+            ))}
           </div>
 
-          {/* CTA */}
-          <div className="mt-16 text-center">
-            <a
-              href={WHATSAPP_DIAGNOSTICO}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-glow inline-flex items-center gap-3 text-primary-foreground px-8 py-4"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>Solicita tu diagnóstico gratuito ahora mismo</span>
-            </a>
+          {/* Coming soon */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-dashed border-border bg-muted/30">
+              <Sparkles className="w-5 h-5 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                Más casos de éxito <span className="text-foreground font-medium">próximamente</span>
+              </p>
+            </div>
           </div>
         </div>
-      </article>
+      </section>
     </div>
   );
 };
