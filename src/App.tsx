@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import CasosExito from "./pages/CasosExito";
+import CasoHawkers from "./pages/CasoHawkers";
 import InvitaAmigo from "./pages/InvitaAmigo";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/casos-exito" element={<CasosExito />} />
+              <Route path="/casos-exito/hawkers" element={<CasoHawkers />} />
               <Route path="/invita-a-un-amigo" element={<InvitaAmigo />} />
               <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
               <Route path="/politica-de-cookies" element={<CookiePolicy />} />
