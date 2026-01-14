@@ -64,6 +64,30 @@
     --shadow-card: 0 8px 32px hsl(235 50% 5% / 0.5);
   }
 
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 235 50% 8%;
+    --card: 0 0% 96%;
+    --card-foreground: 235 50% 8%;
+    --popover: 0 0% 98%;
+    --popover-foreground: 235 50% 8%;
+    --primary: 270 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 20% 92%;
+    --secondary-foreground: 235 50% 15%;
+    --muted: 235 15% 92%;
+    --muted-foreground: 235 30% 40%;
+    --accent: 275 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 235 20% 85%;
+    --input: 235 20% 85%;
+    --ring: 270 80% 50%;
+    --glass-bg: 0 0% 100% / 0.8;
+    --glass-border: 235 20% 80% / 0.5;
+  }
+
   .dark {
     --background: 235 50% 8%;
     --foreground: 0 0% 98%;
