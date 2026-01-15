@@ -19,6 +19,7 @@ import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
 import ReferralPopup from '@/components/ReferralPopup';
 import BriefingCTASection from '@/components/BriefingCTASection';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const INTRO_LAST_SEEN_KEY = 'intro_last_seen';
 const INTRO_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -77,6 +78,7 @@ const Index = () => {
         <ShoppingCart />
         <VirtualAssistant />
         <ReferralPopup />
+        <ThemeToggle variant="floating" />
       </main>
     </>
   );

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
 import dominosImage from '@/assets/dominos-presentation.jpg';
+import hawkersLogo from '@/assets/hawkers-logo.jpg';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const CasosExito = () => {
   const casos = [
@@ -8,7 +10,7 @@ const CasosExito = () => {
       id: 'hawkers',
       title: 'Hawkers: de una idea simple a una marca global',
       description: 'Un artículo para emprendedores que quieren empezar pero sienten que les falta el mapa. Descubre cómo Hawkers construyó una marca global con marketing digital.',
-      image: null,
+      image: hawkersLogo,
       tags: ['Caso real', 'Crecimiento', 'Lecciones prácticas'],
       featured: true,
       isNew: true,
@@ -35,7 +37,10 @@ const CasosExito = () => {
             <ArrowLeft className="w-5 h-5" />
             <span>Volver</span>
           </Link>
-          <span className="text-sm text-muted-foreground">Casos de éxito</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Casos de éxito</span>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -72,7 +77,7 @@ const CasosExito = () => {
                     <img 
                       src={caso.image} 
                       alt={caso.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">

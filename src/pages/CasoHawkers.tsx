@@ -34,6 +34,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Images
 import hawkersPortada from "@/assets/hawkers-portada.jpg";
@@ -722,6 +723,7 @@ export default function CasoHawkers() {
               En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
+            <ThemeToggle />
           </div>
         </div>
       </div>

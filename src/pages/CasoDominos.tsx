@@ -33,6 +33,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Images
 import dominosImage from "@/assets/dominos-presentation.jpg";
@@ -408,6 +409,7 @@ export default function CasoDominos() {
               En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
+            <ThemeToggle />
           </div>
         </div>
       </div>
@@ -455,12 +457,12 @@ export default function CasoDominos() {
           </motion.div>
 
           {/* Historic photos */}
-          <motion.div variants={fadeUp} className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-border/50 overflow-hidden">
-              <img src={dominosHistorica1} alt="DomiNick's Pizza original" className="w-full h-full object-cover" />
+          <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-border/50 overflow-hidden bg-muted/20">
+              <img src={dominosHistorica1} alt="DomiNick's Pizza original" className="w-full h-auto object-contain" />
             </div>
-            <div className="rounded-2xl border border-border/50 overflow-hidden">
-              <img src={dominosHistorica2} alt="Hermanos Monaghan" className="w-full h-full object-cover" />
+            <div className="rounded-2xl border border-border/50 overflow-hidden bg-muted/20">
+              <img src={dominosHistorica2} alt="Hermanos Monaghan" className="w-full h-auto object-contain" />
             </div>
           </motion.div>
         </motion.section>
