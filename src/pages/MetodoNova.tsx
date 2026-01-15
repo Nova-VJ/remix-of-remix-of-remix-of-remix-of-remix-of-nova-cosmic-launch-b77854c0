@@ -90,13 +90,13 @@ function MethodStep({ number, title, description, items, icon: Icon }: { number:
 
 export default function MetodoNova() {
   const benefits = [
-    { icon: Smartphone, title: "📱 Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
-    { icon: TrendingUp, title: "📈 Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
-    { icon: Brain, title: "🧠 Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
-    { icon: Globe, title: "🌍 Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
-    { icon: BarChart3, title: "📊 Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
-    { icon: DollarSign, title: "💰 Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
-    { icon: Trophy, title: "🏆 Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." },
+    { icon: Smartphone, title: "Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
+    { icon: TrendingUp, title: "Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
+    { icon: Brain, title: "Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
+    { icon: Globe, title: "Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
+    { icon: BarChart3, title: "Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
+    { icon: DollarSign, title: "Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
+    { icon: Trophy, title: "Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." },
   ];
 
   const methodSteps = [
@@ -108,10 +108,10 @@ export default function MetodoNova() {
   ];
 
   const results = [
-    "🚀 Un sistema escalable",
-    "💰 Una máquina de ventas",
-    "🌍 Una marca profesional",
-    "📈 Un proyecto preparado para el futuro",
+    { icon: Zap, text: "Un sistema escalable" },
+    { icon: DollarSign, text: "Una máquina de ventas" },
+    { icon: Globe, text: "Una marca profesional" },
+    { icon: TrendingUp, text: "Un proyecto preparado para el futuro" },
   ];
 
   return (
@@ -138,12 +138,30 @@ export default function MetodoNova() {
       <main className="relative mx-auto max-w-3xl px-4 pb-20 pt-24">
         {/* HERO */}
         <motion.header variants={stagger} initial="hidden" animate="show" className="space-y-6 text-center">
-          <motion.div variants={fadeUp} className="flex justify-center">
-            <img src={metodoNovaIcon} alt="Método Nova" className="w-24 h-24 object-contain" />
+          <motion.div 
+            variants={fadeUp} 
+            className="flex justify-center"
+            initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", type: "spring", stiffness: 100 }}
+          >
+            <motion.img 
+              src={metodoNovaIcon} 
+              alt="Método Nova" 
+              className="w-28 h-28 object-contain"
+              animate={{ 
+                y: [0, -8, 0],
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl font-bold text-foreground">
-            🌌 LA VENTAJA NOVA
+            LA VENTAJA NOVA
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-xl text-foreground/80">
@@ -165,7 +183,7 @@ export default function MetodoNova() {
         {/* Benefits */}
         <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
           <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            🚀 ¿Qué consigue tu negocio al digitalizarse con NOVA?
+            ¿Qué consigue tu negocio al digitalizarse con NOVA?
           </motion.h2>
 
           <div className="grid gap-4">
@@ -178,7 +196,7 @@ export default function MetodoNova() {
         {/* Results Preview */}
         <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
           <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            🔮 El resultado
+            El resultado
           </motion.h2>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-primary/30 bg-primary/5 p-6 backdrop-blur">
@@ -222,7 +240,7 @@ export default function MetodoNova() {
         {/* Summary */}
         <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
           <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            🌠 En resumen
+            En resumen
           </motion.h2>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-6 backdrop-blur">
@@ -230,8 +248,8 @@ export default function MetodoNova() {
             <div className="grid sm:grid-cols-2 gap-3">
               {results.map((r, i) => (
                 <div key={i} className="flex items-center gap-2 text-foreground font-semibold">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span>{r}</span>
+                  <r.icon className="h-4 w-4 text-primary" />
+                  <span>{r.text}</span>
                 </div>
               ))}
             </div>
@@ -254,14 +272,14 @@ export default function MetodoNova() {
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
               >
                 <MessageCircle className="h-5 w-5" />
-                👉 Cuéntanos tu proyecto
+                Cuéntanos tu proyecto
               </a>
               <Link
                 to="/#servicios"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-muted/50 px-6 py-3 text-foreground font-semibold hover:bg-muted transition-colors"
               >
                 <ArrowRight className="h-5 w-5" />
-                👉 Haz crecer tu negocio hoy
+                Haz crecer tu negocio hoy
               </Link>
             </div>
 
