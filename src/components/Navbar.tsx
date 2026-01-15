@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, Trophy, Gift, Shield } from 'lucide-react';
+import { Menu, X, User, Trophy, Gift, Shield, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
+import metodoNovaIcon from '@/assets/metodo-nova-icon.png';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +42,10 @@ const Navbar = () => {
             <Link to="/casos-exito" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
               <Trophy className="w-4 h-4" />
               Casos de éxito
+            </Link>
+            <Link to="/metodo-nova" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
+              <img src={metodoNovaIcon} alt="" className="w-4 h-4 object-contain" />
+              Método Nova
             </Link>
             <Link to="/invita-a-un-amigo" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
               <Gift className="w-4 h-4" />
@@ -82,6 +87,10 @@ const Navbar = () => {
               <Link to="/casos-exito" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
                 <Trophy className="w-4 h-4" />
                 Casos de éxito
+              </Link>
+              <Link to="/metodo-nova" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
+                <img src={metodoNovaIcon} alt="" className="w-4 h-4 object-contain" />
+                Método Nova
               </Link>
               <Link to="/invita-a-un-amigo" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
                 <Gift className="w-4 h-4" />

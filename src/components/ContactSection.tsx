@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
-const WHATSAPP_NUMBER = '34659343822';
+const WHATSAPP_NUMBER = '34604948362';
 const EMAIL = 'info@solutionsnova.es';
 
 const ContactSection = () => {
