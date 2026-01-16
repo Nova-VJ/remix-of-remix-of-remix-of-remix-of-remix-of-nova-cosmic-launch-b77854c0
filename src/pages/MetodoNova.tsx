@@ -115,14 +115,14 @@ export default function MetodoNova() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Background gradient */}
-      <div className="pointer-events-none fixed inset-0" style={{ zIndex: -2 }}>
-        <div className="absolute inset-0 opacity-70" style={{ background: "radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_45%),radial-gradient(circle_at_80%_30%,hsl(var(--primary)/0.10),transparent_45%),radial-gradient(circle_at_50%_85%,hsl(var(--primary)/0.08),transparent_50%)" }} />
-      </div>
-
-      {/* Interactive Stars */}
+    <div className="min-h-screen bg-background text-foreground relative">
+      {/* Interactive Stars - behind everything */}
       <InteractiveStars />
+
+      {/* Background gradient */}
+      <div className="pointer-events-none fixed inset-0" style={{ zIndex: 1 }}>
+        <div className="absolute inset-0 opacity-50" style={{ background: "radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.1),transparent_45%),radial-gradient(circle_at_80%_30%,hsl(var(--primary)/0.08),transparent_45%),radial-gradient(circle_at_50%_85%,hsl(var(--primary)/0.05),transparent_50%)" }} />
+      </div>
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -138,7 +138,7 @@ export default function MetodoNova() {
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-3xl px-4 pb-20 pt-24">
+      <main className="relative mx-auto max-w-3xl px-4 pb-20 pt-24" style={{ zIndex: 10 }}>
         {/* HERO */}
         <motion.header variants={stagger} initial="hidden" animate="show" className="space-y-6 text-center">
           <motion.div 
