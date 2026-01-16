@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useMemo } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,44 +10,18 @@ import {
   BarChart3,
   DollarSign,
   Trophy,
-  Sparkles,
   CheckCircle2,
   Target,
   Layers,
   Zap,
   Repeat,
   MessageCircle,
-  Star,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import InteractiveStars from "@/components/InteractiveStars";
 import metodoNovaIcon from "@/assets/metodo-nova-icon.png";
 
 const WHATSAPP_LINK = "https://wa.me/34604948362?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
-
-// Generate fixed particle positions
-const generateParticles = (count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    size: (i % 3) + 2,
-    left: (i * 37 + 13) % 100,
-    top: (i * 23 + 7) % 100,
-    duration: 3 + (i % 4),
-    delay: (i * 0.3) % 3,
-  }));
-};
-
-const generateStars = (count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    left: (i * 41 + 19) % 100,
-    top: (i * 29 + 11) % 100,
-    duration: 4 + (i % 3),
-    delay: (i * 0.5) % 4,
-  }));
-};
-
-const particles = generateParticles(40);
-const stars = generateStars(20);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -143,60 +116,13 @@ export default function MetodoNova() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Background */}
-      <div className="pointer-events-none fixed inset-0">
+      {/* Background gradient */}
+      <div className="pointer-events-none fixed inset-0" style={{ zIndex: -2 }}>
         <div className="absolute inset-0 opacity-70" style={{ background: "radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.15),transparent_45%),radial-gradient(circle_at_80%_30%,hsl(var(--primary)/0.10),transparent_45%),radial-gradient(circle_at_50%_85%,hsl(var(--primary)/0.08),transparent_50%)" }} />
       </div>
 
-      {/* Animated Stars/Particles */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-        {particles.map((p) => (
-          <motion.div
-            key={`particle-${p.id}`}
-            className="absolute rounded-full bg-primary"
-            style={{
-              width: p.size,
-              height: p.size,
-              left: `${p.left}%`,
-              top: `${p.top}%`,
-            }}
-            animate={{
-              opacity: [0.3, 0.9, 0.3],
-              scale: [1, 1.8, 1],
-              y: [0, -30, 0],
-            }}
-            transition={{
-              duration: p.duration,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: p.delay,
-            }}
-          />
-        ))}
-        {stars.map((s) => (
-          <motion.div
-            key={`star-${s.id}`}
-            className="absolute"
-            style={{
-              left: `${s.left}%`,
-              top: `${s.top}%`,
-            }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0.5, 1.2, 0.5],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: s.duration,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: s.delay,
-            }}
-          >
-            <Star className="w-4 h-4 text-primary/50 fill-primary/20" />
-          </motion.div>
-        ))}
-      </div>
+      {/* Interactive Stars */}
+      <InteractiveStars />
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
