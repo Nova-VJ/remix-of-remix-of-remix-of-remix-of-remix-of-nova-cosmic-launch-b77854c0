@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -17,11 +18,37 @@ import {
   Zap,
   Repeat,
   MessageCircle,
+  Star,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import metodoNovaIcon from "@/assets/metodo-nova-icon.png";
 
 const WHATSAPP_LINK = "https://wa.me/34604948362?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
+
+// Generate fixed particle positions
+const generateParticles = (count: number) => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    size: (i % 3) + 2,
+    left: (i * 37 + 13) % 100,
+    top: (i * 23 + 7) % 100,
+    duration: 3 + (i % 4),
+    delay: (i * 0.3) % 3,
+  }));
+};
+
+const generateStars = (count: number) => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    left: (i * 41 + 19) % 100,
+    top: (i * 29 + 11) % 100,
+    duration: 4 + (i % 3),
+    delay: (i * 0.5) % 4,
+  }));
+};
+
+const particles = generateParticles(40);
+const stars = generateStars(20);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -122,50 +149,51 @@ export default function MetodoNova() {
       </div>
 
       {/* Animated Stars/Particles */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        {[...Array(30)].map((_, i) => (
+      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+        {particles.map((p) => (
           <motion.div
-            key={i}
-            className="absolute rounded-full bg-primary/40"
+            key={`particle-${p.id}`}
+            className="absolute rounded-full bg-primary"
             style={{
-              width: Math.random() * 3 + 1,
-              height: Math.random() * 3 + 1,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: p.size,
+              height: p.size,
+              left: `${p.left}%`,
+              top: `${p.top}%`,
             }}
             animate={{
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
-              y: [0, -20, 0],
+              opacity: [0.3, 0.9, 0.3],
+              scale: [1, 1.8, 1],
+              y: [0, -30, 0],
             }}
             transition={{
-              duration: Math.random() * 3 + 2,
+              duration: p.duration,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: Math.random() * 2,
+              delay: p.delay,
             }}
           />
         ))}
-        {[...Array(15)].map((_, i) => (
+        {stars.map((s) => (
           <motion.div
-            key={`star-${i}`}
+            key={`star-${s.id}`}
             className="absolute"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${s.left}%`,
+              top: `${s.top}%`,
             }}
             animate={{
               opacity: [0, 1, 0],
-              scale: [0.5, 1, 0.5],
+              scale: [0.5, 1.2, 0.5],
+              rotate: [0, 180, 360],
             }}
             transition={{
-              duration: Math.random() * 4 + 3,
+              duration: s.duration,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: Math.random() * 3,
+              delay: s.delay,
             }}
           >
-            <Sparkles className="w-3 h-3 text-primary/30" />
+            <Star className="w-4 h-4 text-primary/50 fill-primary/20" />
           </motion.div>
         ))}
       </div>
