@@ -73,17 +73,17 @@ const ResultsSection = () => {
             </div>
           </Link>
 
-          <div className="text-center px-2 md:px-0">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-3 md:mb-4 max-w-xl mx-auto leading-relaxed">
-              Aprende con nosotros, utilizamos historias reales de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también ¡Para levantarse con más fuerza!
+          <div className="text-center px-4 md:px-0">
+            <p className="text-sm sm:text-base md:text-lg text-foreground/80 mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed font-medium">
+              Aprende con nosotros, utilizamos <span className="text-primary font-semibold">historias reales</span> de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también <span className="text-primary font-semibold">¡Para levantarse con más fuerza!</span>
             </p>
             <Link to="/casos-exito">
               <Button 
-                size="default"
-                className="rounded-full px-6 md:px-8 text-sm md:text-base bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0"
+                size="lg"
+                className="rounded-full px-8 md:px-10 text-base md:text-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0 font-semibold"
               >
                 Ver Casos de Éxito
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
           </div>
