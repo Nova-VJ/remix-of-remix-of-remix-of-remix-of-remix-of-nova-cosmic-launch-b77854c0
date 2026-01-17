@@ -38,6 +38,42 @@ FORMATO:
 - Usa emojis con moderación para ser amigable
 - Si es apropiado, ofrece opciones o siguientes pasos`;
 
+// Simple in-memory rate limiting (resets on cold start, but provides basic protection)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per identifier
+
+function checkRateLimit(identifier: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1 };
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return { allowed: false, remaining: 0 };
+  }
+  
+  record.count++;
+  return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - record.count };
+}
+
+// Clean up old entries periodically (every 100 requests)
+let requestCounter = 0;
+function cleanupRateLimitMap() {
+  requestCounter++;
+  if (requestCounter % 100 === 0) {
+    const now = Date.now();
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -45,6 +81,49 @@ serve(async (req) => {
 
   try {
     const { message, anon_id, session_id } = await req.json();
+    
+    // Get client IP for rate limiting (fallback to anon_id)
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("x-real-ip") || 
+                     anon_id || 
+                     "unknown";
+    
+    // Check rate limit
+    cleanupRateLimitMap();
+    const rateLimitResult = checkRateLimit(clientIP);
+    
+    if (!rateLimitResult.allowed) {
+      console.log(`Rate limit exceeded for: ${clientIP}`);
+      return new Response(
+        JSON.stringify({ error: "Demasiadas solicitudes. Por favor, espera un momento antes de enviar otro mensaje." }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000))
+          } 
+        }
+      );
+    }
+
+    // Validate message
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Mensaje inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Limit message length to prevent abuse
+    if (message.length > 2000) {
+      return new Response(
+        JSON.stringify({ error: "Mensaje demasiado largo. Máximo 2000 caracteres." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -108,10 +187,12 @@ serve(async (req) => {
           .insert({
             conversation_id: anonConversationId,
             role: "user",
-            content: message
+            content: message.substring(0, 2000) // Ensure message is truncated
           });
       }
     }
+
+    console.log(`Processing chat request - IP: ${clientIP}, Anonymous: ${isAnonymous}, Remaining requests: ${rateLimitResult.remaining}`);
 
     // Preparar mensajes para la API
     const apiMessages = [
@@ -171,7 +252,13 @@ serve(async (req) => {
         reply: assistantMessage,
         session_id: session_id || anon_id 
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": "application/json",
+          "X-RateLimit-Remaining": String(rateLimitResult.remaining)
+        } 
+      }
     );
   } catch (error) {
     console.error("sara-chat error:", error);
