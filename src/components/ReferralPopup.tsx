@@ -49,28 +49,27 @@ const ReferralPopup = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md p-0 bg-transparent border-none overflow-hidden">
-        <button
+      <DialogContent className="sm:max-w-md p-0 bg-transparent border-none overflow-hidden [&>button]:hidden">
+        {/* Clickable overlay to close */}
+        <div 
+          className="absolute inset-0 cursor-pointer" 
           onClick={handleClose}
-          className="absolute right-2 top-2 z-10 p-2 rounded-full bg-background/80 hover:bg-background transition-colors"
-          aria-label="Cerrar"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        />
         
-        <div className="flex flex-col items-center">
+        <div className="relative">
+          {/* The X button area in the image - top left corner */}
+          <button
+            onClick={handleClose}
+            className="absolute left-2 top-2 z-20 w-10 h-10 cursor-pointer"
+            aria-label="Cerrar"
+          />
+          
           <img 
             src={referralPopupImage} 
             alt="Gana un 10% de descuento invitando amigos" 
-            className="w-full max-w-sm rounded-lg"
-          />
-          
-          <Button 
+            className="w-full max-w-sm rounded-lg cursor-pointer relative z-10"
             onClick={handleCTAClick}
-            className="mt-4 px-8 py-3 bg-primary text-primary-foreground font-bold text-lg rounded-xl shadow-lg hover:bg-primary/90 hover:scale-105 transition-all duration-300 animate-pulse"
-          >
-            🎁 ¡Descubre esta promo!
-          </Button>
+          />
         </div>
       </DialogContent>
     </Dialog>

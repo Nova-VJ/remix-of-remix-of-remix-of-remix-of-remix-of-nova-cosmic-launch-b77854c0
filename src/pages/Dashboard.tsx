@@ -527,16 +527,6 @@ const Dashboard = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">Progreso del proyecto</span>
-                        <span className="font-medium">{Math.round(getStatusProgress(project.status))}%</span>
-                      </div>
-                      <Progress value={getStatusProgress(project.status)} className="h-2" />
-                      <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                        {PROJECT_STATUSES.map((s, i) => <span key={s.key} className={project.status === s.key ? 'text-primary font-medium' : ''}>{i + 1}</span>)}
-                      </div>
-                    </div>
 
                     {project.status === 'in_progress' && project.start_date && project.estimated_end_date && <div className="p-4 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-primary" /><span className="font-medium text-sm">Timeline</span></div>

@@ -145,6 +145,7 @@ const Admin = () => {
   const [registeredConversations, setRegisteredConversations] = useState<any[]>([]);
   const [registeredMessages, setRegisteredMessages] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [revisionRequests, setRevisionRequests] = useState<any[]>([]);
 
   // Budget creation dialog
   const [showCreateBudget, setShowCreateBudget] = useState(false);
@@ -232,7 +233,7 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes, saraConvRes, saraMsgRes, regConvRes, regMsgRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes, saraConvRes, saraMsgRes, regConvRes, regMsgRes, revisionReqRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -247,7 +248,8 @@ const Admin = () => {
       supabase.from('sara_anonymous_conversations').select('*').order('updated_at', { ascending: false }),
       supabase.from('sara_anonymous_messages').select('*').order('created_at', { ascending: true }),
       supabase.from('conversations').select('*').order('updated_at', { ascending: false }),
-      supabase.from('chat_messages').select('*').order('created_at', { ascending: true })
+      supabase.from('chat_messages').select('*').order('created_at', { ascending: true }),
+      supabase.from('revision_requests').select('*').order('created_at', { ascending: false })
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -265,6 +267,7 @@ const Admin = () => {
     if (saraMsgRes.data) setSaraMessages(saraMsgRes.data);
     if (regConvRes.data) setRegisteredConversations(regConvRes.data);
     if (regMsgRes.data) setRegisteredMessages(regMsgRes.data);
+    if (revisionReqRes.data) setRevisionRequests(revisionReqRes.data);
 
     setLoading(false);
   };
@@ -725,6 +728,7 @@ const Admin = () => {
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="appointments">Citas</TabsTrigger>
+            <TabsTrigger value="revisions">📝 Revisiones</TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
@@ -1765,6 +1769,69 @@ const Admin = () => {
                     </div>
                   ))}
                   {appointments.length === 0 && <p className="text-muted-foreground">No hay citas aún.</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Revisions Tab */}
+          <TabsContent value="revisions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Solicitudes de Revisión ({revisionRequests.length})</CardTitle>
+                <CardDescription>Revisiones solicitadas por los clientes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {revisionRequests.map((rev) => {
+                    const project = projects.find(p => p.id === rev.project_id);
+                    const profile = profiles.find(p => p.user_id === rev.user_id);
+                    return (
+                      <div key={rev.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <p className="font-medium">{project?.name || 'Proyecto no encontrado'}</p>
+                            <p className="text-sm text-muted-foreground">{profile?.email || profile?.full_name || 'Usuario desconocido'}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={rev.status === 'pending' ? 'default' : rev.status === 'in_progress' ? 'secondary' : 'outline'}>
+                              {rev.status === 'pending' ? 'Pendiente' : rev.status === 'in_progress' ? 'En progreso' : 'Resuelto'}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground">{formatDate(rev.created_at)}</p>
+                          </div>
+                        </div>
+                        <div className="bg-muted/50 rounded-lg p-3 mb-3">
+                          <p className="text-sm">{rev.description}</p>
+                        </div>
+                        {rev.admin_response && (
+                          <div className="bg-primary/10 rounded-lg p-3 mb-3">
+                            <p className="text-xs font-medium text-primary mb-1">Respuesta admin:</p>
+                            <p className="text-sm">{rev.admin_response}</p>
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <Select
+                            value={rev.status}
+                            onValueChange={async (value) => {
+                              await supabase.from('revision_requests').update({ status: value, resolved_at: value === 'resolved' ? new Date().toISOString() : null }).eq('id', rev.id);
+                              fetchData();
+                              toast({ title: "Estado actualizado" });
+                            }}
+                          >
+                            <SelectTrigger className="w-[150px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Pendiente</SelectItem>
+                              <SelectItem value="in_progress">En progreso</SelectItem>
+                              <SelectItem value="resolved">Resuelto</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {revisionRequests.length === 0 && <p className="text-muted-foreground">No hay solicitudes de revisión.</p>}
                 </div>
               </CardContent>
             </Card>
