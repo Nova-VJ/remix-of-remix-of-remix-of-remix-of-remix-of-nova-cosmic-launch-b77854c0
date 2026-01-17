@@ -24,7 +24,7 @@ const generateStars = (count: number): Star[] => {
   }));
 };
 
-const STAR_COUNT = 60;
+const STAR_COUNT = 30;
 const INTERACTION_RADIUS = 120;
 const BOUNCE_STRENGTH = 50;
 
@@ -119,43 +119,16 @@ export default function InteractiveStars() {
               mass: 0.3,
             }}
           >
-            {/* Star glow - larger and more visible */}
+            {/* Minimalist 4-point star shape */}
             <motion.div
-              className="absolute rounded-full"
+              className="relative"
               style={{
-                width: star.size * 8,
-                height: star.size * 8,
-                left: -star.size * 4,
-                top: -star.size * 4,
-                background: `radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, hsl(var(--primary) / 0.1) 40%, transparent 70%)`,
-              }}
-              animate={{
-                opacity: [0.4, 1, 0.4],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: star.twinkleDuration,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: star.twinkleDelay,
-              }}
-            />
-            {/* Star core - brighter */}
-            <motion.div
-              className="rounded-full"
-              style={{
-                width: star.size,
-                height: star.size,
-                backgroundColor: "hsl(var(--primary))",
-                boxShadow: `
-                  0 0 ${star.size}px hsl(var(--primary)),
-                  0 0 ${star.size * 2}px hsl(var(--primary)),
-                  0 0 ${star.size * 4}px hsl(var(--primary) / 0.5)
-                `,
+                width: star.size * 3,
+                height: star.size * 3,
               }}
               animate={{
                 opacity: [star.brightness, 1, star.brightness],
-                scale: [1, 1.3, 1],
+                scale: [1, 1.2, 1],
               }}
               transition={{
                 duration: star.twinkleDuration,
@@ -163,7 +136,36 @@ export default function InteractiveStars() {
                 ease: "easeInOut",
                 delay: star.twinkleDelay,
               }}
-            />
+            >
+              {/* Horizontal line */}
+              <div
+                className="absolute top-1/2 left-0 -translate-y-1/2"
+                style={{
+                  width: "100%",
+                  height: star.size * 0.3,
+                  background: `linear-gradient(90deg, transparent 0%, hsl(var(--primary)) 50%, transparent 100%)`,
+                }}
+              />
+              {/* Vertical line */}
+              <div
+                className="absolute left-1/2 top-0 -translate-x-1/2"
+                style={{
+                  height: "100%",
+                  width: star.size * 0.3,
+                  background: `linear-gradient(180deg, transparent 0%, hsl(var(--primary)) 50%, transparent 100%)`,
+                }}
+              />
+              {/* Center glow */}
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{
+                  width: star.size * 0.8,
+                  height: star.size * 0.8,
+                  backgroundColor: "hsl(var(--primary))",
+                  boxShadow: `0 0 ${star.size}px hsl(var(--primary) / 0.8)`,
+                }}
+              />
+            </motion.div>
           </motion.div>
         );
       })}
