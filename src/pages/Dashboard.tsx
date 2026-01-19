@@ -404,34 +404,69 @@ const Dashboard = () => {
   }
   return <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <img alt="Nova" className="h-8" src="/lovable-uploads/88c38dcf-6220-422a-8e76-722a26d10429.png" />
-            <span className="font-bold text-foreground">Mi Panel</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            {user?.email === ADMIN_EMAIL && <Link to="/admin">
-                <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/30 hover:bg-primary/10">
-                  <Settings className="w-4 h-4" />
-                  Admin
-                </Button>
-              </Link>}
-            <Link to="/profile">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <User className="w-4 h-4" />
-                Mi Perfil
-              </Button>
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {/* Desktop Header */}
+          <div className="hidden md:flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <img alt="Nova" className="h-8" src="/lovable-uploads/88c38dcf-6220-422a-8e76-722a26d10429.png" />
+              <span className="font-bold text-foreground">Mi Panel</span>
             </Link>
-            <div className="relative">
-              <Bell className="w-5 h-5 text-muted-foreground" />
-              {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                  {unreadCount}
-                </span>}
+            <div className="flex items-center gap-4">
+              {user?.email === ADMIN_EMAIL && <Link to="/admin">
+                  <Button variant="outline" size="sm" className="gap-2 text-primary border-primary/30 hover:bg-primary/10">
+                    <Settings className="w-4 h-4" />
+                    Admin
+                  </Button>
+                </Link>}
+              <Link to="/profile">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <User className="w-4 h-4" />
+                  Mi Perfil
+                </Button>
+              </Link>
+              <div className="relative">
+                <Bell className="w-5 h-5 text-muted-foreground" />
+                {unreadCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </span>}
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Salir
+              </Button>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Salir
-            </Button>
+          </div>
+          
+          {/* Mobile Header */}
+          <div className="md:hidden">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-2">
+                <img alt="Nova" className="h-7" src="/lovable-uploads/88c38dcf-6220-422a-8e76-722a26d10429.png" />
+              </Link>
+              <div className="flex items-center gap-2">
+                {user?.email === ADMIN_EMAIL && <Link to="/admin">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 text-primary">
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </Link>}
+                <Link to="/profile">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <User className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <div className="relative">
+                  <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <Bell className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                  {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center">
+                      {unreadCount}
+                    </span>}
+                </div>
+                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -515,91 +550,170 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="projects" className="space-y-6">
-            {projects.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground"><Folder className="w-12 h-12 mx-auto mb-4 opacity-50" /><p>No tienes proyectos activos</p></CardContent></Card> : projects.map(project => {
-            const projectMilestones = milestones.filter(m => m.project_id === project.id);
-            const projectAssets = assetLinks.filter(a => a.project_id === project.id);
-            const dayProgress = calculateDayProgress(project.start_date, project.estimated_end_date);
-            return <Card key={project.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div><CardTitle className="text-lg">{project.name}</CardTitle><CardDescription>{project.service_type}</CardDescription></div>
-                      <Badge variant={getStatusBadgeVariant(project.status)}>{getStatusLabel(project.status)}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-
-                    {project.status === 'in_progress' && project.start_date && project.estimated_end_date && <div className="p-4 rounded-lg bg-muted/50">
-                        <div className="flex items-center gap-2 mb-2"><Clock className="w-4 h-4 text-primary" /><span className="font-medium text-sm">Timeline</span></div>
-                        <div className="flex justify-between text-xs text-muted-foreground mb-2">
-                          <span>Inicio: {formatDate(project.start_date)}</span>
-                          <span>Entrega: {formatDate(project.estimated_end_date)}</span>
+            {projects.length === 0 ? (
+              <Card className="glass-card border-border/50">
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  <Folder className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No tienes proyectos activos</p>
+                </CardContent>
+              </Card>
+            ) : (
+              projects.map(project => {
+                const projectMilestones = milestones.filter(m => m.project_id === project.id);
+                const projectAssets = assetLinks.filter(a => a.project_id === project.id);
+                const dayProgress = calculateDayProgress(project.start_date, project.estimated_end_date);
+                
+                return (
+                  <Card key={project.id} className="glass-card border-border/50 overflow-hidden">
+                    <CardHeader className="pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg">{project.name}</CardTitle>
+                          <CardDescription className="text-sm">{project.service_type}</CardDescription>
                         </div>
-                        <Progress value={dayProgress} className="h-2" />
-                        <p className="text-xs text-muted-foreground mt-1">{dayProgress}% del tiempo</p>
-                      </div>}
+                        <Badge 
+                          variant={getStatusBadgeVariant(project.status)}
+                          className="w-fit text-xs px-3 py-1"
+                        >
+                          {getStatusLabel(project.status)}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
 
-                    {projectMilestones.length > 0 && <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" />Hitos</h4>
-                        <div className="space-y-2">
-                          {projectMilestones.map(m => <div key={m.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                              <div><p className="font-medium text-sm">{m.title}</p><p className="text-xs text-muted-foreground">{m.milestone_type}</p></div>
-                              <Badge variant={m.status === 'completed' ? 'default' : 'outline'}>{m.status === 'completed' ? 'Completado' : 'Pendiente'}</Badge>
-                            </div>)}
+                      {project.status === 'in_progress' && project.start_date && project.estimated_end_date && (
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="font-medium text-sm text-foreground">Timeline del proyecto</span>
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground mb-3">
+                            <span>Inicio: {formatDate(project.start_date)}</span>
+                            <span>Entrega: {formatDate(project.estimated_end_date)}</span>
+                          </div>
+                          <Progress value={dayProgress} className="h-2" />
+                          <p className="text-xs text-muted-foreground mt-2 text-center">{dayProgress}% completado</p>
                         </div>
-                      </div>}
+                      )}
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <RefreshCw className="w-5 h-5 mx-auto mb-1 text-primary" />
-                        <p className="text-lg font-bold">{project.revisions_used}/{project.max_revisions}</p>
-                        <p className="text-xs text-muted-foreground">Revisiones</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Server className={`w-5 h-5 mx-auto mb-1 ${project.hosting_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
-                        <p className="text-sm font-medium">{project.hosting_status === 'active' ? 'Activo' : 'Inactivo'}</p>
-                        <p className="text-xs text-muted-foreground">Hosting</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Globe className={`w-5 h-5 mx-auto mb-1 ${project.domain_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
-                        <p className="text-sm font-medium">{project.domain_status === 'active' ? 'Activo' : 'Inactivo'}</p>
-                        <p className="text-xs text-muted-foreground">Dominio</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/30 text-center">
-                        <Lock className={`w-5 h-5 mx-auto mb-1 ${project.ssl_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
-                        <p className="text-sm font-medium">{project.ssl_status === 'active' ? 'Activo' : 'Inactivo'}</p>
-                        <p className="text-xs text-muted-foreground">SSL</p>
-                      </div>
-                    </div>
-
-                    {project.maintenance_active && <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                        <div className="flex items-center gap-2 mb-2"><Calendar className="w-4 h-4 text-primary" /><span className="font-medium text-sm">Mantenimiento activo</span></div>
-                        <p className="text-sm text-muted-foreground">Próximo: {formatDate(project.next_maintenance_date)}</p>
-                        {project.last_backup_date && <p className="text-xs text-muted-foreground mt-1">Último backup: {formatDate(project.last_backup_date)}</p>}
-                      </div>}
-
-                    {projectAssets.length > 0 && <div>
-                        <h4 className="font-medium mb-3 flex items-center gap-2"><Download className="w-4 h-4 text-primary" />Entregables</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {projectAssets.map(asset => <Button key={asset.id} variant="outline" size="sm" asChild>
-                              <a href={asset.url} target="_blank" rel="noopener noreferrer"><FileText className="w-4 h-4 mr-2" />{asset.label}</a>
-                            </Button>)}
+                      {projectMilestones.length > 0 && (
+                        <div>
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-primary" />
+                            Hitos
+                          </h4>
+                          <div className="space-y-2">
+                            {projectMilestones.map(m => (
+                              <div key={m.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                                <div>
+                                  <p className="font-medium text-sm">{m.title}</p>
+                                  <p className="text-xs text-muted-foreground">{m.milestone_type}</p>
+                                </div>
+                                <Badge variant={m.status === 'completed' ? 'default' : 'outline'}>
+                                  {m.status === 'completed' ? 'Completado' : 'Pendiente'}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>}
+                      )}
 
-                    {project.revisions_used < project.max_revisions && (project.status === 'revision' || project.status === 'in_progress') && <div className="p-4 rounded-lg border border-border">
-                        <h4 className="font-medium mb-3">Solicitar cambios</h4>
-                        <Textarea placeholder="Describe los cambios..." value={selectedProjectForRevision === project.id ? revisionDescription : ''} onChange={e => {
-                    setSelectedProjectForRevision(project.id);
-                    setRevisionDescription(e.target.value);
-                  }} rows={3} />
-                        <div className="flex items-center justify-between mt-3">
-                          <p className="text-xs text-muted-foreground">{project.max_revisions - project.revisions_used} revisiones restantes</p>
-                          <Button size="sm" onClick={handleRequestRevision} disabled={selectedProjectForRevision !== project.id || !revisionDescription}><Send className="w-4 h-4 mr-2" />Enviar</Button>
+                      {/* Status Grid - Improved for mobile */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+                          <RefreshCw className="w-6 h-6 mx-auto mb-2 text-primary" />
+                          <p className="text-xl font-bold text-foreground">{project.revisions_used}/{project.max_revisions}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Revisiones</p>
                         </div>
-                      </div>}
-                  </CardContent>
-                </Card>;
-          })}
+                        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+                          <Server className={`w-6 h-6 mx-auto mb-2 ${project.hosting_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                          <p className={`text-sm font-semibold ${project.hosting_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`}>
+                            {project.hosting_status === 'active' ? 'Activo' : 'Inactivo'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">Hosting</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+                          <Globe className={`w-6 h-6 mx-auto mb-2 ${project.domain_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                          <p className={`text-sm font-semibold ${project.domain_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`}>
+                            {project.domain_status === 'active' ? 'Activo' : 'Inactivo'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">Dominio</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-muted/30 border border-border/50 text-center">
+                          <Lock className={`w-6 h-6 mx-auto mb-2 ${project.ssl_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`} />
+                          <p className={`text-sm font-semibold ${project.ssl_status === 'active' ? 'text-green-500' : 'text-muted-foreground'}`}>
+                            {project.ssl_status === 'active' ? 'Activo' : 'Inactivo'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">SSL</p>
+                        </div>
+                      </div>
+
+                      {project.maintenance_active && (
+                        <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-primary" />
+                            <span className="font-medium text-sm">Mantenimiento activo</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Próximo: {formatDate(project.next_maintenance_date)}</p>
+                          {project.last_backup_date && (
+                            <p className="text-xs text-muted-foreground mt-1">Último backup: {formatDate(project.last_backup_date)}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {projectAssets.length > 0 && (
+                        <div>
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <Download className="w-4 h-4 text-primary" />
+                            Entregables
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {projectAssets.map(asset => (
+                              <Button key={asset.id} variant="outline" size="sm" asChild>
+                                <a href={asset.url} target="_blank" rel="noopener noreferrer">
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  {asset.label}
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {project.revisions_used < project.max_revisions && (project.status === 'revision' || project.status === 'in_progress') && (
+                        <div className="p-4 rounded-xl border border-border bg-muted/20">
+                          <h4 className="font-medium mb-3">Solicitar cambios</h4>
+                          <Textarea 
+                            placeholder="Describe los cambios que necesitas..." 
+                            value={selectedProjectForRevision === project.id ? revisionDescription : ''} 
+                            onChange={e => {
+                              setSelectedProjectForRevision(project.id);
+                              setRevisionDescription(e.target.value);
+                            }} 
+                            rows={3} 
+                            className="mb-3"
+                          />
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <p className="text-xs text-muted-foreground">
+                              {project.max_revisions - project.revisions_used} revisiones restantes
+                            </p>
+                            <Button 
+                              size="sm" 
+                              onClick={handleRequestRevision} 
+                              disabled={selectedProjectForRevision !== project.id || !revisionDescription}
+                              className="w-full sm:w-auto"
+                            >
+                              <Send className="w-4 h-4 mr-2" />
+                              Enviar solicitud
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
           </TabsContent>
 
           <TabsContent value="tickets" className="space-y-6">
