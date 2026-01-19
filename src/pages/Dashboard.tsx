@@ -13,6 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import logo from '@/assets/logo.png';
 import { LogOut, Folder, CreditCard, Bell, Calendar, Ticket, Gift, Download, Shield, Server, Globe, Lock, RefreshCw, CheckCircle, Clock, FileText, Copy, Send, DollarSign, Check, Settings, User } from 'lucide-react';
+import EmptyProjectsState from '@/components/EmptyProjectsState';
+import AnimatedCard from '@/components/AnimatedCard';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 interface Payment {
   id: string;
@@ -551,20 +553,15 @@ const Dashboard = () => {
 
           <TabsContent value="projects" className="space-y-6">
             {projects.length === 0 ? (
-              <Card className="glass-card border-border/50">
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  <Folder className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No tienes proyectos activos</p>
-                </CardContent>
-              </Card>
+              <EmptyProjectsState />
             ) : (
-              projects.map(project => {
+              projects.map((project, index) => {
                 const projectMilestones = milestones.filter(m => m.project_id === project.id);
                 const projectAssets = assetLinks.filter(a => a.project_id === project.id);
                 const dayProgress = calculateDayProgress(project.start_date, project.estimated_end_date);
                 
                 return (
-                  <Card key={project.id} className="glass-card border-border/50 overflow-hidden">
+                  <AnimatedCard key={project.id} delay={index * 100}>
                     <CardHeader className="pb-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="space-y-1">
@@ -710,7 +707,7 @@ const Dashboard = () => {
                         </div>
                       )}
                     </CardContent>
-                  </Card>
+                  </AnimatedCard>
                 );
               })
             )}
