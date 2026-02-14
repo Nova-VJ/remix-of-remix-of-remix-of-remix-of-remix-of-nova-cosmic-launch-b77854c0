@@ -22,6 +22,6 @@ const TrustSection = () => {
       setPromoApplied(false);
     }
   };
-  return;
+  return null;
 };
 export default TrustSection;
