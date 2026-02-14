@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,8 @@ import logo from '@/assets/logo.png';
 import { LogOut, Folder, CreditCard, Bell, Calendar, Ticket, Gift, Download, Shield, Server, Globe, Lock, RefreshCw, CheckCircle, Clock, FileText, Copy, Send, DollarSign, Check, Settings, User } from 'lucide-react';
 import EmptyProjectsState from '@/components/EmptyProjectsState';
 import AnimatedCard from '@/components/AnimatedCard';
+import WelcomeTutorial from '@/components/WelcomeTutorial';
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 interface Payment {
   id: string;
@@ -151,6 +153,7 @@ const Dashboard = () => {
   const [assetLinks, setAssetLinks] = useState<AssetLink[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [newTicket, setNewTicket] = useState({
     subject: '',
     category: 'consulta',
@@ -159,6 +162,19 @@ const Dashboard = () => {
   });
   const [revisionDescription, setRevisionDescription] = useState('');
   const [selectedProjectForRevision, setSelectedProjectForRevision] = useState<string | null>(null);
+
+  // Realtime notifications
+  const handleNewNotification = useCallback((notification: Notification) => {
+    setNotifications(prev => {
+      const exists = prev.find(n => n.id === notification.id);
+      if (exists) {
+        return prev.map(n => n.id === notification.id ? notification : n);
+      }
+      return [notification, ...prev];
+    });
+  }, []);
+
+  useRealtimeNotifications(user?.id, handleNewNotification);
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
@@ -167,8 +183,20 @@ const Dashboard = () => {
   useEffect(() => {
     if (user) {
       fetchData();
+      // Check if tutorial has been seen
+      const tutorialSeen = localStorage.getItem(`nova_tutorial_seen_${user.id}`);
+      if (!tutorialSeen) {
+        setShowTutorial(true);
+      }
     }
   }, [user]);
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false);
+    if (user) {
+      localStorage.setItem(`nova_tutorial_seen_${user.id}`, 'true');
+    }
+  };
   const fetchData = async () => {
     if (!user) return;
     setLoading(true);
@@ -404,7 +432,9 @@ const Dashboard = () => {
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>;
   }
-  return <div className="min-h-screen bg-background">
+  return <>
+    {showTutorial && <WelcomeTutorial onComplete={handleTutorialComplete} />}
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3">
           {/* Desktop Header */}
@@ -864,6 +894,7 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
-    </div>;
+    </div>
+  </>;
 };
 export default Dashboard;
