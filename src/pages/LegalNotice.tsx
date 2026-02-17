@@ -22,7 +22,6 @@ const LegalNotice = () => {
               En cumplimiento del deber de información recogido en el artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico, se exponen los siguientes datos:
             </p>
             <ul className="list-none space-y-1 text-muted-foreground mt-3">
-              <li><strong>Titular:</strong> Ana Patricia Velasco Franco</li>
               <li><strong>NIF:</strong> 71164077F</li>
               <li><strong>Domicilio:</strong> Calle Recondo 7</li>
               <li><strong>Email:</strong> info@solutionsnova.es</li>
@@ -33,7 +32,7 @@ const LegalNotice = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">2. Objeto</h2>
             <p className="text-muted-foreground">
-              El presente Aviso Legal regula el uso del sitio web solutionsnova.es (en adelante, "la Web"), del que es titular Ana Patricia Velasco Franco.
+              El presente Aviso Legal regula el uso del sitio web solutionsnova.es (en adelante, "la Web").
             </p>
             <p className="text-muted-foreground mt-2">
               La navegación por la Web atribuye la condición de usuario de la misma e implica la aceptación plena y sin reservas de todas y cada una de las disposiciones incluidas en este Aviso Legal.
