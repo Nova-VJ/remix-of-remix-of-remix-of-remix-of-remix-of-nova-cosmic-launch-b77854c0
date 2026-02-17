@@ -113,25 +113,23 @@ const ProjectFlow = ({ currentStage, isActive, projectName }: ProjectFlowProps) 
             ))}
           </div>
 
-          {/* Mobile: Horizontal scroll */}
-          <div className="md:hidden overflow-x-auto pb-2 -mx-2 px-2">
-            <div className="flex items-center gap-2 min-w-max">
-              {PROJECT_STAGES.map((stage, index) => (
-                <div key={stage.id} className="flex items-center">
-                  <div className="flex flex-col items-center min-w-[60px]">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <stage.icon className="w-4 h-4 text-muted-foreground/50" />
-                    </div>
-                    <span className="text-[9px] text-muted-foreground/50 text-center mt-1 max-w-[55px] leading-tight">
-                      {stage.title}
-                    </span>
+          {/* Mobile: Vertical timeline */}
+          <div className="md:hidden space-y-1">
+            {PROJECT_STAGES.map((stage, index) => (
+              <div key={stage.id} className="flex items-start gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <stage.icon className="w-4 h-4 text-muted-foreground/50" />
                   </div>
                   {index < PROJECT_STAGES.length - 1 && (
-                    <div className="w-4 h-0.5 bg-muted mx-0.5 flex-shrink-0" />
+                    <div className="w-0.5 h-4 bg-muted" />
                   )}
                 </div>
-              ))}
-            </div>
+                <div className="pt-1.5">
+                  <p className="text-xs text-muted-foreground/50 leading-tight">{stage.title}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -201,53 +199,43 @@ const ProjectFlow = ({ currentStage, isActive, projectName }: ProjectFlowProps) 
         </div>
       </div>
 
-      {/* Mobile: Horizontal scroll */}
-      <div className="md:hidden overflow-x-auto pb-4 -mx-2 px-2">
-        <div className="flex items-center min-w-max gap-1">
-          {PROJECT_STAGES.map((stage, index) => {
-            const isCompleted = index < currentStageIndex;
-            const isCurrent = index === currentStageIndex;
+      {/* Mobile: Vertical timeline */}
+      <div className="md:hidden space-y-0">
+        {PROJECT_STAGES.map((stage, index) => {
+          const isCompleted = index < currentStageIndex;
+          const isCurrent = index === currentStageIndex;
 
-            return (
-              <div key={stage.id} className="flex items-center">
-                <div className="flex flex-col items-center min-w-[65px] group relative">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                      isCurrent
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40 ring-2 ring-primary/20'
-                        : isCompleted
-                        ? 'bg-primary/80 text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    <stage.icon className="w-4 h-4" />
-                  </div>
-                  <span
-                    className={`text-[9px] text-center mt-1 max-w-[60px] leading-tight ${
-                      isCurrent
-                        ? 'text-primary font-medium'
-                        : isCompleted
-                        ? 'text-foreground'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
-                    {stage.title}
-                  </span>
-                  {isCurrent && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
-                  )}
+          return (
+            <div key={stage.id} className="flex items-start gap-3">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                    isCurrent
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/40 ring-2 ring-primary/20'
+                      : isCompleted
+                      ? 'bg-primary/80 text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <stage.icon className="w-4 h-4" />
                 </div>
                 {index < PROJECT_STAGES.length - 1 && (
-                  <div
-                    className={`w-4 h-0.5 mx-0.5 rounded-full flex-shrink-0 ${
-                      isCompleted ? 'bg-primary/80' : 'bg-muted'
-                    }`}
-                  />
+                  <div className={`w-0.5 h-6 ${isCompleted ? 'bg-primary/80' : 'bg-muted'}`} />
                 )}
               </div>
-            );
-          })}
-        </div>
+              <div className="pt-2 pb-4">
+                <p className={`text-sm font-medium leading-tight ${
+                  isCurrent ? 'text-primary' : isCompleted ? 'text-foreground' : 'text-muted-foreground'
+                }`}>
+                  {stage.title}
+                </p>
+                {isCurrent && (
+                  <p className="text-xs text-muted-foreground mt-0.5">{stage.description}</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

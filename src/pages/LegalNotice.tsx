@@ -95,8 +95,8 @@ const LegalNotice = () => {
             <p className="text-muted-foreground">
               El titular se reserva el derecho a modificar el presente Aviso Legal para adaptarlo a novedades legislativas o jurisprudenciales.
             </p>
-            <p className="text-muted-foreground mt-2">
-              <strong>Última actualización:</strong> Enero 2026
+             <p className="text-muted-foreground mt-2">
+              <strong>Última actualización:</strong> {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())}
             </p>
           </section>
         </div>

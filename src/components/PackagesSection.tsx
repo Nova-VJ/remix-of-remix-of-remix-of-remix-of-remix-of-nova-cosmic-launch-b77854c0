@@ -1,4 +1,4 @@
-import { Check, ShoppingCart, Crown, Sparkles, Gift } from 'lucide-react';
+import { Check, ShoppingCart, Crown, Gem, Gift } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ const packages = [
     name: "Paquete Plus",
     price: 1900,
     priceLabel: "1.900€",
-    icon: Sparkles,
+    icon: Gem,
     description: "El pack completo para transformar tu negocio digitalmente.",
     includes: [
       "Página web profesional",

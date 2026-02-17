@@ -19,7 +19,6 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Responsable del Tratamiento</h2>
             <ul className="list-none space-y-1 text-muted-foreground">
-              <li><strong>Titular:</strong> Ana Patricia Velasco Franco</li>
               <li><strong>NIF:</strong> 71164077F</li>
               <li><strong>Dirección:</strong> Calle Recondo 7</li>
               <li><strong>Email:</strong> info@solutionsnova.es</li>
@@ -118,8 +117,8 @@ const PrivacyPolicy = () => {
             <p className="text-muted-foreground">
               Esta política puede actualizarse. Te recomendamos revisarla periódicamente.
             </p>
-            <p className="text-muted-foreground mt-2">
-              <strong>Última actualización:</strong> Enero 2026
+             <p className="text-muted-foreground mt-2">
+              <strong>Última actualización:</strong> {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase())}
             </p>
           </section>
         </div>
