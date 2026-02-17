@@ -5,7 +5,7 @@ import serviceBrandingIcon from '@/assets/service-branding-icon.svg';
 import serviceSocialIcon from '@/assets/service-social-icon.svg';
 import serviceContentIcon from '@/assets/service-content-icon.png';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, ShoppingCart, TrendingUp, Search, Bot, Sparkles, ChevronDown, ChevronUp, FileEdit } from 'lucide-react';
+import { Check, ShoppingCart, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, ChevronUp, FileEdit } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -17,9 +17,9 @@ const services = [
     alt: "Páginas web que convierten",
     title: "Páginas web que convierten",
     description: "Diseño + velocidad + SEO para vender más",
-    includes: ["SEM base y estructura", "Embudos de venta", "Medición y optimización"],
-    price: 1000,
-    priceLabel: "desde 1.000€",
+    includes: ["SEO", "Embudos de venta", "Medición y optimización"],
+    price: 600,
+    priceLabel: "desde 600€",
     hasVirtualAssistant: true,
   },
   {
@@ -51,8 +51,8 @@ const services = [
     title: "Branding profesional",
     description: "Creación de identidad visual premium y manual de marca",
     includes: ["Logotipo (variantes)", "Papelería corporativa", "Elementos gráficos"],
-    price: 300,
-    priceLabel: "desde 300€",
+    price: 200,
+    priceLabel: "desde 200€",
   },
   {
     id: 'content',
@@ -81,12 +81,12 @@ const virtualAssistants = [
       "Deriva a humano cuando haga falta"
     ],
     useCase: "Uso típico: peluquerías, clínicas, restaurantes, servicios locales, academias.",
-    price: 200,
-    priceLabel: "200€",
+    price: 100,
+    priceLabel: "100€",
   },
   {
     id: 'assistant-plus',
-    icon: Sparkles,
+    icon: BotMessageSquare,
     title: "Asistente Virtual PLUS",
     subtitle: "Para atención completa, 24/7, con IA avanzada.",
     features: [
@@ -96,8 +96,8 @@ const virtualAssistants = [
       "Puede calificar leads y guiar a \"Solicitar presupuesto\" o \"Comprar\""
     ],
     useCase: "Uso típico: empresas con muchos servicios, ventas consultivas, soporte y captación constante.",
-    price: 400,
-    priceLabel: "400€",
+    price: 200,
+    priceLabel: "200€",
   }
 ];
 
@@ -117,11 +117,11 @@ const additionalServices = [
     icon: Search,
     title: "SEM",
     subtitle: "Posicionamiento en Google",
-    description: "Crea campañas para el posicionamiento de tu página en Google.",
+    description: "Creación y seguimiento de campañas en Google/Social Ads",
     price: 150,
     priceLabel: "150€/mes",
     isMonthly: true,
-    badge: "Gratis con 4 servicios",
+    badge: "Primer mes gratis con 4 servicios",
   }
 ];
 
