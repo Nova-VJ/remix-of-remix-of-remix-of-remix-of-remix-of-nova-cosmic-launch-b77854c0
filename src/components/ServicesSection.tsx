@@ -16,8 +16,8 @@ const services = [
     image: serviceWebIcon,
     alt: "Páginas web que convierten",
     title: "Páginas web que convierten",
-    description: "Diseño + velocidad + SEO para vender más",
-    includes: ["SEO", "Embudos de venta", "Medición y optimización"],
+    description: "Diseño + velocidad + Posicionamiento en Google",
+    includes: ["SEO (Visitas)", "Embudos de venta", "Medición y optimización"],
     price: 600,
     priceLabel: "desde 600€",
     hasVirtualAssistant: true,
@@ -116,7 +116,7 @@ const additionalServices = [
     id: 'sem',
     icon: Search,
     title: "SEM",
-    subtitle: "Posicionamiento en Google",
+    subtitle: "Creación y seguimiento de campañas en Google/Social Ads",
     description: "Creación y seguimiento de campañas en Google/Social Ads",
     price: 150,
     priceLabel: "150€/mes",
@@ -208,7 +208,7 @@ const ServicesSection = () => {
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {/* Service image */}
-              <div className={`${(service as any).isFullWidth ? 'w-40 h-40' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
+              <div className={`${(service as any).isFullWidth ? 'w-48 h-48' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
                 <img
                   src={service.image}
                   alt={service.alt}
