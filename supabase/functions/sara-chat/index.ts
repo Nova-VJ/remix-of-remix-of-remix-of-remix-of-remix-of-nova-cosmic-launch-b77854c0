@@ -12,17 +12,16 @@ SOBRE NOVA MARKETING SOLUTIONS:
 - Agencia de marketing digital y desarrollo web ubicada en España
 - Servicios: Páginas web, Aplicaciones móviles, Redes sociales, Branding, Ciberseguridad/Pentesting
 - Paquetes: Pro (incluye marketing digital gratis) y Plus (incluye marketing digital + SEM gratis)
-- Código promocional: NOVA30 para 30% de descuento (no aplicable con paquete Plus)
+- Código promocional: NOVA20 para 20% de descuento
 - Contacto: info@solutionsnova.es, WhatsApp disponible
 
 PACKS Y PRECIOS (orientativos):
-- Web Starter: desde 499€ - Landing page, 3 secciones
-- Web Business: desde 999€ - Web completa, hasta 10 páginas
-- Web Premium: desde 1999€ - E-commerce, funcionalidades avanzadas
+- Páginas web: desde 600€
 - Apps: desde 1499€ (básica) hasta 4999€ (premium)
-- Branding: desde 299€ (básico) hasta 999€ (completo)
-- Redes sociales: desde 299€/mes hasta 799€/mes
-- Ciberseguridad: desde 499€ (auditoría) hasta 2999€ (pentesting completo)
+- Branding: desde 200€
+- Asistente Virtual PRO: 100€/mes, PLUS: 200€/mes
+- Paquete Pro: 800€, Paquete Plus: 1.900€
+- Redes sociales: desde 299€/mes
 
 INSTRUCCIONES:
 1. Responde SOLO con información de Nova Marketing Solutions
@@ -38,39 +37,90 @@ FORMATO:
 - Usa emojis con moderación para ser amigable
 - Si es apropiado, ofrece opciones o siguientes pasos`;
 
-// Simple in-memory rate limiting (resets on cold start, but provides basic protection)
+const CLASSIFICATION_PROMPT = `Analiza la siguiente conversación entre un usuario y Sara (asistente de Nova Marketing Solutions).
+Devuelve un JSON con esta estructura exacta (sin markdown, solo JSON puro):
+{
+  "title": "Título máximo 8 palabras, específico y comercial. Ejemplos: 'Web corporativa – Alta intención', 'App marketplace – Solicita presupuesto', 'Solo pregunta precios', 'Branding – Consulta inicial'",
+  "service": "uno de: Web|App|Branding|Social|Ads|Automatizaciones|Consulta general|Otro",
+  "stage": "uno de: Curioso|Comparando|Pide precio|Alta intención|Listo para comprar",
+  "urgency": "uno de: Alta|Media|Baja",
+  "quality": "uno de: Alta|Media|Baja",
+  "score": número entre 0 y 100 (considera: menciona presupuesto +20, plazo concreto +15, solicita llamada +20, negocio activo +10, claridad de necesidad +15, intención de compra +20),
+  "summary": "Resumen ejecutivo 3-5 líneas: qué quiere, en qué fase está, probabilidad de cierre, próxima acción recomendada",
+  "next_action": "Próxima acción específica recomendada en máximo 10 palabras",
+  "contact_name": "nombre si se mencionó o null",
+  "contact_email": "email si se mencionó o null",
+  "contact_phone": "teléfono si se mencionó o null",
+  "contact_city": "ciudad si se mencionó o null",
+  "contact_website": "web si se mencionó o null"
+}`;
+
+// Simple in-memory rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per identifier
+const RATE_LIMIT_WINDOW_MS = 60000;
+const MAX_REQUESTS_PER_WINDOW = 10;
 
 function checkRateLimit(identifier: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
-  
   if (!record || now > record.resetTime) {
     rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1 };
   }
-  
   if (record.count >= MAX_REQUESTS_PER_WINDOW) {
     return { allowed: false, remaining: 0 };
   }
-  
   record.count++;
   return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - record.count };
 }
 
-// Clean up old entries periodically (every 100 requests)
 let requestCounter = 0;
 function cleanupRateLimitMap() {
   requestCounter++;
   if (requestCounter % 100 === 0) {
     const now = Date.now();
     for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetTime) {
-        rateLimitMap.delete(key);
-      }
+      if (now > value.resetTime) rateLimitMap.delete(key);
     }
+  }
+}
+
+async function classifyConversation(
+  messages: { role: string; content: string }[],
+  apiKey: string
+): Promise<any> {
+  try {
+    const conversationText = messages
+      .map(m => `${m.role === 'user' ? 'Usuario' : 'Sara'}: ${m.content}`)
+      .join('\n');
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: CLASSIFICATION_PROMPT },
+          { role: "user", content: `Conversación:\n${conversationText}` }
+        ],
+        max_tokens: 600,
+      }),
+    });
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    
+    // Parse JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+    return JSON.parse(jsonMatch[0]);
+  } catch (e) {
+    console.error("Classification error:", e);
+    return null;
   }
 }
 
@@ -82,33 +132,21 @@ serve(async (req) => {
   try {
     const { message, anon_id, session_id } = await req.json();
     
-    // Get client IP for rate limiting (fallback to anon_id)
     const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
                      req.headers.get("x-real-ip") || 
                      anon_id || 
                      "unknown";
     
-    // Check rate limit
     cleanupRateLimitMap();
     const rateLimitResult = checkRateLimit(clientIP);
     
     if (!rateLimitResult.allowed) {
-      console.log(`Rate limit exceeded for: ${clientIP}`);
       return new Response(
         JSON.stringify({ error: "Demasiadas solicitudes. Por favor, espera un momento antes de enviar otro mensaje." }),
-        { 
-          status: 429, 
-          headers: { 
-            ...corsHeaders, 
-            "Content-Type": "application/json",
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000))
-          } 
-        }
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Validate message
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return new Response(
         JSON.stringify({ error: "Mensaje inválido" }),
@@ -116,7 +154,6 @@ serve(async (req) => {
       );
     }
 
-    // Limit message length to prevent abuse
     if (message.length > 2000) {
       return new Response(
         JSON.stringify({ error: "Mensaje demasiado largo. Máximo 2000 caracteres." }),
@@ -128,33 +165,29 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Crear cliente de Supabase con service role para guardar mensajes
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
-    // Check if user is authenticated
+    // Check auth
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
-    
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.replace("Bearer ", "");
       const { data: { user } } = await supabase.auth.getUser(token);
       userId = user?.id || null;
     }
 
-    // Determinar si es usuario anónimo o registrado
     const isAnonymous = !userId && anon_id;
 
-    // Obtener o crear conversación anónima
+    // Handle anonymous conversation
     let anonConversationId: string | null = null;
+    let allMessages: { role: string; content: string }[] = [];
+    
     if (isAnonymous) {
-      // Buscar si ya existe una conversación para este anon_id
       const { data: existingConv } = await supabase
         .from("sara_anonymous_conversations")
-        .select("id")
+        .select("id, message_count")
         .eq("anon_id", anon_id)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -162,43 +195,53 @@ serve(async (req) => {
 
       if (existingConv) {
         anonConversationId = existingConv.id;
-        // Actualizar timestamp
         await supabase
           .from("sara_anonymous_conversations")
-          .update({ updated_at: new Date().toISOString() })
+          .update({ 
+            updated_at: new Date().toISOString(),
+            message_count: (existingConv.message_count || 0) + 1
+          })
           .eq("id", anonConversationId);
       } else {
-        // Crear nueva conversación anónima
         const { data: newConv } = await supabase
           .from("sara_anonymous_conversations")
-          .insert({ anon_id })
+          .insert({ anon_id, message_count: 1 })
           .select("id")
           .single();
-        
-        if (newConv) {
-          anonConversationId = newConv.id;
-        }
+        if (newConv) anonConversationId = newConv.id;
       }
 
-      // Guardar mensaje del usuario
       if (anonConversationId) {
-        await supabase
+        await supabase.from("sara_anonymous_messages").insert({
+          conversation_id: anonConversationId,
+          role: "user",
+          content: message.substring(0, 2000)
+        });
+
+        // Load conversation history for context
+        const { data: history } = await supabase
           .from("sara_anonymous_messages")
-          .insert({
-            conversation_id: anonConversationId,
-            role: "user",
-            content: message.substring(0, 2000) // Ensure message is truncated
-          });
+          .select("role, content")
+          .eq("conversation_id", anonConversationId)
+          .order("created_at", { ascending: true })
+          .limit(20);
+        allMessages = history || [];
       }
     }
 
-    console.log(`Processing chat request - IP: ${clientIP}, Anonymous: ${isAnonymous}, Remaining requests: ${rateLimitResult.remaining}`);
+    console.log(`Processing chat - IP: ${clientIP}, Anonymous: ${isAnonymous}, Remaining: ${rateLimitResult.remaining}`);
 
-    // Preparar mensajes para la API
+    // Build API messages with history for context
     const apiMessages = [
       { role: "system", content: SYSTEM_PROMPT },
+      ...allMessages.slice(-10).map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
       { role: "user", content: message }
     ];
+    // Deduplicate last user message if already in history
+    const lastHistoryMsg = allMessages[allMessages.length - 1];
+    const finalMessages = lastHistoryMsg?.role === 'user' && lastHistoryMsg.content === message
+      ? [{ role: "system", content: SYSTEM_PROMPT }, ...allMessages.slice(-10).map(m => ({ role: m.role as "user" | "assistant", content: m.content }))]
+      : apiMessages;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -208,8 +251,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: apiMessages,
-        stream: false,
+        messages: finalMessages,
         max_tokens: 500,
       }),
     });
@@ -236,15 +278,76 @@ serve(async (req) => {
     const assistantMessage = data.choices?.[0]?.message?.content || 
       "Lo siento, no pude procesar tu mensaje. ¿Puedes intentarlo de nuevo?";
 
-    // Guardar respuesta de Sara para usuarios anónimos
+    // Save Sara's response
     if (isAnonymous && anonConversationId) {
-      await supabase
-        .from("sara_anonymous_messages")
-        .insert({
-          conversation_id: anonConversationId,
-          role: "assistant",
-          content: assistantMessage
-        });
+      await supabase.from("sara_anonymous_messages").insert({
+        conversation_id: anonConversationId,
+        role: "assistant",
+        content: assistantMessage
+      });
+
+      // Create admin notification for every new message
+      const notifTitle = `💬 Nuevo mensaje de Sara`;
+      const notifMsg = `Anónimo escribió: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`;
+      await supabase.from("admin_notifications").insert({
+        type: 'sara_message',
+        title: notifTitle,
+        message: notifMsg,
+        data: { 
+          conversation_id: anonConversationId, 
+          anon_id,
+          user_message: message.substring(0, 200)
+        }
+      });
+
+      // Run AI classification every 3 messages (background)
+      const { data: msgCount } = await supabase
+        .from("sara_anonymous_conversations")
+        .select("message_count")
+        .eq("id", anonConversationId)
+        .single();
+      
+      const count = msgCount?.message_count || 0;
+      if (count >= 3 && count % 3 === 0) {
+        // Get full conversation for classification
+        const { data: fullHistory } = await supabase
+          .from("sara_anonymous_messages")
+          .select("role, content")
+          .eq("conversation_id", anonConversationId)
+          .order("created_at", { ascending: true });
+
+        if (fullHistory && fullHistory.length >= 3) {
+          const classification = await classifyConversation(fullHistory, LOVABLE_API_KEY);
+          if (classification) {
+            await supabase.from("sara_anonymous_conversations").update({
+              ai_title: classification.title,
+              ai_service: classification.service,
+              ai_stage: classification.stage,
+              ai_urgency: classification.urgency,
+              ai_quality: classification.quality,
+              ai_score: Math.min(100, Math.max(0, parseInt(classification.score) || 0)),
+              ai_summary: classification.summary,
+              ai_next_action: classification.next_action,
+              contact_name: classification.contact_name,
+              contact_email: classification.contact_email,
+              contact_phone: classification.contact_phone,
+              contact_city: classification.contact_city,
+              contact_website: classification.contact_website,
+              classified_at: new Date().toISOString()
+            }).eq("id", anonConversationId);
+
+            // High priority admin alert
+            if ((classification.score || 0) >= 70) {
+              await supabase.from("admin_notifications").insert({
+                type: 'high_priority_lead',
+                title: `🚀 Lead de alta prioridad detectado (Score: ${classification.score})`,
+                message: `${classification.title} – ${classification.service} – ${classification.stage}`,
+                data: { conversation_id: anonConversationId, ...classification }
+              });
+            }
+          }
+        }
+      }
     }
 
     return new Response(
@@ -263,9 +366,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("sara-chat error:", error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Error desconocido" 
-      }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Error desconocido" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

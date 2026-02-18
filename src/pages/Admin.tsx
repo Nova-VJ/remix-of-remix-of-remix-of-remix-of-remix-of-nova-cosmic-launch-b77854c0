@@ -12,7 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock } from 'lucide-react';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock, Brain } from 'lucide-react';
+import SaraLeadIntelligence from '@/components/SaraLeadIntelligence';
 
 interface Lead {
   id: string;
@@ -145,6 +146,7 @@ const Admin = () => {
   const [registeredConversations, setRegisteredConversations] = useState<any[]>([]);
   const [registeredMessages, setRegisteredMessages] = useState<any[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [adminNotifications, setAdminNotifications] = useState<any[]>([]);
   const [revisionRequests, setRevisionRequests] = useState<any[]>([]);
 
   // Budget creation dialog
@@ -233,7 +235,7 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     
-    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes, saraConvRes, saraMsgRes, regConvRes, regMsgRes, revisionReqRes] = await Promise.all([
+    const [leadsRes, ticketsRes, projectsRes, emailsRes, appointmentsRes, milestonesRes, maintenanceRes, profilesRes, referralsRes, budgetsRes, storiesRes, saraConvRes, saraMsgRes, regConvRes, regMsgRes, revisionReqRes, adminNotifsRes] = await Promise.all([
       supabase.from('leads').select('*').order('created_at', { ascending: false }),
       supabase.from('tickets').select('*').order('created_at', { ascending: false }),
       supabase.from('projects').select('*').order('created_at', { ascending: false }),
@@ -249,7 +251,8 @@ const Admin = () => {
       supabase.from('sara_anonymous_messages').select('*').order('created_at', { ascending: true }),
       supabase.from('conversations').select('*').order('updated_at', { ascending: false }),
       supabase.from('chat_messages').select('*').order('created_at', { ascending: true }),
-      supabase.from('revision_requests').select('*').order('created_at', { ascending: false })
+      supabase.from('revision_requests').select('*').order('created_at', { ascending: false }),
+      supabase.from('admin_notifications').select('*').order('created_at', { ascending: false }).limit(100)
     ]);
 
     if (leadsRes.data) setLeads(leadsRes.data);
@@ -268,6 +271,7 @@ const Admin = () => {
     if (regConvRes.data) setRegisteredConversations(regConvRes.data);
     if (regMsgRes.data) setRegisteredMessages(regMsgRes.data);
     if (revisionReqRes.data) setRevisionRequests(revisionReqRes.data);
+    if (adminNotifsRes.data) setAdminNotifications(adminNotifsRes.data);
 
     setLoading(false);
   };
@@ -717,7 +721,14 @@ const Admin = () => {
         <Tabs defaultValue="budgets">
           <TabsList className="mb-4 flex-wrap h-auto gap-1">
             <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
-            <TabsTrigger value="sara-history">💬 Sara</TabsTrigger>
+            <TabsTrigger value="sara-history" className="relative">
+              🧠 Sara IA
+              {adminNotifications.filter((n: any) => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                  {adminNotifications.filter((n: any) => !n.read).length > 9 ? '9+' : adminNotifications.filter((n: any) => !n.read).length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="budgets">Presupuestos</TabsTrigger>
             <TabsTrigger value="stories">Casos de éxito</TabsTrigger>
             <TabsTrigger value="projects">Proyectos</TabsTrigger>
@@ -798,73 +809,15 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          {/* Sara History Tab */}
+          {/* Sara Intelligence Tab */}
           <TabsContent value="sara-history">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2"><MessageSquare className="w-5 h-5" />Conversaciones</CardTitle>
-                </CardHeader>
-                <CardContent className="max-h-[500px] overflow-y-auto space-y-2">
-                  <p className="text-xs text-muted-foreground mb-2 font-medium">Usuarios Anónimos</p>
-                  {saraConversations.map(conv => (
-                    <div 
-                      key={conv.id} 
-                      onClick={() => setSelectedConversation(`anon-${conv.id}`)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedConversation === `anon-${conv.id}` ? 'bg-primary/20 border-primary' : 'bg-muted/50 hover:bg-muted'} border`}
-                    >
-                      <p className="font-medium text-sm">Anónimo #{conv.anon_number}</p>
-                      <p className="text-xs text-muted-foreground">{formatDate(conv.updated_at)}</p>
-                    </div>
-                  ))}
-                  <p className="text-xs text-muted-foreground mt-4 mb-2 font-medium">Usuarios Registrados</p>
-                  {registeredConversations.map(conv => {
-                    const userProfile = profiles.find(p => p.user_id === conv.user_id);
-                    return (
-                      <div 
-                        key={conv.id} 
-                        onClick={() => setSelectedConversation(`reg-${conv.id}`)}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors ${selectedConversation === `reg-${conv.id}` ? 'bg-primary/20 border-primary' : 'bg-muted/50 hover:bg-muted'} border`}
-                      >
-                        <p className="font-medium text-sm">{userProfile?.full_name || userProfile?.email || 'Usuario'}</p>
-                        <p className="text-xs text-muted-foreground">{formatDate(conv.updated_at)}</p>
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-lg">Mensajes</CardTitle>
-                </CardHeader>
-                <CardContent className="max-h-[500px] overflow-y-auto">
-                  {selectedConversation ? (
-                    <div className="space-y-3">
-                      {selectedConversation.startsWith('anon-') 
-                        ? saraMessages
-                            .filter(m => m.conversation_id === selectedConversation.replace('anon-', ''))
-                            .map(msg => (
-                              <div key={msg.id} className={`p-3 rounded-lg ${msg.role === 'user' ? 'bg-primary/10 ml-8' : 'bg-muted mr-8'}`}>
-                                <p className="text-xs text-muted-foreground mb-1">{msg.role === 'user' ? 'Usuario' : 'Sara'} - {formatDate(msg.created_at)}</p>
-                                <p className="text-sm">{msg.content}</p>
-                              </div>
-                            ))
-                        : registeredMessages
-                            .filter(m => m.conversation_id === selectedConversation.replace('reg-', ''))
-                            .map(msg => (
-                              <div key={msg.id} className={`p-3 rounded-lg ${msg.role === 'user' ? 'bg-primary/10 ml-8' : 'bg-muted mr-8'}`}>
-                                <p className="text-xs text-muted-foreground mb-1">{msg.role === 'user' ? 'Usuario' : 'Sara'} - {formatDate(msg.created_at)}</p>
-                                <p className="text-sm">{msg.content}</p>
-                              </div>
-                            ))
-                      }
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground text-center py-8">Selecciona una conversación para ver los mensajes</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+            <SaraLeadIntelligence
+              conversations={saraConversations}
+              messages={saraMessages}
+              notifications={adminNotifications}
+              onRefresh={fetchData}
+              formatDate={formatDate}
+            />
           </TabsContent>
 
           {/* Budgets Tab */}

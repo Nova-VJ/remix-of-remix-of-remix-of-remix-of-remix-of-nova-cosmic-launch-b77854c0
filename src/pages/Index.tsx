@@ -17,7 +17,7 @@ import StickyMobileCTA from '@/components/StickyMobileCTA';
 import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
-import ReferralPopup from '@/components/ReferralPopup';
+import AuditPopup from '@/components/AuditPopup';
 import BriefingCTASection from '@/components/BriefingCTASection';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -77,7 +77,7 @@ const Index = () => {
         <StickyMobileCTA />
         <ShoppingCart />
         <VirtualAssistant />
-        <ReferralPopup />
+        <AuditPopup />
         <ThemeToggle variant="floating" />
       </main>
     </>

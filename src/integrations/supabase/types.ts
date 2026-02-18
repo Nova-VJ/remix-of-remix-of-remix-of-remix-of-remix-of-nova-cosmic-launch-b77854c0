@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           calendly_link: string | null
@@ -233,22 +263,55 @@ export type Database = {
       }
       conversations: {
         Row: {
+          ai_next_action: string | null
+          ai_quality: string | null
+          ai_score: number | null
+          ai_service: string | null
+          ai_stage: string | null
+          ai_summary: string | null
+          ai_title: string | null
+          ai_urgency: string | null
+          classified_at: string | null
           created_at: string
           id: string
+          lead_status: string | null
+          message_count: number | null
           title: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          ai_next_action?: string | null
+          ai_quality?: string | null
+          ai_score?: number | null
+          ai_service?: string | null
+          ai_stage?: string | null
+          ai_summary?: string | null
+          ai_title?: string | null
+          ai_urgency?: string | null
+          classified_at?: string | null
           created_at?: string
           id?: string
+          lead_status?: string | null
+          message_count?: number | null
           title?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          ai_next_action?: string | null
+          ai_quality?: string | null
+          ai_score?: number | null
+          ai_service?: string | null
+          ai_stage?: string | null
+          ai_summary?: string | null
+          ai_title?: string | null
+          ai_urgency?: string | null
+          classified_at?: string | null
           created_at?: string
           id?: string
+          lead_status?: string | null
+          message_count?: number | null
           title?: string | null
           updated_at?: string
           user_id?: string
@@ -737,24 +800,72 @@ export type Database = {
       }
       sara_anonymous_conversations: {
         Row: {
+          ai_next_action: string | null
+          ai_quality: string | null
+          ai_score: number | null
+          ai_service: string | null
+          ai_stage: string | null
+          ai_summary: string | null
+          ai_title: string | null
+          ai_urgency: string | null
           anon_id: string
           anon_number: number
+          classified_at: string | null
+          contact_city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          contact_website: string | null
           created_at: string
           id: string
+          lead_status: string | null
+          message_count: number | null
           updated_at: string
         }
         Insert: {
+          ai_next_action?: string | null
+          ai_quality?: string | null
+          ai_score?: number | null
+          ai_service?: string | null
+          ai_stage?: string | null
+          ai_summary?: string | null
+          ai_title?: string | null
+          ai_urgency?: string | null
           anon_id: string
           anon_number?: number
+          classified_at?: string | null
+          contact_city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
           created_at?: string
           id?: string
+          lead_status?: string | null
+          message_count?: number | null
           updated_at?: string
         }
         Update: {
+          ai_next_action?: string | null
+          ai_quality?: string | null
+          ai_score?: number | null
+          ai_service?: string | null
+          ai_stage?: string | null
+          ai_summary?: string | null
+          ai_title?: string | null
+          ai_urgency?: string | null
           anon_id?: string
           anon_number?: number
+          classified_at?: string | null
+          contact_city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          contact_website?: string | null
           created_at?: string
           id?: string
+          lead_status?: string | null
+          message_count?: number | null
           updated_at?: string
         }
         Relationships: []
