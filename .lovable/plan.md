@@ -1,57 +1,39 @@
 
-## Fix del build de Cloudflare Pages — lockfile desincronizado
+## Fix del Chat de Sara - Endpoint incorrecto
 
-### Diagnóstico del problema
+### Problema
+El chat de Sara llama a la edge function del proyecto Lovable Cloud (`rpqldtlvdzdwspxpccuh.supabase.co`), pero la funcion real de Sara esta desplegada en un proyecto Supabase externo (`dnnqeydtybmzriyjqqyt.supabase.co`). Esto causa errores 500 porque la edge function local no es la correcta.
 
-Cloudflare Pages usa `npm ci` (clean install), que es estricto: **falla si el `package-lock.json` no coincide exactamente con `package.json`**. El log muestra conflictos en:
+### Solucion
 
-- `rollup`: lockfile tiene `4.24.0` pero `package.json` requiere `4.57.x`
-- `ajv`: lockfile tiene `6.12.6` pero se necesita `8.18.0`
-- `picomatch`: lockfile tiene `2.3.1` pero se necesita `4.0.3`
-- `@rollup/*` platform binaries: todos desactualizados
-- `json-schema-traverse`, `@types/estree`: versiones incompatibles
+**Archivo: `src/lib/saraApi.ts`** (linea 1-2)
 
-Esto ocurre porque el `package.json` ha recibido actualizaciones de versiones (vite, rollup, etc.) pero el `package-lock.json` no se regeneró en sincronía.
-
-### Solución: Eliminar el lockfile y que Cloudflare use `npm install`
-
-Dado que no es posible ejecutar `npm install` directamente para regenerar el lockfile, la solución más limpia es:
-
-**1. Eliminar el `package-lock.json`** del repositorio (escribir un archivo vacío o eliminarlo hace que `npm install` lo regenere).
-
-**2. Cambiar el comando de build en Cloudflare Pages** de su `npm ci` automático a un comando explícito:
-```
-npm install && npm run build
+Cambiar el endpoint de:
+```typescript
+const SARA_ENDPOINT =
+  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sara-chat`;
 ```
 
-Esto se configura en el panel de Cloudflare Pages → Settings → Builds & Deployments → Build command.
+A:
+```typescript
+const SARA_ENDPOINT =
+  import.meta.env.VITE_SARA_CHAT_ENDPOINT ||
+  "https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat";
+```
 
-**3. Agregar `.nvmrc`** con `20` para fijar Node 20.x en Cloudflare.
+Esto usa una variable de entorno dedicada (`VITE_SARA_CHAT_ENDPOINT`) con fallback al endpoint correcto. No se hardcodea el endpoint del proyecto equivocado.
 
-**4. Agregar `engines`** en `package.json` para declarar explícitamente la versión de Node compatible.
+**Archivo: `src/config/env.ts`**
 
----
+Agregar la variable de configuracion para documentarla junto a las demas:
+```typescript
+export const SARA_CHAT_ENDPOINT = import.meta.env.VITE_SARA_CHAT_ENDPOINT ?? 'https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat';
+```
 
-### Archivos a modificar/crear
+### Lo que NO se toca
+- El backend / edge function (no hay cambios en `supabase/functions/sara-chat/`)
+- El formato de request/response (ya es correcto: `{message, session_id, anon_id}` y `{reply, session_id}`)
+- Los headers CORS (ya funcionan con el endpoint correcto)
 
-| Archivo | Cambio |
-|---|---|
-| `package.json` | Añadir `"engines": { "node": ">=20.0.0" }` |
-| `.nvmrc` | Crear con contenido `20` |
-| `package-lock.json` | Eliminar (se reemplaza por uno mínimo vacío que fuerza a Cloudflare a usar `npm install`) |
-
-### Instrucción manual requerida en Cloudflare (1 paso)
-
-Una vez hecho el commit, hay que cambiar el **build command** en Cloudflare Pages:
-
-> Settings → Builds & Deployments → Build command → cambiar a:
-> `npm install && npm run build`
-
-Esto evita que Cloudflare use `npm ci` automáticamente, y en su lugar ejecuta `npm install` que genera el lockfile fresco y luego compila.
-
-### Por qué esto es seguro
-
-- El proyecto compila correctamente en el entorno de Lovable (Node 22, npm 10)
-- El `package.json` tiene todas las versiones correctas con rangos `^`
-- `npm install` resolverá las versiones más recientes compatibles y generará un lockfile correcto
-- El build con `vite build` funciona perfectamente (ya se ha verificado en Lovable)
+### Resultado esperado
+Despues del cambio, el chat de Sara llamara a `dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat` y recibira respuestas 200 con el reply correcto.
