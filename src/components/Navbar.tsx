@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, Trophy, Gift, Shield, Sparkles } from 'lucide-react';
+import { Menu, X, User, Trophy, Gift, Shield, Sparkles, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.png';
@@ -51,6 +51,10 @@ const Navbar = () => {
               <Gift className="w-4 h-4" />
               Invita a un amigo
             </Link>
+            <Link to="/instalar-app" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
+              <Download className="w-4 h-4" />
+              Instalar App
+            </Link>
             <button onClick={() => scrollToSection('contacto')} className="text-foreground/80 hover:text-primary transition-colors text-sm">
               Contacto
             </button>
@@ -95,6 +99,10 @@ const Navbar = () => {
               <Link to="/invita-a-un-amigo" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
                 <Gift className="w-4 h-4" />
                 Invita a un amigo
+              </Link>
+              <Link to="/instalar-app" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
+                <Download className="w-4 h-4" />
+                Instalar App
               </Link>
               <button onClick={() => scrollToSection('contacto')} className="text-foreground/80 hover:text-primary transition-colors py-2 text-left">
                 Contacto
