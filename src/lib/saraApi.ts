@@ -1,5 +1,5 @@
 const SARA_ENDPOINT =
-  "https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat";
+  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sara-chat`;
 
 function getOrCreateAnonId() {
   const key = "sara_anon_id";

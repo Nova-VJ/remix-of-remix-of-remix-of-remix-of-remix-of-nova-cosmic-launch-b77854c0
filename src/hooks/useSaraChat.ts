@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { sendToSara } from '@/lib/saraApi';
@@ -24,8 +24,6 @@ interface UseSaraChatReturn {
 const DEMO_LIMIT = 3;
 const DEMO_MESSAGES_KEY = 'sara_demo_messages';
 const DEMO_COUNT_KEY = 'sara_demo_count';
-
-// ✅ Session ID persistente para memoria del chat (por navegador/usuario)
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 
 export const useSaraChat = (): UseSaraChatReturn => {
@@ -35,14 +33,115 @@ export const useSaraChat = (): UseSaraChatReturn => {
   const [error, setError] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [demoCount, setDemoCount] = useState(0);
+  const migrationDoneRef = useRef(false);
 
   const isDemo = !user;
   const demoLimitReached = isDemo && demoCount >= DEMO_LIMIT;
 
-  // Cargar mensajes al iniciar
+  // Load conversation from Supabase (for logged-in users)
+  const loadConversation = async (userId: string) => {
+    try {
+      const { data: conversations, error: convError } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(1);
+
+      if (convError) throw convError;
+
+      let convId: string;
+
+      if (conversations && conversations.length > 0) {
+        convId = conversations[0].id;
+      } else {
+        const { data: newConv, error: newConvError } = await supabase
+          .from('conversations')
+          .insert({ user_id: userId, title: 'Chat con Sara' })
+          .select('id')
+          .single();
+
+        if (newConvError) throw newConvError;
+        convId = newConv.id;
+      }
+
+      setConversationId(convId);
+
+      const { data: chatMessages, error: msgError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', convId)
+        .order('created_at', { ascending: true });
+
+      if (msgError) throw msgError;
+
+      if (chatMessages) {
+        setMessages(chatMessages.map((m) => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          createdAt: new Date(m.created_at)
+        })));
+      }
+
+      return convId;
+    } catch (e) {
+      console.error('Error loading conversation:', e);
+      setError('Error al cargar el historial');
+      return null;
+    }
+  };
+
+  // Migrate demo messages to DB when user logs in
+  const migrateDemoMessages = async (userId: string, convId: string) => {
+    const storedMessages = localStorage.getItem(DEMO_MESSAGES_KEY);
+    if (!storedMessages) return;
+
+    try {
+      const demoMessages: Message[] = JSON.parse(storedMessages).map((m: any) => ({
+        ...m,
+        createdAt: new Date(m.createdAt)
+      }));
+
+      if (demoMessages.length === 0) return;
+
+      // Insert demo messages into DB at the beginning
+      for (const msg of demoMessages) {
+        await supabase.from('chat_messages').insert({
+          conversation_id: convId,
+          user_id: userId,
+          role: msg.role,
+          content: msg.content
+        });
+      }
+
+      // Reload messages from DB (includes migrated + any existing)
+      const { data: chatMessages } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', convId)
+        .order('created_at', { ascending: true });
+
+      if (chatMessages) {
+        setMessages(chatMessages.map((m) => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          createdAt: new Date(m.created_at)
+        })));
+      }
+
+      // Clear demo data from localStorage
+      localStorage.removeItem(DEMO_MESSAGES_KEY);
+      localStorage.removeItem(DEMO_COUNT_KEY);
+    } catch (e) {
+      console.error('Error migrating demo messages:', e);
+    }
+  };
+
+  // Main effect: load messages based on auth state
   useEffect(() => {
     if (isDemo) {
-      // Cargar mensajes de demo desde localStorage
       const storedMessages = localStorage.getItem(DEMO_MESSAGES_KEY);
       const storedCount = localStorage.getItem(DEMO_COUNT_KEY);
 
@@ -61,66 +160,18 @@ export const useSaraChat = (): UseSaraChatReturn => {
       if (storedCount) {
         setDemoCount(parseInt(storedCount, 10));
       }
-    } else {
-      // Cargar conversación y mensajes desde Supabase
-      loadConversation();
+    } else if (user && !migrationDoneRef.current) {
+      migrationDoneRef.current = true;
+      // Check if there are demo messages to migrate
+      const hasDemoMessages = !!localStorage.getItem(DEMO_MESSAGES_KEY);
+      
+      loadConversation(user.id).then((convId) => {
+        if (convId && hasDemoMessages) {
+          migrateDemoMessages(user.id, convId);
+        }
+      });
     }
   }, [user]);
-
-  const loadConversation = async () => {
-    if (!user) return;
-
-    try {
-      // Buscar la última conversación del usuario
-      const { data: conversations, error: convError } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false })
-        .limit(1);
-
-      if (convError) throw convError;
-
-      let convId: string;
-
-      if (conversations && conversations.length > 0) {
-        convId = conversations[0].id;
-      } else {
-        // Crear nueva conversación
-        const { data: newConv, error: newConvError } = await supabase
-          .from('conversations')
-          .insert({ user_id: user.id, title: 'Chat con Sara' })
-          .select('id')
-          .single();
-
-        if (newConvError) throw newConvError;
-        convId = newConv.id;
-      }
-
-      setConversationId(convId);
-
-      // Cargar mensajes de la conversación
-      const { data: chatMessages, error: msgError } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('conversation_id', convId)
-        .order('created_at', { ascending: true });
-
-      if (msgError) throw msgError;
-
-      if (chatMessages) {
-        setMessages(chatMessages.map((m) => ({
-          id: m.id,
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-          createdAt: new Date(m.created_at)
-        })));
-      }
-    } catch (e) {
-      console.error('Error loading conversation:', e);
-      setError('Error al cargar el historial');
-    }
-  };
 
   const saveDemoMessage = (newMessages: Message[], newCount: number) => {
     localStorage.setItem(DEMO_MESSAGES_KEY, JSON.stringify(newMessages));
@@ -141,24 +192,19 @@ export const useSaraChat = (): UseSaraChatReturn => {
       createdAt: new Date()
     };
 
-    // Añadir mensaje del usuario inmediatamente
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      // Obtener token de acceso si existe sesión
       const accessToken = session?.access_token;
 
-      // ✅ Recuperar/crear session_id persistente
       let sid = localStorage.getItem(SARA_SESSION_KEY);
       if (!sid) {
         sid = crypto.randomUUID();
         localStorage.setItem(SARA_SESSION_KEY, sid);
       }
 
-      // ✅ Llamar a la Edge Function pasando session_id (memoria)
       const { reply, session_id } = await sendToSara(content, accessToken, sid);
 
-      // ✅ Si backend devuelve session_id, lo guardamos (por si cambia/primera vez)
       if (session_id && session_id !== sid) {
         localStorage.setItem(SARA_SESSION_KEY, session_id);
       }
@@ -171,36 +217,27 @@ export const useSaraChat = (): UseSaraChatReturn => {
       };
 
       if (isDemo) {
-        // Modo demo: guardar en localStorage
         const newCount = demoCount + 1;
         setDemoCount(newCount);
         const newMessages = [...messages, userMessage, assistantMessage];
         setMessages(newMessages);
         saveDemoMessage(newMessages, newCount);
       } else {
-        // Modo logueado: guardar en Supabase
         if (conversationId && user) {
-          // Guardar mensaje del usuario en DB
-          await supabase
-            .from('chat_messages')
-            .insert({
-              conversation_id: conversationId,
-              user_id: user.id,
-              role: 'user',
-              content
-            });
+          await supabase.from('chat_messages').insert({
+            conversation_id: conversationId,
+            user_id: user.id,
+            role: 'user',
+            content
+          });
 
-          // Guardar respuesta en DB
-          await supabase
-            .from('chat_messages')
-            .insert({
-              conversation_id: conversationId,
-              user_id: user.id,
-              role: 'assistant',
-              content: assistantMessage.content
-            });
+          await supabase.from('chat_messages').insert({
+            conversation_id: conversationId,
+            user_id: user.id,
+            role: 'assistant',
+            content: assistantMessage.content
+          });
 
-          // Actualizar timestamp de la conversación
           await supabase
             .from('conversations')
             .update({ updated_at: new Date().toISOString() })
@@ -212,7 +249,6 @@ export const useSaraChat = (): UseSaraChatReturn => {
     } catch (e) {
       console.error('Error sending message:', e);
 
-      // Añadir burbuja de error como mensaje de Sara
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
