@@ -181,9 +181,6 @@ const InstalarApp = () => {
                       <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Tu presupuesto sea aprobado o actualizado</li>
                       <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" /> Haya actualizaciones importantes en tu cuenta</li>
                     </ul>
-                    <p className="text-xs text-muted-foreground mt-3">
-                      El ícono de la app mostrará un punto rojo (estilo Facebook) cuando tengas notificaciones pendientes.
-                    </p>
                   </div>
                 </div>
               </CardContent>
