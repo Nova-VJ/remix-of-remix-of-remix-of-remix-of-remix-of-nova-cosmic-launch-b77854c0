@@ -1,90 +1,290 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, Monitor, Apple, Download, Bell, CheckCircle, ArrowRight, Chrome, Share, Plus, X } from 'lucide-react';
+import { Smartphone, Monitor, Apple, Download, Bell, CheckCircle, ArrowRight, Chrome, Share, Plus, X, MessageCircleHeart, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import saraAvatar from '@/assets/sara-avatar.png';
 
-// Sara tutorial callout per platform
-const SaraTutorial = ({ platform, onClose }: { platform: 'android' | 'ios' | 'pc'; onClose: () => void }) => {
-  const content = {
-    android: {
+// ─── Step definitions per platform ───────────────────────────────────────────
+
+interface TutorialStep {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  // Where Sara's card should appear: 'center' | 'top-right' | 'mid-right' | 'bottom-center'
+  position: 'center' | 'top-right' | 'mid-right' | 'bottom-center';
+  // Optional pointer direction shown as an animated arrow
+  pointer?: 'up' | 'left' | 'none';
+}
+
+const STEPS: Record<'android' | 'ios' | 'pc', TutorialStep[]> = {
+  android: [
+    {
       title: '¡Hola! Soy Sara 👋',
-      steps: [
-        { icon: <Chrome className="w-5 h-5 text-primary" />, text: 'Abre esta página en Google Chrome en tu Android.' },
-        { icon: <Share className="w-5 h-5 text-primary" />, text: 'Toca los tres puntos (⋮) en la esquina superior derecha.' },
-        { icon: <Plus className="w-5 h-5 text-primary" />, text: 'Selecciona "Añadir a pantalla de inicio" o "Instalar app".' },
-        { icon: <CheckCircle className="w-5 h-5 text-primary" />, text: '¡Listo! Nova aparecerá como una app nativa en tu pantalla.' },
-      ],
-      note: 'Si ves el botón "Instalar ahora" en la parte superior de esta página, también puedes usarlo directamente.',
+      description: 'Voy a guiarte para instalar la app de Nova en tu dispositivo Android. Es muy sencillo, solo sigue mis indicaciones.',
+      icon: <Smartphone className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
     },
-    ios: {
+    {
+      title: 'Abre Google Chrome',
+      description: 'Asegúrate de estar usando Google Chrome. Si usas otro navegador, ábrelo en Chrome para continuar.',
+      icon: <Chrome className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
+    },
+    {
+      title: 'Toca los tres puntos ⋮',
+      description: 'Mira la esquina superior derecha de tu pantalla. Ahí verás el menú con tres puntos verticales. ¡Tócalos!',
+      icon: <Share className="w-5 h-5 text-primary" />,
+      position: 'top-right',
+      pointer: 'up',
+    },
+    {
+      title: 'Selecciona "Instalar app"',
+      description: 'En el menú que aparece, busca "Añadir a pantalla de inicio" o "Instalar app" y tócalo.',
+      icon: <Plus className="w-5 h-5 text-primary" />,
+      position: 'mid-right',
+      pointer: 'left',
+    },
+    {
+      title: '¡Instalada! 🎉',
+      description: 'Nova ya aparece como app en tu pantalla de inicio. Tócala como cualquier otra app. ¡Ya puedes cerrar este tutorial!',
+      icon: <CheckCircle className="w-5 h-5 text-primary" />,
+      position: 'bottom-center',
+      pointer: 'none',
+    },
+  ],
+  ios: [
+    {
       title: '¡Hola! Soy Sara 👋',
-      steps: [
-        { icon: <Apple className="w-5 h-5 text-primary" />, text: 'Abre esta página en Safari (no funciona en Chrome para iOS).' },
-        { icon: <Share className="w-5 h-5 text-primary" />, text: 'Toca el ícono de compartir (□↑) en la barra inferior de Safari.' },
-        { icon: <Plus className="w-5 h-5 text-primary" />, text: 'Desliza hacia abajo y elige "Añadir a pantalla de inicio".' },
-        { icon: <CheckCircle className="w-5 h-5 text-primary" />, text: '¡Listo! La app de Nova aparece en tu pantalla de inicio.' },
-      ],
-      note: 'En iPhone/iPad solo funciona desde Safari. Apple no permite instalar apps PWA desde Chrome u otros navegadores.',
+      description: 'Voy a guiarte para instalar la app de Nova en tu iPhone o iPad. Necesitarás usar Safari.',
+      icon: <Apple className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
     },
-    pc: {
+    {
+      title: 'Abre en Safari',
+      description: 'En iOS, solo Safari permite instalar apps PWA. Si estás en Chrome u otro navegador, cópiala en Safari.',
+      icon: <Apple className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
+    },
+    {
+      title: 'Toca el ícono Compartir',
+      description: 'Mira la barra inferior de Safari. Verás un cuadrado con una flecha hacia arriba (□↑). ¡Tócalo!',
+      icon: <Share className="w-5 h-5 text-primary" />,
+      position: 'bottom-center',
+      pointer: 'none',
+    },
+    {
+      title: '"Añadir a pantalla de inicio"',
+      description: 'En el menú que se despliega, desliza hacia abajo y toca "Añadir a pantalla de inicio".',
+      icon: <Plus className="w-5 h-5 text-primary" />,
+      position: 'mid-right',
+      pointer: 'left',
+    },
+    {
+      title: '¡Instalada! 🎉',
+      description: 'Nova ya aparece en tu pantalla de inicio como cualquier app. ¡Perfecto, ya puedes cerrar este tutorial!',
+      icon: <CheckCircle className="w-5 h-5 text-primary" />,
+      position: 'bottom-center',
+      pointer: 'none',
+    },
+  ],
+  pc: [
+    {
       title: '¡Hola! Soy Sara 👋',
-      steps: [
-        { icon: <Chrome className="w-5 h-5 text-primary" />, text: 'Abre esta página en Google Chrome o Microsoft Edge.' },
-        { icon: <Monitor className="w-5 h-5 text-primary" />, text: 'Busca el ícono de instalación (⊕) en la barra de direcciones.' },
-        { icon: <Download className="w-5 h-5 text-primary" />, text: 'Haz clic en él y luego en "Instalar" en el diálogo que aparece.' },
-        { icon: <CheckCircle className="w-5 h-5 text-primary" />, text: '¡Listo! Nova se añade como app de escritorio con acceso directo.' },
-      ],
-      note: 'Si ves el botón "Instalar ahora" en la parte superior, úsalo directamente. Funciona en Chrome y Edge.',
+      description: 'Voy a guiarte para instalar la app de Nova en tu ordenador. Funciona en Chrome y Edge.',
+      icon: <Monitor className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
     },
+    {
+      title: 'Usa Chrome o Edge',
+      description: 'Asegúrate de usar Google Chrome o Microsoft Edge. En Firefox y Safari para Mac no está disponible esta función.',
+      icon: <Chrome className="w-5 h-5 text-primary" />,
+      position: 'center',
+      pointer: 'none',
+    },
+    {
+      title: 'Busca el ícono ⊕ en la barra',
+      description: 'Mira la esquina superior derecha de la barra de direcciones. Verás un pequeño ícono de instalación (⊕ o una pantalla con flecha). ¡Haz clic en él!',
+      icon: <Download className="w-5 h-5 text-primary" />,
+      position: 'top-right',
+      pointer: 'up',
+    },
+    {
+      title: 'Confirma la instalación',
+      description: 'Aparecerá un diálogo preguntando si quieres instalar la app. Haz clic en "Instalar" para confirmar.',
+      icon: <Plus className="w-5 h-5 text-primary" />,
+      position: 'mid-right',
+      pointer: 'left',
+    },
+    {
+      title: '¡Instalada! 🎉',
+      description: 'Nova se ha añadido como app de escritorio con su propio icono. La encontrarás en tu menú de aplicaciones. ¡Listo!',
+      icon: <CheckCircle className="w-5 h-5 text-primary" />,
+      position: 'bottom-center',
+      pointer: 'none',
+    },
+  ],
+};
+
+// ─── Position classes map ─────────────────────────────────────────────────────
+
+const POSITION_CLASSES: Record<TutorialStep['position'], string> = {
+  center: 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+  'top-right': 'top-20 right-4',
+  'mid-right': 'top-1/2 right-4 -translate-y-1/2',
+  'bottom-center': 'bottom-24 left-1/2 -translate-x-1/2',
+};
+
+// ─── Sara Install Tutorial Overlay ───────────────────────────────────────────
+
+const SaraInstallTutorial = ({
+  platform,
+  onClose,
+}: {
+  platform: 'android' | 'ios' | 'pc';
+  onClose: () => void;
+}) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
+  const steps = STEPS[platform];
+  const step = steps[currentStep];
+  const isFirst = currentStep === 0;
+  const isLast = currentStep === steps.length - 1;
+
+  const handleNext = () => {
+    if (isLast) {
+      handleClose();
+    } else {
+      setCurrentStep(p => p + 1);
+    }
   };
 
-  const { title, steps, note } = content[platform];
+  const handlePrev = () => {
+    if (!isFirst) setCurrentStep(p => p - 1);
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 250);
+  };
+
+  const posClass = POSITION_CLASSES[step.position];
 
   return (
-    <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 relative animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground"
+    <div
+      className={`fixed inset-0 z-[200] transition-all duration-300 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-background/75 backdrop-blur-sm" onClick={handleClose} />
+
+      {/* Pointer arrow for top-right */}
+      {step.pointer === 'up' && step.position === 'top-right' && (
+        <div className="fixed top-14 right-6 z-[201] animate-bounce">
+          <div className="w-0 h-0 border-l-8 border-r-8 border-b-[16px] border-l-transparent border-r-transparent border-b-primary" />
+        </div>
+      )}
+
+      {/* Pointer arrow for mid-right */}
+      {step.pointer === 'left' && step.position === 'mid-right' && (
+        <div className="fixed top-1/2 right-[calc(var(--card-width,320px)+16px)] z-[201] animate-pulse"
+          style={{ transform: 'translateY(-50%) translateX(100%)' }}>
+          <div className="w-0 h-0 border-t-8 border-b-8 border-l-[16px] border-t-transparent border-b-transparent border-l-primary" />
+        </div>
+      )}
+
+      {/* Sara Card — dynamically positioned */}
+      <div
+        className={`fixed z-[202] w-[90vw] max-w-xs transition-all duration-300 ${posClass} ${
+          visible ? 'scale-100' : 'scale-95'
+        }`}
       >
-        <X className="w-4 h-4" />
-      </button>
+        {/* Arrow indicator for top-right: show below the card pointing up-right */}
+        {step.pointer === 'up' && step.position === 'top-right' && (
+          <div className="flex justify-end pr-2 mb-1">
+            <span className="text-xs text-primary font-semibold animate-pulse">↑ Aquí</span>
+          </div>
+        )}
+        {step.pointer === 'left' && step.position === 'mid-right' && (
+          <div className="flex justify-end pr-2 mb-1">
+            <span className="text-xs text-primary font-semibold animate-pulse">→ Aquí</span>
+          </div>
+        )}
 
-      {/* Sara avatar + header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm flex-shrink-0">
-          S
-        </div>
-        <div>
-          <p className="font-semibold text-sm">{title}</p>
-          <p className="text-xs text-muted-foreground">Te explico cómo instalarlo paso a paso:</p>
-        </div>
-      </div>
+        <div className="rounded-2xl border border-primary/30 bg-card shadow-2xl p-5">
+          {/* Close */}
+          <button
+            onClick={handleClose}
+            className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground z-10"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-      {/* Steps */}
-      <div className="space-y-3 mb-4">
-        {steps.map((step, i) => (
-          <div key={i} className="flex items-start gap-3">
-            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              {step.icon}
+          {/* Sara header */}
+          <div className="flex items-start gap-3 mb-4">
+            <div className="relative flex-shrink-0">
+              <img
+                src={saraAvatar}
+                alt="Sara"
+                className="w-12 h-12 rounded-full object-cover border-2 border-primary/30 shadow"
+              />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                <MessageCircleHeart className="w-2.5 h-2.5 text-primary-foreground" />
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="text-xs font-bold text-primary mt-1">{i + 1}.</span>
-              <p className="text-sm text-foreground/80">{step.text}</p>
+            <div className="flex-1 min-w-0 pr-6">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                {step.icon}
+                <h3 className="font-bold text-sm text-foreground">{step.title}</h3>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Note */}
-      <div className="rounded-lg bg-muted/50 border border-border p-3 text-xs text-muted-foreground">
-        💡 {note}
+          {/* Progress dots */}
+          <div className="flex items-center justify-center gap-1.5 mb-4">
+            {steps.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentStep(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentStep ? 'w-5 bg-primary' : i < currentStep ? 'w-1.5 bg-primary/50' : 'w-1.5 bg-muted-foreground/30'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between gap-2">
+            <Button variant="ghost" size="sm" onClick={handlePrev} disabled={isFirst} className="gap-1 text-xs h-8">
+              <ArrowLeft className="w-3 h-3" />
+              Anterior
+            </Button>
+            <span className="text-xs text-muted-foreground">{currentStep + 1}/{steps.length}</span>
+            <Button size="sm" onClick={handleNext} className="gap-1 text-xs h-8">
+              {isLast ? 'Cerrar' : 'Siguiente'}
+              {!isLast && <ArrowRight className="w-3 h-3" />}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 const InstalarApp = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -121,13 +321,11 @@ const InstalarApp = () => {
   };
 
   const handlePlatformClick = async (platform: 'android' | 'ios' | 'pc') => {
-    // For android/pc: try native prompt first, then show Sara
     if ((platform === 'android' || platform === 'pc') && deferredPrompt) {
       await handleInstallClick();
       return;
     }
-    // Otherwise open Sara tutorial
-    setSaraPlatform(prev => prev === platform ? null : platform);
+    setSaraPlatform(platform);
   };
 
   const androidSteps = [
@@ -160,27 +358,33 @@ const InstalarApp = () => {
       label: 'Android',
       sublabel: 'Google Chrome',
       icon: <Smartphone className="w-6 h-6" />,
-      badge: deferredPrompt && activeOS === 'android' ? 'Instalar directo' : 'Ver instrucciones',
+      badge: deferredPrompt && activeOS === 'android' ? 'Instalar directo' : 'Tutorial con Sara',
     },
     {
       id: 'ios' as const,
       label: 'iPhone / iPad',
       sublabel: 'Safari',
       icon: <Apple className="w-6 h-6" />,
-      badge: 'Ver instrucciones',
+      badge: 'Tutorial con Sara',
     },
     {
       id: 'pc' as const,
       label: 'PC / Mac',
       sublabel: 'Chrome o Edge',
       icon: <Monitor className="w-6 h-6" />,
-      badge: deferredPrompt && activeOS === 'pc' ? 'Instalar directo' : 'Ver instrucciones',
+      badge: deferredPrompt && activeOS === 'pc' ? 'Instalar directo' : 'Tutorial con Sara',
     },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
+      {/* Sara interactive tutorial overlay */}
+      {saraPlatform && (
+        <SaraInstallTutorial platform={saraPlatform} onClose={() => setSaraPlatform(null)} />
+      )}
+
       <main className="pt-20 pb-16">
         {/* Hero */}
         <section className="py-16 px-4 text-center">
@@ -207,7 +411,7 @@ const InstalarApp = () => {
         <section className="px-4 pb-10">
           <div className="max-w-3xl mx-auto">
             <p className="text-center text-sm text-muted-foreground mb-5">
-              Elige tu dispositivo y Sara te guiará:
+              Elige tu dispositivo y Sara te guiará paso a paso:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {platformButtons.map((btn) => (
@@ -233,18 +437,6 @@ const InstalarApp = () => {
                   </Badge>
                 </button>
               ))}
-            </div>
-
-            {/* Sara Tutorial Callout */}
-            {saraPlatform && (
-              <SaraTutorial platform={saraPlatform} onClose={() => setSaraPlatform(null)} />
-            )}
-
-            {/* Honest note */}
-            <div className="mt-6 rounded-xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground text-center">
-              <strong className="text-foreground">¿Por qué no hay un archivo APK o IPA para descargar?</strong>
-              <br />
-              Esta app usa tecnología PWA, que es equivalente a una app nativa: mismo ícono, misma experiencia, sin necesidad de la App Store ni Google Play. La instalación se hace directamente desde el navegador.
             </div>
           </div>
         </section>

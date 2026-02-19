@@ -44,7 +44,7 @@ const Navbar = () => {
               Casos de éxito
             </Link>
             <Link to="/metodo-nova" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
-              <img src={metodoNovaIcon} alt="" className="w-5 h-5 object-contain" />
+              <img src={metodoNovaIcon} alt="" className="w-7 h-7 object-contain" />
               Método Nova
             </Link>
             <Link to="/invita-a-un-amigo" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
@@ -93,7 +93,7 @@ const Navbar = () => {
                 Casos de éxito
               </Link>
               <Link to="/metodo-nova" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
-                <img src={metodoNovaIcon} alt="" className="w-12 h-12 object-contain" />
+                <img src={metodoNovaIcon} alt="" className="w-7 h-7 object-contain" />
                 Método Nova
               </Link>
               <Link to="/invita-a-un-amigo" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
