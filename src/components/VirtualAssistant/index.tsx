@@ -21,7 +21,6 @@ import {
   HelpCircle, 
   Briefcase, 
   Wrench, 
-  Calendar, 
   MessageCircle, 
   Mail, 
   Phone, 
@@ -30,7 +29,8 @@ import {
   Smartphone,
   Share2,
   Palette,
-  Bot
+  Bot,
+  Download
 } from 'lucide-react';
 
 type FlowState = 
@@ -47,7 +47,8 @@ type FlowState =
   | 'quote'
   | 'ticket'
   | 'client-portal'
-  | 'ai-chat';
+  | 'ai-chat'
+  | 'install-app';
 
 interface Message {
   id: string;
@@ -136,6 +137,11 @@ const VirtualAssistant = () => {
         setSelectedService('cybersecurity');
         setFlowState('service-category');
         break;
+      case 'install-app':
+        addUserMessage('Instalar App');
+        navigate('/instalar-app');
+        setIsOpen(false);
+        break;
       case 'client-portal':
         if (user) {
           navigate('/dashboard');
@@ -189,6 +195,7 @@ const VirtualAssistant = () => {
       case 'agent':
       case 'client-portal':
       case 'ai-chat':
+      case 'install-app':
         setFlowState('welcome');
         break;
       case 'faq-category':
@@ -231,6 +238,7 @@ const VirtualAssistant = () => {
     { id: 'email', label: 'Enviar correo', icon: <Mail className="w-4 h-4" /> },
     { id: 'agent', label: 'Hablar con un agente', icon: <Phone className="w-4 h-4" /> },
     { id: 'cybersecurity', label: 'Ciberseguridad / Pentesting', icon: <Shield className="w-4 h-4" /> },
+    { id: 'install-app', label: 'Instalar App', icon: <Download className="w-4 h-4" /> },
   ];
 
   if (user) {

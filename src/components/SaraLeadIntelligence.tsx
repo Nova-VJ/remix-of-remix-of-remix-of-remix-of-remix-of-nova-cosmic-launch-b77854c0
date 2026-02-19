@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  MessageSquare, TrendingUp, Search,
+  MessageSquare, Search,
   Zap, AlertTriangle, Target,
-  BarChart3, PieChart, Brain
+  Brain, CalendarDays
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, isWithinInterval, parseISO } from 'date-fns';
 
 interface SaraConversation {
   id: string;
@@ -92,8 +93,47 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
   const [filterService, setFilterService] = useState('all');
   const [filterScore, setFilterScore] = useState('all');
   const [activeTab, setActiveTab] = useState<'conversations' | 'analytics' | 'notifications'>('conversations');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
-  const filtered = conversations.filter(conv => {
+  // Quick date range presets
+  const setPreset = (preset: 'today' | 'week' | 'month' | '3months') => {
+    const now = new Date();
+    const fmt = (d: Date) => d.toISOString().split('T')[0];
+    if (preset === 'today') {
+      setDateFrom(fmt(startOfDay(now)));
+      setDateTo(fmt(endOfDay(now)));
+    } else if (preset === 'week') {
+      setDateFrom(fmt(startOfWeek(now, { weekStartsOn: 1 })));
+      setDateTo(fmt(endOfWeek(now, { weekStartsOn: 1 })));
+    } else if (preset === 'month') {
+      setDateFrom(fmt(startOfMonth(now)));
+      setDateTo(fmt(endOfMonth(now)));
+    } else if (preset === '3months') {
+      setDateFrom(fmt(subMonths(now, 3)));
+      setDateTo(fmt(now));
+    }
+  };
+
+  const clearDates = () => { setDateFrom(''); setDateTo(''); };
+
+  // Date-filtered conversations (for analytics)
+  const dateFilteredConversations = useMemo(() => {
+    if (!dateFrom && !dateTo) return conversations;
+    return conversations.filter(conv => {
+      try {
+        const d = parseISO(conv.created_at);
+        const from = dateFrom ? startOfDay(parseISO(dateFrom)) : null;
+        const to = dateTo ? endOfDay(parseISO(dateTo)) : null;
+        if (from && to) return isWithinInterval(d, { start: from, end: to });
+        if (from) return d >= from;
+        if (to) return d <= to;
+        return true;
+      } catch { return true; }
+    });
+  }, [conversations, dateFrom, dateTo]);
+
+  const filtered = dateFilteredConversations.filter(conv => {
     const matchSearch = !search || 
       (conv.ai_title || '').toLowerCase().includes(search.toLowerCase()) ||
       (conv.contact_name || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -109,7 +149,7 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
   const sorted = [...filtered].sort((a, b) => (b.ai_score || 0) - (a.ai_score || 0));
 
   // Analytics data
-  const serviceData = conversations.reduce((acc: any[], conv) => {
+  const serviceData = dateFilteredConversations.reduce((acc: any[], conv) => {
     const svc = conv.ai_service || 'Sin clasificar';
     const existing = acc.find(a => a.name === svc);
     if (existing) existing.value++;
@@ -117,7 +157,7 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
     return acc;
   }, []);
 
-  const stageData = conversations.reduce((acc: any[], conv) => {
+  const stageData = dateFilteredConversations.reduce((acc: any[], conv) => {
     const stage = conv.ai_stage || 'Sin clasificar';
     const existing = acc.find(a => a.name === stage);
     if (existing) existing.count++;
@@ -125,24 +165,24 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
     return acc;
   }, []);
 
-  // Weekly trend
+  // Weekly trend using dateFilteredConversations
   const now = new Date();
   const weeklyData = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(now);
     d.setDate(d.getDate() - (6 - i));
     const dayStr = d.toLocaleDateString('es-ES', { weekday: 'short' });
-    const count = conversations.filter(c => {
+    const count = dateFilteredConversations.filter(c => {
       const cd = new Date(c.created_at);
       return cd.toDateString() === d.toDateString();
     }).length;
     return { day: dayStr, leads: count };
   });
 
-  const highPriority = conversations.filter(c => (c.ai_score || 0) >= 70).length;
-  const avgScore = conversations.length > 0 
-    ? Math.round(conversations.reduce((s, c) => s + (c.ai_score || 0), 0) / conversations.length) 
+  const highPriority = dateFilteredConversations.filter(c => (c.ai_score || 0) >= 70).length;
+  const avgScore = dateFilteredConversations.length > 0 
+    ? Math.round(dateFilteredConversations.reduce((s, c) => s + (c.ai_score || 0), 0) / dateFilteredConversations.length) 
     : 0;
-  const classified = conversations.filter(c => c.ai_title).length;
+  const classified = dateFilteredConversations.filter(c => c.ai_title).length;
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
   const convMessages = selectedConv
@@ -159,9 +199,39 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
 
   return (
     <div className="space-y-4">
+      {/* Date range filter */}
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/20 rounded-xl border border-border">
+        <CalendarDays className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { label: 'Hoy', preset: 'today' as const },
+            { label: 'Esta semana', preset: 'week' as const },
+            { label: 'Este mes', preset: 'month' as const },
+            { label: '3 meses', preset: '3months' as const },
+          ].map(({ label, preset }) => (
+            <Button key={preset} variant="outline" size="sm" className="h-7 text-xs px-2.5" onClick={() => setPreset(preset)}>
+              {label}
+            </Button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1.5 ml-auto">
+          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-7 text-xs w-36" />
+          <span className="text-xs text-muted-foreground">–</span>
+          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-7 text-xs w-36" />
+          {(dateFrom || dateTo) && (
+            <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={clearDates}>✕</Button>
+          )}
+        </div>
+        {(dateFrom || dateTo) && (
+          <span className="text-xs text-primary ml-1">
+            Mostrando {dateFilteredConversations.length} de {conversations.length} conversaciones
+          </span>
+        )}
+      </div>
+
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="bg-gradient-to-br from-[hsl(270,80%,60%,0.15)] to-[hsl(265,60%,40%,0.1)] border-[hsl(270,80%,60%,0.3)]">
+        <Card className="bg-gradient-to-br from-primary/15 to-primary/5 border-primary/30">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
               <MessageSquare className="w-4 h-4 text-[hsl(var(--nova-purple-light))]" />
@@ -458,8 +528,8 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
             {/* Service distribution */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <PieChart className="w-4 h-4 text-primary" /> Leads por Servicio
+                  <CardTitle className="text-sm flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-primary" /> Leads por Servicio
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -495,8 +565,8 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
             {/* Weekly trend */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-400" /> Tendencia Semanal
+                  <CardTitle className="text-sm flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-green-400" /> Tendencia Semanal
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -518,8 +588,8 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
           {/* Stage funnel */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-primary" /> Etapas del Lead
+                  <CardTitle className="text-sm flex items-center gap-2">
+                <Target className="w-4 h-4 text-primary" /> Etapas del Lead
               </CardTitle>
             </CardHeader>
             <CardContent>
