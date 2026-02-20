@@ -453,11 +453,7 @@ const VirtualAssistant = () => {
         );
 
       case 'ai-chat':
-        return (
-          <div className="h-[500px] max-h-[75vh]">
-            <AIChatMode onBack={handleBack} />
-          </div>
-        );
+        return null; // Rendered outside ScrollArea
 
       default:
         return null;
@@ -469,9 +465,9 @@ const VirtualAssistant = () => {
       <ChatButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
-        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300 flex flex-col" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
           {/* Header with Sara avatar */}
-          <div className="bg-primary text-primary-foreground p-3">
+          <div className="bg-primary text-primary-foreground p-3 shrink-0">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 <img 
@@ -495,22 +491,27 @@ const VirtualAssistant = () => {
             </div>
           </div>
 
-          {/* Messages */}
-          <ScrollArea className="h-[400px] p-4" ref={scrollRef}>
-            {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg.text}
-                isBot={msg.isBot}
-                timestamp={msg.timestamp}
-              />
-            ))}
-            
-            {/* Current flow content */}
-            <div className="mt-2">
-              {renderContent()}
+          {flowState === 'ai-chat' ? (
+            <div className="flex-1 min-h-0" style={{ height: '500px', maxHeight: '70vh' }}>
+              <AIChatMode onBack={handleBack} />
             </div>
-          </ScrollArea>
+          ) : (
+            <ScrollArea className="flex-1 p-4" style={{ maxHeight: '400px' }} ref={scrollRef}>
+              {messages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  message={msg.text}
+                  isBot={msg.isBot}
+                  timestamp={msg.timestamp}
+                />
+              ))}
+              
+              {/* Current flow content */}
+              <div className="mt-2">
+                {renderContent()}
+              </div>
+            </ScrollArea>
+          )}
         </div>
       )}
     </>
