@@ -50,11 +50,29 @@ const normalizeSaraReply = (text: string): string => {
 };
 
 const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
-  const match = text.match(/\[PROPUESTA_CARRITO:(.*?)\]/s);
-  if (!match) return { cleanText: text, proposal: null };
+  const startTag = '[PROPUESTA_CARRITO:';
+  const startIdx = text.indexOf(startTag);
+  if (startIdx === -1) return { cleanText: text, proposal: null };
+
+  // Find the matching closing bracket by counting nested brackets
+  let depth = 0;
+  let endIdx = -1;
+  for (let i = startIdx + startTag.length; i < text.length; i++) {
+    if (text[i] === '{' || text[i] === '[') depth++;
+    else if (text[i] === '}' || text[i] === ']') {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
+  }
+  if (endIdx === -1) return { cleanText: text, proposal: null };
+
+  const jsonStr = text.substring(startIdx + startTag.length, endIdx + 1);
   try {
-    const proposal: CartProposal = JSON.parse(match[1]);
-    const cleanText = text.replace(/\[PROPUESTA_CARRITO:.*?\]/s, '').trim();
+    const proposal: CartProposal = JSON.parse(jsonStr);
+    const cleanText = (text.substring(0, startIdx) + text.substring(endIdx + 2)).trim();
     return { cleanText, proposal };
   } catch {
     return { cleanText: text, proposal: null };
