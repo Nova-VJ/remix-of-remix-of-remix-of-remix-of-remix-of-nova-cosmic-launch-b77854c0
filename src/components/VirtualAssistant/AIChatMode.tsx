@@ -67,8 +67,7 @@ const isFormLink = (url: string) => url.includes('openBriefing=true');
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
   const [inputValue, setInputValue] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [pendingProposal, setPendingProposal] = useState<CartProposal | null>(null);
-  const [proposalAccepted, setProposalAccepted] = useState(false);
+  const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -87,24 +86,11 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
     if (demoLimitReached) setShowLoginDialog(true);
   }, [demoLimitReached]);
 
-  useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'assistant') {
-      const raw = normalizeSaraReply(lastMsg.content);
-      const { proposal } = extractCartProposal(raw);
-      if (proposal && !proposalAccepted) {
-        setPendingProposal(proposal);
-      }
-    }
-  }, [messages]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading || demoLimitReached) return;
     const message = inputValue;
     setInputValue('');
-    setProposalAccepted(false);
-    setPendingProposal(null);
     await sendMessage(message);
   };
 
@@ -115,20 +101,13 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
-  const handleAcceptProposal = () => {
-    if (!pendingProposal) return;
-    pendingProposal.items.forEach(item => addItem(item));
-    setProposalAccepted(true);
-    setPendingProposal(null);
+  const handleAddSingleItem = (item: CartProposal['items'][0]) => {
+    addItem(item);
+    setAddedItems(prev => new Set(prev).add(item.id));
     toast({
       title: '🛒 Añadido al carrito',
-      description: `${pendingProposal.items.length} servicio(s) añadido(s). Total: ${pendingProposal.items.reduce((s, i) => s + i.price, 0).toLocaleString('es-ES')}€`,
+      description: `${item.name} — ${item.price.toLocaleString('es-ES')}€`,
     });
-  };
-
-  const handleRejectProposal = () => {
-    setPendingProposal(null);
-    toast({ title: 'Sin problema', description: 'Puedes pedirme otra recomendación cuando quieras.' });
   };
 
   const renderLink = ({ attributes, content }: { attributes: any; content: string }) => {
@@ -157,7 +136,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
 
   const linkifyOptions = { render: renderLink, target: '_blank', rel: 'noopener noreferrer' };
 
-  const proposalTotal = pendingProposal?.items.reduce((s, i) => s + i.price, 0) ?? 0;
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -186,79 +165,55 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         {messages.map((msg) => {
           const isBot = msg.role === 'assistant';
           const raw = isBot ? normalizeSaraReply(msg.content) : msg.content;
-          const { cleanText } = isBot ? extractCartProposal(raw) : { cleanText: raw };
+          const { cleanText, proposal } = isBot ? extractCartProposal(raw) : { cleanText: raw, proposal: null };
 
           return (
-            <div key={msg.id} className={`mb-3 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
-                msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
-              }`}>
-                <div className="whitespace-pre-wrap break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                  {isBot ? <Linkify options={linkifyOptions}>{cleanText}</Linkify> : <p>{cleanText}</p>}
+            <div key={msg.id} className="mb-3">
+              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
+                  msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
+                }`}>
+                  <div className="whitespace-pre-wrap break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    {isBot ? <Linkify options={linkifyOptions}>{cleanText}</Linkify> : <p>{cleanText}</p>}
+                  </div>
+                  <span className="text-[10px] opacity-60 mt-1 block">
+                    {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
-                <span className="text-[10px] opacity-60 mt-1 block">
-                  {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                </span>
               </div>
+
+              {/* Inline product items - Ecoland style */}
+              {proposal && (
+                <div className="mt-2 space-y-1.5 max-w-[90%]">
+                  {proposal.items.map((item, i) => {
+                    const isAdded = addedItems.has(item.id);
+                    return (
+                      <div key={i} className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-lg px-2.5 py-1.5">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary shrink-0">
+                          {SERVICE_ICONS[item.id] || <ShoppingCart className="w-3 h-3" />}
+                        </div>
+                        <span className="text-xs font-medium flex-1 truncate">{item.name}</span>
+                        <span className="text-xs font-bold text-primary whitespace-nowrap">{item.price.toLocaleString('es-ES')}€</span>
+                        <button
+                          onClick={() => handleAddSingleItem(item)}
+                          disabled={isAdded}
+                          className={`shrink-0 p-1 rounded-md transition-colors ${
+                            isAdded 
+                              ? 'text-primary bg-primary/10' 
+                              : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
+                          }`}
+                          title={isAdded ? 'Añadido' : 'Añadir al carrito'}
+                        >
+                          {isAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingCart className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
-
-        {/* Cart Proposal Card - Ecoland style */}
-        {pendingProposal && (
-          <div className="mb-3 animate-in slide-in-from-bottom-2 duration-300">
-            <div className="border border-primary/30 bg-card rounded-xl overflow-hidden shadow-sm">
-              {/* Header */}
-              <div className="bg-primary/10 px-3 py-2 flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-primary">Recomendación de Sara</span>
-              </div>
-
-              {/* Description */}
-              <div className="px-3 pt-2">
-                <p className="text-xs text-muted-foreground">{pendingProposal.description}</p>
-              </div>
-
-              {/* Items */}
-              <div className="px-3 py-2 space-y-1.5">
-                {pendingProposal.items.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-muted/50 rounded-lg px-2.5 py-2">
-                    <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary shrink-0">
-                      {SERVICE_ICONS[item.id] || <ShoppingCart className="w-3.5 h-3.5" />}
-                    </div>
-                    <span className="text-xs font-medium flex-1 truncate">{item.name}</span>
-                    <span className="text-xs font-bold text-primary whitespace-nowrap">{item.price.toLocaleString('es-ES')}€</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Total + Actions */}
-              <div className="px-3 pb-3 space-y-2">
-                <div className="flex justify-between items-center px-1">
-                  <span className="text-xs font-medium text-muted-foreground">Total estimado</span>
-                  <span className="text-sm font-bold text-primary">{proposalTotal.toLocaleString('es-ES')}€</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1 h-8 text-xs gap-1.5" onClick={handleAcceptProposal}>
-                    <ShoppingCart className="w-3.5 h-3.5" /> Añadir al carrito
-                  </Button>
-                  <Button size="sm" variant="ghost" className="h-8 text-xs px-3 text-muted-foreground" onClick={handleRejectProposal}>
-                    No, gracias
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Accepted feedback */}
-        {proposalAccepted && (
-          <div className="mb-3 flex justify-start">
-            <div className="bg-primary/10 text-primary rounded-lg px-3 py-2 text-xs flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5" /> Servicios añadidos al carrito
-            </div>
-          </div>
-        )}
 
         {isLoading && (
           <div className="flex justify-start mb-3">

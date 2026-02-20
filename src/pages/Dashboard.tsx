@@ -15,6 +15,7 @@ import logo from '@/assets/logo.png';
 import { LogOut, Folder, CreditCard, Bell, Calendar, Ticket, Gift, Download, Shield, Server, Globe, Lock, RefreshCw, CheckCircle, Clock, FileText, Copy, Send, DollarSign, Check, Settings, User } from 'lucide-react';
 import EmptyProjectsState from '@/components/EmptyProjectsState';
 import AnimatedCard from '@/components/AnimatedCard';
+import VirtualAssistant from '@/components/VirtualAssistant';
 import WelcomeTutorial from '@/components/WelcomeTutorial';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
@@ -894,6 +895,7 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </main>
+      <VirtualAssistant />
     </div>
   </>;
 };
