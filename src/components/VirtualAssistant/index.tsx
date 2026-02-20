@@ -454,7 +454,7 @@ const VirtualAssistant = () => {
 
       case 'ai-chat':
         return (
-          <div className="h-[450px] max-h-[70vh]">
+          <div className="h-[500px] max-h-[75vh]">
             <AIChatMode onBack={handleBack} />
           </div>
         );
@@ -469,7 +469,7 @@ const VirtualAssistant = () => {
       <ChatButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
-        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
           {/* Header with Sara avatar */}
           <div className="bg-primary text-primary-foreground p-3">
             <div className="flex items-center justify-between mb-2">
