@@ -18,6 +18,7 @@ import AnimatedCard from '@/components/AnimatedCard';
 import VirtualAssistant from '@/components/VirtualAssistant';
 import WelcomeTutorial from '@/components/WelcomeTutorial';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 interface Payment {
   id: string;
@@ -176,6 +177,30 @@ const Dashboard = () => {
   }, []);
 
   useRealtimeNotifications(user?.id, handleNewNotification);
+
+  // Push notifications
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, subscribe: subscribePush, setBadgeCount } = usePushNotifications();
+
+  // Request push permission on first login
+  useEffect(() => {
+    if (user && pushSupported && pushPermission === 'default') {
+      const asked = localStorage.getItem(`nova_push_asked_${user.id}`);
+      if (!asked) {
+        localStorage.setItem(`nova_push_asked_${user.id}`, 'true');
+        // Small delay so it doesn't fire immediately on page load
+        const timer = setTimeout(() => {
+          subscribePush();
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [user, pushSupported, pushPermission, subscribePush]);
+
+  // Update badge count when unread notifications change
+  useEffect(() => {
+    const unread = notifications.filter(n => !n.read).length;
+    setBadgeCount(unread);
+  }, [notifications, setBadgeCount]);
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');

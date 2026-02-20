@@ -739,6 +739,7 @@ const Admin = () => {
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
             <TabsTrigger value="appointments">Citas</TabsTrigger>
+            <TabsTrigger value="users">👥 Usuarios</TabsTrigger>
             <TabsTrigger value="revisions">📝 Revisiones</TabsTrigger>
           </TabsList>
 
@@ -1723,6 +1724,47 @@ const Admin = () => {
                   ))}
                   {appointments.length === 0 && <p className="text-muted-foreground">No hay citas aún.</p>}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Users Directory Tab */}
+          <TabsContent value="users">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Users className="w-5 h-5" /> Usuarios Registrados ({profiles.length})</CardTitle>
+                <CardDescription>Directorio de todas las cuentas registradas en Nova</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 px-3 font-medium">Nombre</th>
+                        <th className="text-left py-2 px-3 font-medium">Email</th>
+                        <th className="text-left py-2 px-3 font-medium">Teléfono</th>
+                        <th className="text-left py-2 px-3 font-medium">Empresa</th>
+                        <th className="text-left py-2 px-3 font-medium">Sector</th>
+                        <th className="text-left py-2 px-3 font-medium">Web</th>
+                        <th className="text-left py-2 px-3 font-medium">Registrado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {profiles.map((p) => (
+                        <tr key={p.id} className="border-b hover:bg-muted/50">
+                          <td className="py-2 px-3">{p.full_name || '—'}</td>
+                          <td className="py-2 px-3">{p.email || '—'}</td>
+                          <td className="py-2 px-3">{p.phone || '—'}</td>
+                          <td className="py-2 px-3">{p.business_name || '—'}</td>
+                          <td className="py-2 px-3">{p.sector || '—'}</td>
+                          <td className="py-2 px-3">{p.website ? <a href={p.website} target="_blank" rel="noopener noreferrer" className="text-primary underline">{p.website}</a> : '—'}</td>
+                          <td className="py-2 px-3 text-muted-foreground">{formatDate(p.created_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {profiles.length === 0 && <p className="text-muted-foreground mt-4">No hay usuarios registrados.</p>}
               </CardContent>
             </Card>
           </TabsContent>
