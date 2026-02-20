@@ -389,7 +389,7 @@ const InstalarApp = () => {
         {/* Hero */}
         <section className="py-16 px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <Badge variant="secondary" className="mb-4">App Gratuita · PWA</Badge>
+            <Badge variant="secondary" className="mb-4">App · PWA</Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Instala la app de{' '}
               <span className="text-primary">Nova</span>

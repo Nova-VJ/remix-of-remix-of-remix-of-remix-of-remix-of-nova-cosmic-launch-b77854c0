@@ -190,10 +190,10 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
 
           return (
             <div key={msg.id} className={`mb-3 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
+              <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
                 msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
               }`}>
-                <div className="whitespace-pre-wrap break-words">
+                <div className="whitespace-pre-wrap break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                   {isBot ? <Linkify options={linkifyOptions}>{cleanText}</Linkify> : <p>{cleanText}</p>}
                 </div>
                 <span className="text-[10px] opacity-60 mt-1 block">

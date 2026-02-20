@@ -47,13 +47,6 @@ const EmptyProjectsState = () => {
             </Button>
           </Link>
 
-          {/* Additional info */}
-          <div className="pt-4 border-t border-border/50 w-full">
-            <p className="text-xs text-muted-foreground">
-              ¿Tienes un presupuesto pendiente? Revisa la pestaña 
-              <span className="text-primary font-medium"> Presupuestos</span>
-            </p>
-          </div>
         </div>
       </CardContent>
     </Card>
