@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Rocket, CheckCircle2, Zap } from 'lucide-react';
+import { X, Rocket, CheckCircle2, Zap, MessageCircle, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { WHATSAPP_URL } from '@/config/env';
 
 const POPUP_CLOSED_KEY = 'audit_popup_closed';
 const POPUP_CTA_KEY = 'audit_popup_cta_clicked';
@@ -34,11 +35,22 @@ const AuditPopup = () => {
     localStorage.setItem(POPUP_CTA_KEY, Date.now().toString());
   };
 
-  const handleCTA = () => {
+  const handleWhatsApp = () => {
     localStorage.setItem(POPUP_CTA_KEY, Date.now().toString());
     setIsOpen(false);
-    // Scroll to contact section
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+    window.open(
+      `${WHATSAPP_URL}?text=${encodeURIComponent('Hola Nova, me interesa la auditoría gratuita. Mi código es NOVA20.')}`,
+      '_blank'
+    );
+  };
+
+  const handleEmail = () => {
+    localStorage.setItem(POPUP_CTA_KEY, Date.now().toString());
+    setIsOpen(false);
+    window.open(
+      `mailto:info@solutionsnova.es?subject=${encodeURIComponent('Solicitud de auditoría gratuita – NOVA20')}&body=${encodeURIComponent('Hola Nova,\n\nMe interesa recibir la auditoría gratuita de mi web/negocio.\n\nMi código promocional es NOVA20.\n\nQuedo atento/a a su respuesta.\n\nSaludos.')}`,
+      '_blank'
+    );
   };
 
   return (
@@ -108,13 +120,24 @@ const AuditPopup = () => {
               </button>
             </div>
 
-            {/* CTA */}
-            <Button
-              className="w-full bg-gradient-to-r from-[hsl(270,80%,60%)] to-[hsl(280,70%,50%)] hover:from-[hsl(270,80%,65%)] hover:to-[hsl(280,70%,55%)] text-white font-semibold py-5 rounded-xl shadow-lg shadow-[hsl(270,80%,60%,0.3)] transition-all"
-              onClick={handleCTA}
-            >
-              Quiero mi auditoría gratuita →
-            </Button>
+            {/* CTA Buttons - WhatsApp & Email */}
+            <div className="space-y-2">
+              <Button
+                className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold py-5 rounded-xl shadow-lg transition-all gap-2"
+                onClick={handleWhatsApp}
+              >
+                <MessageCircle className="w-5 h-5" />
+                Pedir auditoría por WhatsApp
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-white/20 text-white hover:bg-white/10 font-semibold py-5 rounded-xl transition-all gap-2"
+                onClick={handleEmail}
+              >
+                <Mail className="w-5 h-5" />
+                Pedir auditoría por correo
+              </Button>
+            </div>
             <p className="text-center text-xs text-white/30 mt-3">Sin compromiso. Respuesta en 24h.</p>
           </div>
         </div>

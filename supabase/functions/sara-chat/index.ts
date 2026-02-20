@@ -213,58 +213,56 @@ serve(async (req) => {
       userId = user?.id || null;
     }
 
-    const isAnonymous = !userId && anon_id;
-
-    // Handle anonymous conversation
-    let anonConversationId: string | null = null;
+    const effectiveAnonId = userId || anon_id || "unknown";
+    
+    // Always use sara_anonymous_conversations for admin visibility
+    let conversationId: string | null = null;
     let allMessages: { role: string; content: string }[] = [];
     
-    if (isAnonymous) {
-      const { data: existingConv } = await supabase
+    const { data: existingConv } = await supabase
+      .from("sara_anonymous_conversations")
+      .select("id, message_count")
+      .eq("anon_id", effectiveAnonId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (existingConv) {
+      conversationId = existingConv.id;
+      await supabase
         .from("sara_anonymous_conversations")
-        .select("id, message_count")
-        .eq("anon_id", anon_id)
-        .order("created_at", { ascending: false })
-        .limit(1)
+        .update({ 
+          updated_at: new Date().toISOString(),
+          message_count: (existingConv.message_count || 0) + 1
+        })
+        .eq("id", conversationId);
+    } else {
+      const { data: newConv } = await supabase
+        .from("sara_anonymous_conversations")
+        .insert({ anon_id: effectiveAnonId, message_count: 1 })
+        .select("id")
         .single();
-
-      if (existingConv) {
-        anonConversationId = existingConv.id;
-        await supabase
-          .from("sara_anonymous_conversations")
-          .update({ 
-            updated_at: new Date().toISOString(),
-            message_count: (existingConv.message_count || 0) + 1
-          })
-          .eq("id", anonConversationId);
-      } else {
-        const { data: newConv } = await supabase
-          .from("sara_anonymous_conversations")
-          .insert({ anon_id, message_count: 1 })
-          .select("id")
-          .single();
-        if (newConv) anonConversationId = newConv.id;
-      }
-
-      if (anonConversationId) {
-        await supabase.from("sara_anonymous_messages").insert({
-          conversation_id: anonConversationId,
-          role: "user",
-          content: message.substring(0, 2000)
-        });
-
-        // Load conversation history for context
-        const { data: history } = await supabase
-          .from("sara_anonymous_messages")
-          .select("role, content")
-          .eq("conversation_id", anonConversationId)
-          .order("created_at", { ascending: true })
-          .limit(20);
-        allMessages = history || [];
-      }
+      if (newConv) conversationId = newConv.id;
     }
 
-    console.log(`Processing chat - IP: ${clientIP}, Anonymous: ${isAnonymous}, Remaining: ${rateLimitResult.remaining}`);
+    if (conversationId) {
+      await supabase.from("sara_anonymous_messages").insert({
+        conversation_id: conversationId,
+        role: "user",
+        content: message.substring(0, 2000)
+      });
+
+      // Load conversation history for context
+      const { data: history } = await supabase
+        .from("sara_anonymous_messages")
+        .select("role, content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true })
+        .limit(20);
+      allMessages = history || [];
+    }
+
+    console.log(`Processing chat - ID: ${effectiveAnonId}, Authenticated: ${!!userId}, Remaining: ${rateLimitResult.remaining}`);
 
     // Build API messages with history for context
     const apiMessages = [
@@ -314,23 +312,24 @@ serve(async (req) => {
       "Lo siento, no pude procesar tu mensaje. ¿Puedes intentarlo de nuevo?";
 
     // Save Sara's response
-    if (isAnonymous && anonConversationId) {
+    if (conversationId) {
       await supabase.from("sara_anonymous_messages").insert({
-        conversation_id: anonConversationId,
+        conversation_id: conversationId,
         role: "assistant",
         content: assistantMessage
       });
 
-      // Create admin notification for every new message
+      // Create admin notification
+      const senderLabel = userId ? 'Usuario registrado' : 'Anónimo';
       const notifTitle = `💬 Nuevo mensaje de Sara`;
-      const notifMsg = `Anónimo escribió: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`;
+      const notifMsg = `${senderLabel} escribió: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`;
       await supabase.from("admin_notifications").insert({
         type: 'sara_message',
         title: notifTitle,
         message: notifMsg,
         data: { 
-          conversation_id: anonConversationId, 
-          anon_id,
+          conversation_id: conversationId, 
+          anon_id: effectiveAnonId,
           user_message: message.substring(0, 200)
         }
       });
@@ -339,16 +338,15 @@ serve(async (req) => {
       const { data: msgCount } = await supabase
         .from("sara_anonymous_conversations")
         .select("message_count")
-        .eq("id", anonConversationId)
+        .eq("id", conversationId)
         .single();
       
       const count = msgCount?.message_count || 0;
       if (count >= 3 && count % 3 === 0) {
-        // Get full conversation for classification
         const { data: fullHistory } = await supabase
           .from("sara_anonymous_messages")
           .select("role, content")
-          .eq("conversation_id", anonConversationId)
+          .eq("conversation_id", conversationId)
           .order("created_at", { ascending: true });
 
         if (fullHistory && fullHistory.length >= 3) {
@@ -369,15 +367,14 @@ serve(async (req) => {
               contact_city: classification.contact_city,
               contact_website: classification.contact_website,
               classified_at: new Date().toISOString()
-            }).eq("id", anonConversationId);
+            }).eq("id", conversationId);
 
-            // High priority admin alert
             if ((classification.score || 0) >= 70) {
               await supabase.from("admin_notifications").insert({
                 type: 'high_priority_lead',
                 title: `🚀 Lead de alta prioridad detectado (Score: ${classification.score})`,
                 message: `${classification.title} – ${classification.service} – ${classification.stage}`,
-                data: { conversation_id: anonConversationId, ...classification }
+                data: { conversation_id: conversationId, ...classification }
               });
             }
           }
