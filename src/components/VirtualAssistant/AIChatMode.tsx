@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, ArrowLeft, Loader2, LogIn, ExternalLink, MessageCircle, ShoppingCart, Check, X, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem } from 'lucide-react';
+import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { useSaraChat } from '@/hooks/useSaraChat';
 import { Badge } from '@/components/ui/badge';
 import Linkify from 'linkify-react';
-import { FORM_URL, WHATSAPP_URL } from '@/config/env';
+import { WHATSAPP_URL } from '@/config/env';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
 import {
   Dialog,
   DialogContent,
@@ -40,13 +41,15 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const normalizeSaraReply = (text: string): string => {
+  // Remove all form-related URLs and placeholders - we'll handle them as buttons
   return text
-    .replace(/\[LINK_FORMULARIO\]/gi, FORM_URL)
-    .replace(/\[FORMULARIO\]/gi, FORM_URL)
     .replace(/\[LINK_WHATSAPP\]/gi, WHATSAPP_URL)
     .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL)
-    // Catch any literal formulario URLs Sara might generate
-    .replace(/https?:\/\/[^\s]*formulario[^\s]*/gi, FORM_URL);
+    // Replace form placeholders with a special marker that won't be a URL
+    .replace(/\[LINK_FORMULARIO\]/gi, '##OPEN_FORM##')
+    .replace(/\[FORMULARIO\]/gi, '##OPEN_FORM##')
+    // Catch any literal formulario URLs Sara might generate and replace with marker
+    .replace(/https?:\/\/[^\s]*(?:formulario|openBriefing)[^\s]*/gi, '##OPEN_FORM##');
 };
 
 const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
@@ -54,7 +57,6 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
   const startIdx = text.indexOf(startTag);
   if (startIdx === -1) return { cleanText: text, proposal: null };
 
-  // Find the matching closing bracket by counting nested brackets
   let depth = 0;
   let endIdx = -1;
   for (let i = startIdx + startTag.length; i < text.length; i++) {
@@ -80,11 +82,11 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
 };
 
 const isWhatsAppLink = (url: string) => url.includes('wa.me') || url.includes('whatsapp');
-const isFormLink = (url: string) => url.includes('openBriefing=true');
 
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
   const [inputValue, setInputValue] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showBriefingModal, setShowBriefingModal] = useState(false);
   const [addedItems, setAddedItems] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -138,23 +140,39 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         </a>
       );
     }
-    if (isFormLink(href)) {
-      return (
-        <a href={href} {...props}
-          className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/90 transition-colors no-underline">
-          <ExternalLink className="w-3.5 h-3.5" /> Abrir formulario
-        </a>
-      );
-    }
     return (
       <a href={href} {...props} target="_blank" rel="noopener noreferrer"
-        className="text-primary underline hover:text-primary/80 transition-colors">{content}</a>
+        className="text-primary underline hover:text-primary/80 transition-colors text-xs break-all">{content}</a>
     );
   };
 
   const linkifyOptions = { render: renderLink, target: '_blank', rel: 'noopener noreferrer' };
 
-  
+  // Render text with ##OPEN_FORM## replaced by buttons
+  const renderMessageContent = (text: string) => {
+    if (!text.includes('##OPEN_FORM##')) {
+      return <Linkify options={linkifyOptions}>{text}</Linkify>;
+    }
+    
+    const parts = text.split('##OPEN_FORM##');
+    return (
+      <>
+        {parts.map((part, i) => (
+          <span key={i}>
+            <Linkify options={linkifyOptions}>{part}</Linkify>
+            {i < parts.length - 1 && (
+              <button
+                onClick={() => setShowBriefingModal(true)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 mb-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/90 transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5" /> Abrir formulario
+              </button>
+            )}
+          </span>
+        ))}
+      </>
+    );
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -188,11 +206,11 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           return (
             <div key={msg.id} className="mb-3">
               <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm break-words overflow-hidden ${
+                <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm ${
                   msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
                 }`}>
-                  <div className="whitespace-pre-wrap break-words overflow-hidden" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                    {isBot ? <Linkify options={linkifyOptions}>{cleanText}</Linkify> : <p>{cleanText}</p>}
+                  <div className="whitespace-pre-wrap break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    {isBot ? renderMessageContent(cleanText) : <p>{cleanText}</p>}
                   </div>
                   <span className="text-[10px] opacity-60 mt-1 block">
                     {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
@@ -200,7 +218,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                 </div>
               </div>
 
-              {/* Inline product items - Ecoland style */}
+              {/* Inline product items */}
               {proposal && (
                 <div className="mt-2 space-y-1.5 max-w-[90%]">
                   {proposal.items.map((item, i) => {
@@ -294,6 +312,12 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Briefing Form Modal */}
+      <BriefingFormModal 
+        open={showBriefingModal} 
+        onOpenChange={setShowBriefingModal} 
+      />
     </div>
   );
 };
