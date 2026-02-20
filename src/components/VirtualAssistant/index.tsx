@@ -454,7 +454,7 @@ const VirtualAssistant = () => {
 
       case 'ai-chat':
         return (
-          <div className="h-[400px]">
+          <div className="h-[450px] max-h-[70vh]">
             <AIChatMode onBack={handleBack} />
           </div>
         );
