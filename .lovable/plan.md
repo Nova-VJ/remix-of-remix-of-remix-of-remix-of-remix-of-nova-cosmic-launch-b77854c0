@@ -1,85 +1,138 @@
 
 
-## Chat Sara: Recomendaciones interactivas al carrito (estilo Ecoland)
+# Plan: Mejoras del Admin, Chat de Sara, Referidos, Notificaciones Push y PWA
 
-### Estado actual
+## Resumen
 
-El sistema de propuestas al carrito ya existe parcialmente:
-- La edge function `sara-chat` tiene instrucciones en el system prompt para generar `[PROPUESTA_CARRITO:{...}]` al final de sus respuestas
-- `AIChatMode.tsx` ya parsea ese tag con `extractCartProposal()` y muestra una card con botones "Añadir al carrito" / "No, gracias"
-- El `CartContext` ya soporta `addItem()` con servicios y paquetes
+Este plan cubre 6 areas principales:
+1. Arreglar scroll del chat de Sara en movil
+2. Sistema de referidos con registro automatico
+3. Icono de la app sin borde blanco
+4. Analiticas admin para conversaciones de Sara
+5. Notificaciones push con badges
+6. Tab de usuarios admin con exportacion
 
-Sin embargo, hay problemas que impiden que funcione bien:
+---
 
-1. **Sara no siempre genera la propuesta** porque el prompt no es lo suficientemente claro sobre cuándo y cómo hacerlo
-2. **La card de propuesta es demasiado simple** - no se parece al estilo de Ecoland (con iconos, precios destacados e items individuales seleccionables)
-3. **Los items de la propuesta no coinciden con los IDs reales del carrito** (el CartContext espera IDs como "web", "apps", "pkg-pro", etc.)
-4. **Falta feedback visual** cuando se acepta o rechaza la propuesta
+## 1. Arreglar scroll del chat de Sara en movil
 
-### Cambios planificados
+**Problema**: En la version movil no se puede hacer scroll dentro del chat de Sara (AIChatMode).
 
-#### 1. Mejorar el system prompt de la edge function (`supabase/functions/sara-chat/index.ts`)
+**Solucion**: El componente `AIChatMode.tsx` usa `ScrollArea` pero el contenedor padre tiene restricciones de altura fijas. Se necesita:
+- Agregar `overflow-y: auto` y `-webkit-overflow-scrolling: touch` al contenedor del chat
+- Asegurar que el `ScrollArea` tenga `touch-action: pan-y` para que funcione el scroll tactil en movil
+- Ajustar la estructura del contenedor para que flex funcione correctamente con alturas dinamicas
 
-- Hacer las instrucciones de PROPUESTA_CARRITO mas claras y enfaticas
-- Añadir ejemplos concretos de cuándo generar la propuesta (cuando el usuario describe su proyecto, cuando pregunta por precios de algo concreto)
-- Asegurar que los IDs y precios del JSON coinciden con los del CartContext
-- Añadir instruccion para que Sara presente la propuesta con un mensaje natural antes del tag (ej: "Basandome en lo que me cuentas, te recomiendo:")
+**Archivos**: `src/components/VirtualAssistant/AIChatMode.tsx`, `src/components/VirtualAssistant/index.tsx`
 
-#### 2. Mejorar la card de propuesta en `AIChatMode.tsx`
+---
 
-Rediseñar la card `pendingProposal` para que sea mas visual y profesional (estilo Ecoland):
+## 2. Sistema de referidos con codigo en registro
 
-- Cada item aparece como una mini-card con icono del servicio, nombre y precio
-- Precio total calculado y visible
-- Boton principal "Aceptar y añadir al carrito" con icono de carrito
-- Boton secundario "No me interesa"
-- Animacion de entrada suave
-- Feedback visual tras aceptar (checkmark, toast con resumen)
+**Problema**: Al registrarse, no hay opcion de ingresar un codigo de referido. Ademas, el link de invitacion debe incluir el codigo de referido para que se auto-rellene al abrir.
 
-#### 3. Mejorar la ventana del chat en PC
+**Solucion**:
 
-- La ventana del chat AI (`h-[400px]`) es fija y a veces corta mensajes
-- Cambiar a `h-[450px]` o `max-h-[70vh]` para pantallas grandes
-- Asegurar que el ScrollArea funciona correctamente y no corta contenido
+### 2a. Registro con codigo de referido
+- En `Auth.tsx`, agregar un campo "Codigo de referido" (opcional) en el formulario de registro
+- Al detectar `?ref=CODIGO` en la URL, auto-rellenar ese campo
+- Tras el registro exitoso, buscar en la tabla `profiles` al usuario con ese `referral_code` y crear un registro en la tabla `referrals` vinculando referidor y referido
+- Mostrar el campo de referido en la seccion de datos opcionales del registro
 
-#### 4. Fix del link al formulario que genera Sara
+### 2b. Link de invitacion en el perfil del usuario
+- En la pagina de perfil (`Profile.tsx`), agregar una seccion de "Referidos" con:
+  - Mostrar el codigo de referido del usuario
+  - Un link de invitacion copiable (ej: `solutionsnova.es/auth?ref=NOVAXXXXXX`)
+  - Boton para copiar el link
 
-Sara genera links como `https://solutionsnova.es/formulario` que dan 404. El normalizador ya reemplaza `[LINK_FORMULARIO]` por `?openBriefing=true`, pero Sara a veces genera URLs literales en lugar del placeholder.
+### 2c. Admin: ver referidos con datos
+- La tabla de referidos en Admin ya existe. Se mejorara para mostrar de donde vino cada usuario referido.
 
-- Actualizar el system prompt para que Sara use SIEMPRE el placeholder `[LINK_FORMULARIO]` y NUNCA escriba URLs de formulario
-- Añadir en `normalizeSaraReply` un regex que capture URLs con "formulario" y las reemplace por el FORM_URL correcto
+**Archivos**: `src/pages/Auth.tsx`, `src/pages/Profile.tsx`, `src/pages/Admin.tsx`
 
-#### 5. Fix de links que se salen del cuerpo del chat
+---
 
-- Los links largos no tienen `word-break` y se desbordan del contenedor
-- Añadir `break-all` o `overflow-wrap: break-word` al contenedor de mensajes en AIChatMode
+## 3. Icono de app sin borde blanco
 
-### Archivos a modificar
+**Problema**: El icono SVG actual tiene un fondo transparente, lo que causa que el sistema operativo ponga un borde/fondo blanco alrededor al instalarlo como PWA.
 
-| Archivo | Cambio |
-|---|---|
-| `supabase/functions/sara-chat/index.ts` | Mejorar system prompt para propuestas de carrito y uso de placeholders |
-| `src/components/VirtualAssistant/AIChatMode.tsx` | Rediseñar card de propuesta, fix overflow de links, ajustar altura del chat |
-| `src/components/VirtualAssistant/index.tsx` | Ajustar altura del contenedor ai-chat |
+**Solucion**:
+- Generar iconos PNG en multiples resoluciones (192x192, 512x512) con fondo solido del color de la marca (`#0f0a1e`) rellenando todo el area
+- Actualizar `manifest.json` para usar PNG en lugar de SVG para los iconos
+- Separar el icono `maskable` (con padding) del icono `any` (sin padding extra)
+- Crear el icono maskable con zona segura (el logo centrado en el 80% interior)
 
-### Detalles tecnicos
+**Nota tecnica**: Los iconos SVG no son bien soportados como iconos de PWA en todos los dispositivos. Se necesitan PNGs. Se creara un componente o script que genere las imagenes correctas, o se hara manualmente ajustando el SVG para que tenga fondo solido y exportandolo.
 
-**Formato del JSON de propuesta (sin cambios):**
-```json
-[PROPUESTA_CARRITO:{"items":[{"id":"web","name":"Pagina Web","price":1000,"type":"service"}],"description":"Recomendacion personalizada"}]
-```
+**Solucion practica**: Modificar el SVG actual para que tenga un fondo solido `#0f0a1e` que cubra todo el viewBox, y actualizar manifest.json con entradas separadas para `any` y `maskable`.
 
-**IDs validos del CartContext:**
-- Servicios: `web` (1000), `apps` (1700), `social` (500), `branding` (300), `marketing` (200), `sem` (150)
-- Paquetes: `pkg-pro` (1400), `pkg-plus` (2500)
+**Archivos**: `public/nova-icon.svg`, `public/manifest.json`
 
-**Iconos por servicio (para la card mejorada):**
-- web -> Globe
-- apps -> Smartphone
-- social -> Share2
-- branding -> Palette
-- marketing -> TrendingUp
-- sem -> BarChart3
-- pkg-pro -> Briefcase
-- pkg-plus -> Gem
+---
+
+## 4. Analiticas admin: guardar y visualizar chats de Sara
+
+**Problema**: Las conversaciones de Sara no se estan guardando correctamente en la base de datos.
+
+**Solucion**:
+- Verificar que la edge function `sara-chat` este insertando correctamente tanto mensajes del usuario como respuestas en `sara_anonymous_messages`
+- Verificar que las conversaciones se crean/actualizan en `sara_anonymous_conversations`
+- Verificar las politicas RLS: las tablas usan `has_role(auth.uid(), 'admin')` pero tambien tienen politicas con `profiles.is_admin`. Asegurar que el admin tenga el rol en `user_roles`
+- Revisar los logs de la edge function para detectar errores
+
+**Archivos**: `supabase/functions/sara-chat/index.ts` (verificar), posible migracion de datos
+
+---
+
+## 5. Notificaciones push con badges
+
+**Problema**: Se necesita que al iniciar sesion en la app movil, se mantenga la sesion y lleguen notificaciones push con badges en el icono.
+
+**Solucion**:
+- La sesion ya se persiste via `localStorage` (configurado en el cliente de Supabase)
+- Se necesita generar claves VAPID reales para las notificaciones push
+- Crear una edge function `send-push-notification` que envie notificaciones a los endpoints suscritos
+- Integrar el envio de push en eventos clave (nuevo mensaje de Sara, nuevo usuario registrado)
+- El service worker ya existe en `public/sw.js` y maneja push y badges
+
+**Pasos tecnicos**:
+1. Generar par de claves VAPID (publica/privada) y guardar la privada como secret
+2. Actualizar la clave publica en `usePushNotifications.ts`
+3. Crear edge function `send-push-notification` usando la libreria `web-push`
+4. Llamar a esta funcion desde `sara-chat` y desde triggers relevantes
+5. En el Dashboard, solicitar permiso de notificaciones al usuario admin
+
+**Archivos**: `src/hooks/usePushNotifications.ts`, `public/sw.js`, nueva edge function `supabase/functions/send-push-notification/index.ts`, `src/pages/Dashboard.tsx`
+
+---
+
+## 6. Tab de usuarios admin con exportacion
+
+**Problema**: El tab de usuarios ya existe pero necesita opciones de exportacion.
+
+**Solucion**:
+- Agregar boton "Exportar CSV" en el tab de usuarios del admin
+- El boton generara un CSV con todos los datos de los perfiles (nombre, email, telefono, empresa, sector, web, fecha de registro, codigo de referido)
+- Descargar el archivo automaticamente
+
+**Archivos**: `src/pages/Admin.tsx`
+
+---
+
+## Detalles tecnicos
+
+### Migraciones de base de datos
+- Agregar columna `referred_by_code` a la tabla `profiles` para registrar el codigo de referido usado al registrarse (texto, nullable)
+
+### Edge functions
+- Actualizar `sara-chat` si es necesario para corregir persistencia
+- Crear `send-push-notification` para enviar notificaciones push reales
+
+### Orden de implementacion
+1. Fix scroll movil del chat (rapido)
+2. Icono PWA sin borde blanco
+3. Sistema de referidos en registro
+4. Analiticas y persistencia de conversaciones Sara
+5. Exportacion CSV en admin
+6. Notificaciones push con VAPID (requiere secret key)
 
