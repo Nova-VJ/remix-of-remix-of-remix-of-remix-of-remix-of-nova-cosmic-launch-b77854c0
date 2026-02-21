@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock, Brain } from 'lucide-react';
+import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock, Brain, Download } from 'lucide-react';
 import SaraLeadIntelligence from '@/components/SaraLeadIntelligence';
 
 interface Lead {
@@ -1731,9 +1731,28 @@ const Admin = () => {
           {/* Users Directory Tab */}
           <TabsContent value="users">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Users className="w-5 h-5" /> Usuarios Registrados ({profiles.length})</CardTitle>
-                <CardDescription>Directorio de todas las cuentas registradas en Nova</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><Users className="w-5 h-5" /> Usuarios Registrados ({profiles.length})</CardTitle>
+                  <CardDescription>Directorio de todas las cuentas registradas en Nova</CardDescription>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => {
+                  const headers = ['Nombre', 'Email', 'Teléfono', 'Empresa', 'Sector', 'Web', 'Código Referido', 'Referido Por', 'Registrado'];
+                  const rows = profiles.map((p: any) => [
+                    p.full_name || '', p.email || '', p.phone || '', p.business_name || '',
+                    p.sector || '', p.website || '', p.referral_code || '', p.referred_by_code || '',
+                    p.created_at ? new Date(p.created_at).toLocaleDateString('es-ES') : ''
+                  ]);
+                  const csv = [headers.join(','), ...rows.map((r: string[]) => r.map(v => `"${v}"`).join(','))].join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = `usuarios-nova-${new Date().toISOString().split('T')[0]}.csv`;
+                  a.click(); URL.revokeObjectURL(url);
+                  toast({ title: 'CSV descargado', description: `${profiles.length} usuarios exportados` });
+                }}>
+                  <Download className="w-4 h-4 mr-2" /> Exportar CSV
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -1746,11 +1765,12 @@ const Admin = () => {
                         <th className="text-left py-2 px-3 font-medium">Empresa</th>
                         <th className="text-left py-2 px-3 font-medium">Sector</th>
                         <th className="text-left py-2 px-3 font-medium">Web</th>
+                        <th className="text-left py-2 px-3 font-medium">Código Ref.</th>
                         <th className="text-left py-2 px-3 font-medium">Registrado</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {profiles.map((p) => (
+                      {profiles.map((p: any) => (
                         <tr key={p.id} className="border-b hover:bg-muted/50">
                           <td className="py-2 px-3">{p.full_name || '—'}</td>
                           <td className="py-2 px-3">{p.email || '—'}</td>
@@ -1758,6 +1778,7 @@ const Admin = () => {
                           <td className="py-2 px-3">{p.business_name || '—'}</td>
                           <td className="py-2 px-3">{p.sector || '—'}</td>
                           <td className="py-2 px-3">{p.website ? <a href={p.website} target="_blank" rel="noopener noreferrer" className="text-primary underline">{p.website}</a> : '—'}</td>
+                          <td className="py-2 px-3 font-mono text-xs">{p.referral_code || '—'}</td>
                           <td className="py-2 px-3 text-muted-foreground">{formatDate(p.created_at)}</td>
                         </tr>
                       ))}

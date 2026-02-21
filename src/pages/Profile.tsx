@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, Mail, Phone, Building, Globe, AtSign, Smartphone, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Building, Globe, AtSign, Smartphone, Save, Loader2, Gift, Copy, Check } from 'lucide-react';
 import ProjectFlow from '@/components/ProjectFlow';
+import { SITE_URL } from '@/config/env';
 
 interface ProfileData {
   full_name: string;
@@ -45,6 +46,8 @@ const Profile = () => {
     has_app: '',
   });
   const [activeProject, setActiveProject] = useState<ProjectData | null>(null);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -66,7 +69,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, email, phone, business_name, sector, website, social_media, has_app')
+        .select('full_name, email, phone, business_name, sector, website, social_media, has_app, referral_code')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -100,6 +103,7 @@ const Profile = () => {
         return;
       }
 
+      setReferralCode(data.referral_code || null);
       setProfileData({
         full_name: data.full_name || (user.user_metadata as any)?.full_name || '',
         email: data.email || user.email || '',
@@ -368,6 +372,56 @@ const Profile = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Referral Section */}
+        {referralCode && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-primary" />
+                Programa de Referidos
+              </CardTitle>
+              <CardDescription>
+                Invita a tus amigos y ambos ganan beneficios
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Tu código de referido</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <code className="flex-1 bg-muted px-4 py-2 rounded-lg font-mono text-primary font-bold text-lg">
+                    {referralCode}
+                  </code>
+                </div>
+              </div>
+              <div>
+                <Label>Link de invitación</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Input
+                    readOnly
+                    value={`${SITE_URL}/auth?ref=${referralCode}`}
+                    className="flex-1 font-mono text-xs"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${SITE_URL}/auth?ref=${referralCode}`);
+                      setCopied(true);
+                      toast({ title: 'Link copiado', description: 'Compártelo con tus amigos.' });
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                  >
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Cuando alguien se registre con tu link, aparecerá automáticamente como tu referido.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );

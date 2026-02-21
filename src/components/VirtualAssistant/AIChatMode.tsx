@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { useNavigate } from 'react-router-dom';
 import { useSaraChat } from '@/hooks/useSaraChat';
 import { Badge } from '@/components/ui/badge';
@@ -190,7 +190,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
             <p>¡Hola! 👋 Soy Sara, tu asistente virtual.</p>
@@ -260,7 +260,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         )}
 
         {error && <div className="text-center text-destructive text-xs py-2">{error}</div>}
-      </ScrollArea>
+      </div>
 
       {/* Scroll-back button when demo limit reached */}
       {demoLimitReached && messages.length > 0 && (

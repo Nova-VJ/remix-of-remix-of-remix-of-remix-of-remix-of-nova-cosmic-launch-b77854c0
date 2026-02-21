@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Lock, User, ArrowLeft, Eye, EyeOff, Building, Phone, Globe, AtSign, Smartphone, ChevronDown, ChevronUp } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, Eye, EyeOff, Building, Phone, Globe, AtSign, Smartphone, ChevronDown, ChevronUp, Gift } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import logo from '@/assets/logo.png';
@@ -20,6 +20,7 @@ const nameSchema = z.string().max(100, {
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect');
+  const refCode = searchParams.get('ref');
   
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -36,6 +37,7 @@ const Auth = () => {
   const [website, setWebsite] = useState('');
   const [socialMedia, setSocialMedia] = useState('');
   const [hasApp, setHasApp] = useState('');
+  const [referralCode, setReferralCode] = useState(refCode || '');
   
   const [errors, setErrors] = useState<{
     email?: string;
@@ -54,8 +56,13 @@ const Auth = () => {
   } = useToast();
   
   useEffect(() => {
+    if (refCode && !isLogin) {
+      setShowOptionalFields(true);
+    }
+  }, [refCode]);
+
+  useEffect(() => {
     if (!loading && user) {
-      // If coming from briefing form, go back to home with briefing flag
       if (redirectTo === 'briefing') {
         navigate('/?openBriefing=true');
       } else {
@@ -89,7 +96,6 @@ const Auth = () => {
   };
 
   const saveOptionalProfileData = async (userId: string, userEmail?: string | null) => {
-    // Create/ensure profile row exists, then apply optional fields if provided
     const payload: any = {
       user_id: userId,
       email: userEmail ?? null,
@@ -100,6 +106,7 @@ const Auth = () => {
       website: website || null,
       social_media: socialMedia || null,
       has_app: hasApp || null,
+      referred_by_code: referralCode || null,
     };
 
     const { error } = await supabase
@@ -107,6 +114,29 @@ const Auth = () => {
       .upsert(payload, { onConflict: 'user_id' });
 
     if (error) throw error;
+
+    // If referral code was used, create a referral record
+    if (referralCode) {
+      try {
+        const { data: referrerProfile } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('referral_code', referralCode)
+          .maybeSingle();
+
+        if (referrerProfile) {
+          await supabase.from('referrals').insert({
+            referral_code: referralCode,
+            referrer_id: referrerProfile.user_id,
+            referred_user_id: userId,
+            referred_email: userEmail,
+            status: 'pending',
+          });
+        }
+      } catch (e) {
+        console.error('Error creating referral:', e);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -293,6 +323,16 @@ const Auth = () => {
                       <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <input type="text" value={hasApp} onChange={e => setHasApp(e.target.value)} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="App actual (si tienes)" />
                     </div>
+
+                    <div className="relative">
+                      <Gift className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <input type="text" value={referralCode} onChange={e => setReferralCode(e.target.value.toUpperCase())} className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" placeholder="Código de referido (opcional)" />
+                    </div>
+                    {referralCode && (
+                      <p className="text-xs text-primary">
+                        🎁 Código de referido aplicado: {referralCode}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
