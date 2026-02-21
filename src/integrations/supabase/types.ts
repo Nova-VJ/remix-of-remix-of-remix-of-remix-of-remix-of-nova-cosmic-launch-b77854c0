@@ -522,6 +522,7 @@ export type Database = {
           is_admin: boolean | null
           phone: string | null
           referral_code: string | null
+          referred_by_code: string | null
           sector: string | null
           social_media: string | null
           updated_at: string
@@ -538,6 +539,7 @@ export type Database = {
           is_admin?: boolean | null
           phone?: string | null
           referral_code?: string | null
+          referred_by_code?: string | null
           sector?: string | null
           social_media?: string | null
           updated_at?: string
@@ -554,6 +556,7 @@ export type Database = {
           is_admin?: boolean | null
           phone?: string | null
           referral_code?: string | null
+          referred_by_code?: string | null
           sector?: string | null
           social_media?: string | null
           updated_at?: string
