@@ -379,13 +379,13 @@ serve(async (req) => {
 
               // Send push notification to admin devices
               const SUPABASE_URL_VAL = Deno.env.get("SUPABASE_URL")!;
-              const SUPABASE_ANON_KEY_VAL = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
+              const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
               try {
-                await fetch(`${SUPABASE_URL_VAL}/functions/v1/send-push-notification`, {
+                const pushRes = await fetch(`${SUPABASE_URL_VAL}/functions/v1/send-push-notification`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${SUPABASE_ANON_KEY_VAL}`,
+                    "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
                   },
                   body: JSON.stringify({
                     title: `🚀 Lead Score: ${classification.score}`,
@@ -395,6 +395,8 @@ serve(async (req) => {
                     target: "admin",
                   }),
                 });
+                const pushResult = await pushRes.text();
+                console.log("Push notification result:", pushRes.status, pushResult);
               } catch (pushErr) {
                 console.error("Push notification error:", pushErr);
               }
