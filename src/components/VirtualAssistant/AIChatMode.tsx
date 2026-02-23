@@ -175,7 +175,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 p-2 border-b border-border">
         <Button variant="ghost" size="sm" onClick={onBack} className="h-8 px-2">
