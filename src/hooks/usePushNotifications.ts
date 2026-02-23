@@ -71,13 +71,20 @@ export const usePushNotifications = () => {
 
       const subJson = sub.toJSON();
       
+      // Check if user is admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('user_id', user.id)
+        .single();
+      
       // Save to database
       await supabase.from('push_subscriptions').upsert({
         user_id: user.id,
         endpoint: sub.endpoint,
         p256dh: subJson.keys?.p256dh || '',
         auth: subJson.keys?.auth || '',
-        is_admin: false,
+        is_admin: profile?.is_admin || false,
       }, { onConflict: 'endpoint' });
 
       setIsSubscribed(true);
