@@ -660,9 +660,15 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
           {notifications.map(notif => (
             <Card 
               key={notif.id} 
-              className={`border transition-all ${
+              className={`border transition-all cursor-pointer hover:opacity-80 ${
                 !notif.read ? 'border-primary/40 bg-primary/5' : 'border-border'
               } ${notif.type === 'high_priority_lead' ? 'border-green-500/40 bg-green-500/5' : ''}`}
+              onClick={async () => {
+                if (!notif.read) {
+                  await supabase.from('admin_notifications').update({ read: true }).eq('id', notif.id);
+                  onRefresh();
+                }
+              }}
             >
               <CardContent className="p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -671,7 +677,7 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
                     <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {!notif.read && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    {!notif.read && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
                     <span className="text-xs text-muted-foreground">{formatDate(notif.created_at)}</span>
                   </div>
                 </div>

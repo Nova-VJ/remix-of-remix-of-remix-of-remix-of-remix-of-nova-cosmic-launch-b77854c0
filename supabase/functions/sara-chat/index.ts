@@ -369,13 +369,35 @@ serve(async (req) => {
               classified_at: new Date().toISOString()
             }).eq("id", conversationId);
 
-            if ((classification.score || 0) >= 70) {
+            if ((classification.score || 0) >= 50) {
               await supabase.from("admin_notifications").insert({
                 type: 'high_priority_lead',
                 title: `🚀 Lead de alta prioridad detectado (Score: ${classification.score})`,
                 message: `${classification.title} – ${classification.service} – ${classification.stage}`,
                 data: { conversation_id: conversationId, ...classification }
               });
+
+              // Send push notification to admin devices
+              const SUPABASE_URL_VAL = Deno.env.get("SUPABASE_URL")!;
+              const SUPABASE_ANON_KEY_VAL = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || "";
+              try {
+                await fetch(`${SUPABASE_URL_VAL}/functions/v1/send-push-notification`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY_VAL}`,
+                  },
+                  body: JSON.stringify({
+                    title: `🚀 Lead Score: ${classification.score}`,
+                    body: `${classification.title} – ${classification.service}`,
+                    url: "/admin",
+                    type: "high_priority_lead",
+                    target: "admin",
+                  }),
+                });
+              } catch (pushErr) {
+                console.error("Push notification error:", pushErr);
+              }
             }
           }
         }
