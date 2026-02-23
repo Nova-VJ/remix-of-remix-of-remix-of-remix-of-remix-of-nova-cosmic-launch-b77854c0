@@ -190,7 +190,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
             <p>¡Hola! 👋 Soy Sara, tu asistente virtual.</p>
