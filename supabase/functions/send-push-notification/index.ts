@@ -26,6 +26,7 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { title, body, url, type, target } = await req.json();
+    console.log("Push request received:", { title, body, url, type, target });
 
     // target: "admin" | "all" | specific user_id
     let query = supabase.from("push_subscriptions").select("*");
@@ -35,7 +36,8 @@ serve(async (req) => {
       query = query.eq("user_id", target);
     }
 
-    const { data: subscriptions } = await query;
+    const { data: subscriptions, error: subError } = await query;
+    console.log("Subscriptions found:", subscriptions?.length || 0, "Error:", subError);
 
     if (!subscriptions || subscriptions.length === 0) {
       await supabase.from("admin_notifications").insert({
