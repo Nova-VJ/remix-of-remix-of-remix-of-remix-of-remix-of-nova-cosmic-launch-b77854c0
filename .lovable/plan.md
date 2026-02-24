@@ -1,44 +1,92 @@
 
 
-# Plan: Icono oficial, clasificacion IA y notificaciones push
+# Plan: Icono definitivo, notificaciones push funcionales y badge de alertas
 
-## Problemas identificados
+## Problemas encontrados
 
-1. **Icono con marco blanco**: Los PNGs actuales tienen fondo oscuro que no se adapta bien a todos los launchers. Se necesita usar el nuevo SVG oficial con fondo transparente, y configurar el manifest para que Android use `theme_color` (#0f0a1e) como relleno.
+### 1. Icono con marco blanco (PC y movil)
+El SVG actual no se renderiza bien como icono de app/favicon en algunos contextos. La solucion definitiva es usar el nuevo SVG que has proporcionado (`Favi_icon_Nova_logo_de_app_y_pc-4.svg`) y copiarlo como `public/nova-icon.svg`, reemplazando el anterior.
 
-2. **La IA no clasifica la mayoria de leads**: La clasificacion solo se ejecuta cuando `message_count >= 3 AND message_count % 3 === 0`. La mayoria de conversaciones tienen solo 2 mensajes del usuario, por lo que nunca llegan al umbral. Hay que bajar el umbral a 2 mensajes.
+### 2. Notificaciones push NO llegan (error 403 VAPID)
+Este es el problema principal. Los logs del servidor muestran este error claro:
 
-3. **Notificaciones push no llegan**: La tabla `push_subscriptions` esta VACIA. La suscripcion anterior fue eliminada (error 410 - endpoint expirado). Se necesita que te vuelvas a suscribir desde la app instalada. Ademas, el Service Worker referencia iconos que no existen.
+```text
+403: the VAPID credentials in the authorization header 
+do not correspond to the credentials used to create 
+the subscriptions.
+```
+
+Esto significa que la clave publica VAPID que usa el frontend para crear la suscripcion (`BIuPxNAgh93iY84V...`) **NO coincide** con las claves VAPID guardadas como secretos del proyecto. Cuando creaste las claves VAPID en una web y me las diste, se guardaron como secretos del servidor. Pero la clave publica que esta hardcodeada en el frontend es diferente.
+
+**Solucion**: Mover la clave publica VAPID a una variable de entorno para que sea consistente. Y lo mas importante: necesitas **verificar** que la clave publica VAPID que tienes guardada en un lugar seguro coincide con la que esta en el frontend. Si no coincide, necesitaremos actualizarla.
+
+**Pasos concretos**:
+- Cambiar el frontend para usar `VITE_VAPID_PUBLIC_KEY` como variable de entorno en vez de tener la clave hardcodeada
+- Alternativamente, puedo leer la clave publica desde el secreto del servidor a traves de un endpoint seguro
+- **Despues de arreglar las claves**, hay que borrar la suscripcion actual (que fue creada con la clave incorrecta) y re-suscribirse
+
+### 3. Punto rojo de notificaciones tipo Facebook/WhatsApp
+Actualmente el badge de notificaciones solo aparece dentro del panel de admin. Hay que agregar un indicador visual permanente (punto rojo con numero) en la Navbar, visible en todo momento cuando el admin esta logueado, usando realtime para actualizarse automaticamente.
 
 ## Cambios a realizar
 
-### 1. Icono oficial en todas partes
-- Copiar el nuevo SVG a `public/nova-icon.svg`
-- Actualizar `public/manifest.json`: usar el SVG como icono principal con `purpose: "any"` y `purpose: "maskable"` (Android rellenara el fondo con el theme_color oscuro)
-- Actualizar `index.html`: favicon apuntando al SVG
-- Actualizar `public/sw.js`: iconos de notificacion push apuntando al SVG correcto
+### Archivo 1: `public/nova-icon.svg`
+- Reemplazar con el nuevo SVG proporcionado (fondo transparente, sin marco)
 
-### 2. Arreglar clasificacion IA de leads
-- En `supabase/functions/sara-chat/index.ts`: cambiar el umbral de clasificacion de `count >= 3 && count % 3 === 0` a `count >= 2` para que clasifique desde el segundo mensaje del usuario y en cada mensaje posterior
-- Esto hara que todos los leads nuevos (y los existentes cuando envien otro mensaje) reciban score, analisis y clasificacion automatica
+### Archivo 2: `index.html`
+- Sin cambios (ya apunta a `/nova-icon.svg`)
 
-### 3. Arreglar notificaciones push
-- Verificar que el `send-push-notification` edge function tiene el header CORS correcto para aceptar llamadas internas con service role key
-- Agregar logs adicionales en `send-push-notification` para diagnosticar problemas
-- Importante: despues de implementar estos cambios, deberas abrir la app en tu movil, ir a tu perfil y activar las notificaciones de nuevo para registrar un nuevo token push
+### Archivo 3: `public/manifest.json`
+- Sin cambios (ya apunta a `/nova-icon.svg` con purpose any/maskable)
 
----
+### Archivo 4: `src/hooks/usePushNotifications.ts`
+- Crear un mecanismo para obtener la clave publica VAPID correcta
+- Opcion recomendada: usar una variable de entorno `VITE_VAPID_PUBLIC_KEY` o leerla del secreto del servidor
+- La clave publica VAPID del frontend DEBE coincidir con el par de claves del servidor
+
+### Archivo 5: `src/components/Navbar.tsx`
+- Agregar indicador de notificaciones (punto rojo con numero) para el admin
+- Consultar `admin_notifications` con filtro `read = false` y mostrar el conteo
+- Suscripcion realtime a cambios en `admin_notifications` para actualizar en tiempo real
+- Al hacer clic, navegar al panel de admin en la pestana de Sara IA / Alertas
+
+### Archivo 6: `src/pages/Admin.tsx`
+- Agregar auto-suscripcion a push notifications cuando el admin accede al panel (si aun no esta suscrito)
+
+### Archivo 7: `supabase/functions/send-push-notification/index.ts`
+- Agregar un endpoint GET que devuelva la clave publica VAPID (para que el frontend la lea de forma segura y siempre coincida con el servidor)
 
 ## Seccion tecnica
 
-### Archivos a modificar:
-1. `public/nova-icon.svg` - reemplazar con el nuevo icono oficial
-2. `public/manifest.json` - referencias al SVG, mantener theme_color #0f0a1e
-3. `index.html` - favicon SVG
-4. `public/sw.js` - icon/badge en notificaciones push
-5. `supabase/functions/sara-chat/index.ts` - umbral de clasificacion IA (linea 345)
-6. `supabase/functions/send-push-notification/index.ts` - logging mejorado
+### Sobre las claves VAPID
+El error 403 es definitivo: la clave publica en el frontend (`BIuPxNAgh93iY84VXiCUywI5ucFgeJ7pfgYDhOh0eZXYLh7EA7lHhFJCYtIEfqUHkkWdK5P277KHVQPG7Eo_yxc`) NO es la misma que el par guardado como secreto del servidor. 
 
-### Sobre las VAPID keys:
-Las claves VAPID estan correctamente guardadas como secretos del proyecto (VAPID_PUBLIC_KEY y VAPID_PRIVATE_KEY). El problema NO son las claves, sino que la tabla de suscripciones push esta vacia porque el token anterior expiro y fue eliminado. Solo necesitas volver a activar las notificaciones desde la app.
+Para solucionarlo de raiz, creare un nuevo endpoint que devuelve la clave publica VAPID desde el servidor, y el frontend la usara para suscribirse. Asi siempre coincidiran.
+
+### Flujo de notificacion corregido
+```text
+1. Admin abre Dashboard/Admin -> se suscribe automaticamente
+2. Frontend pide la clave publica VAPID al servidor
+3. Se crea suscripcion push con la clave correcta
+4. Sara clasifica lead con score >= 50
+5. sara-chat llama a send-push-notification
+6. send-push-notification envia push con las claves correctas
+7. El movil/PC recibe la notificacion nativa
+8. Badge rojo en Navbar se actualiza en tiempo real
+```
+
+### Badge en Navbar (punto rojo)
+- Solo visible para el admin (email === 'info@solutionsnova.es')
+- Consulta inicial de `admin_notifications` con `read = false`
+- Suscripcion realtime para actualizacion instantanea
+- Punto rojo con numero (estilo WhatsApp/Facebook)
+- Al pulsar, redirige a `/admin` (tab Sara IA)
+
+### Pasos post-implementacion
+Despues de aplicar los cambios:
+1. Borrar los datos de la app instalada en PC y movil (o desinstalar y reinstalar)
+2. Volver a abrir la app
+3. Iniciar sesion como admin
+4. Aceptar el permiso de notificaciones cuando aparezca
+5. Enviar un mensaje de prueba a Sara para verificar que llega la notificacion
 
