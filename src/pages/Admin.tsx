@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { ArrowLeft, Users, Ticket, FolderOpen, Mail, Calendar, Plus, Milestone, Wrench, Bell, Gift, FileText, Send, DollarSign, Star, Trash2, Image, MessageSquare, BarChart3, TrendingUp, UserCheck, Clock, Brain, Download } from 'lucide-react';
 import SaraLeadIntelligence from '@/components/SaraLeadIntelligence';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface Lead {
   id: string;
@@ -128,6 +129,7 @@ const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isSupported, isSubscribed, subscribe } = usePushNotifications();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -205,6 +207,17 @@ const Admin = () => {
   useEffect(() => {
     checkAdminStatus();
   }, [user]);
+
+  // Auto-subscribe admin to push notifications
+  useEffect(() => {
+    if (isAdmin && isSupported && !isSubscribed) {
+      subscribe().then((ok) => {
+        if (ok) {
+          console.log('Admin auto-subscribed to push notifications');
+        }
+      });
+    }
+  }, [isAdmin, isSupported, isSubscribed, subscribe]);
 
   const checkAdminStatus = async () => {
     if (!user) {

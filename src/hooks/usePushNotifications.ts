@@ -2,8 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-const VAPID_PUBLIC_KEY = 'BIuPxNAgh93iY84VXiCUywI5ucFgeJ7pfgYDhOh0eZXYLh7EA7lHhFJCYtIEfqUHkkWdK5P277KHVQPG7Eo_yxc';
-
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -13,6 +11,25 @@ function urlBase64ToUint8Array(base64String: string) {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
+}
+
+// Cache the VAPID public key after fetching once
+let cachedVapidKey: string | null = null;
+
+async function getVapidPublicKey(): Promise<string> {
+  if (cachedVapidKey) return cachedVapidKey;
+  
+  const { data, error } = await supabase.functions.invoke('send-push-notification', {
+    method: 'GET',
+  });
+  
+  if (error || !data?.publicKey) {
+    console.error('Failed to fetch VAPID public key:', error);
+    throw new Error('Could not fetch VAPID public key from server');
+  }
+  
+  cachedVapidKey = data.publicKey;
+  return data.publicKey;
 }
 
 export const usePushNotifications = () => {
@@ -59,15 +76,24 @@ export const usePushNotifications = () => {
       const granted = await requestPermission();
       if (!granted) return false;
 
+      // Fetch the VAPID public key from the server to ensure it matches
+      const vapidPublicKey = await getVapidPublicKey();
+      console.log('Using VAPID public key from server:', vapidPublicKey.substring(0, 20) + '...');
+
       const reg: any = await navigator.serviceWorker.ready;
       
-      let sub = await reg.pushManager.getSubscription();
-      if (!sub) {
-        sub = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-        });
+      // Unsubscribe any existing subscription (may have been created with wrong key)
+      const existingSub = await reg.pushManager.getSubscription();
+      if (existingSub) {
+        await existingSub.unsubscribe();
+        console.log('Unsubscribed old push subscription');
       }
+
+      // Create new subscription with correct server key
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      });
 
       const subJson = sub.toJSON();
       
@@ -88,6 +114,7 @@ export const usePushNotifications = () => {
       }, { onConflict: 'endpoint' });
 
       setIsSubscribed(true);
+      console.log('Push subscription created successfully');
       return true;
     } catch (e) {
       console.error('Push subscription error:', e);
@@ -105,7 +132,6 @@ export const usePushNotifications = () => {
           await (navigator as any).clearAppBadge();
         }
       } catch (e) {
-        // Fallback to SW
         const reg = await navigator.serviceWorker?.ready;
         reg?.active?.postMessage({ type: 'SET_BADGE', count });
       }

@@ -4,12 +4,27 @@ import webpush from "npm:web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // GET endpoint: return VAPID public key so frontend always uses the correct one
+  if (req.method === "GET") {
+    const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY");
+    if (!VAPID_PUBLIC_KEY) {
+      return new Response(
+        JSON.stringify({ error: "VAPID_PUBLIC_KEY not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    return new Response(
+      JSON.stringify({ publicKey: VAPID_PUBLIC_KEY }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 
   try {
@@ -74,10 +89,12 @@ serve(async (req) => {
       try {
         await webpush.sendNotification(pushSub, payload);
         sent++;
+        console.log(`Push sent successfully to ${sub.endpoint.substring(0, 50)}...`);
       } catch (e: any) {
         console.error(`Push failed for ${sub.endpoint}:`, e.statusCode, e.body);
         if (e.statusCode === 410 || e.statusCode === 404) {
           await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+          console.log(`Removed expired subscription: ${sub.endpoint.substring(0, 50)}...`);
         }
         failed++;
       }
