@@ -342,7 +342,7 @@ serve(async (req) => {
         .single();
       
       const count = msgCount?.message_count || 0;
-      if (count >= 3 && count % 3 === 0) {
+      if (count >= 2) {
         const { data: fullHistory } = await supabase
           .from("sara_anonymous_messages")
           .select("role, content")
