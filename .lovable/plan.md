@@ -1,138 +1,44 @@
 
 
-# Plan: Mejoras del Admin, Chat de Sara, Referidos, Notificaciones Push y PWA
+# Plan: Icono oficial, clasificacion IA y notificaciones push
 
-## Resumen
+## Problemas identificados
 
-Este plan cubre 6 areas principales:
-1. Arreglar scroll del chat de Sara en movil
-2. Sistema de referidos con registro automatico
-3. Icono de la app sin borde blanco
-4. Analiticas admin para conversaciones de Sara
-5. Notificaciones push con badges
-6. Tab de usuarios admin con exportacion
+1. **Icono con marco blanco**: Los PNGs actuales tienen fondo oscuro que no se adapta bien a todos los launchers. Se necesita usar el nuevo SVG oficial con fondo transparente, y configurar el manifest para que Android use `theme_color` (#0f0a1e) como relleno.
 
----
+2. **La IA no clasifica la mayoria de leads**: La clasificacion solo se ejecuta cuando `message_count >= 3 AND message_count % 3 === 0`. La mayoria de conversaciones tienen solo 2 mensajes del usuario, por lo que nunca llegan al umbral. Hay que bajar el umbral a 2 mensajes.
 
-## 1. Arreglar scroll del chat de Sara en movil
+3. **Notificaciones push no llegan**: La tabla `push_subscriptions` esta VACIA. La suscripcion anterior fue eliminada (error 410 - endpoint expirado). Se necesita que te vuelvas a suscribir desde la app instalada. Ademas, el Service Worker referencia iconos que no existen.
 
-**Problema**: En la version movil no se puede hacer scroll dentro del chat de Sara (AIChatMode).
+## Cambios a realizar
 
-**Solucion**: El componente `AIChatMode.tsx` usa `ScrollArea` pero el contenedor padre tiene restricciones de altura fijas. Se necesita:
-- Agregar `overflow-y: auto` y `-webkit-overflow-scrolling: touch` al contenedor del chat
-- Asegurar que el `ScrollArea` tenga `touch-action: pan-y` para que funcione el scroll tactil en movil
-- Ajustar la estructura del contenedor para que flex funcione correctamente con alturas dinamicas
+### 1. Icono oficial en todas partes
+- Copiar el nuevo SVG a `public/nova-icon.svg`
+- Actualizar `public/manifest.json`: usar el SVG como icono principal con `purpose: "any"` y `purpose: "maskable"` (Android rellenara el fondo con el theme_color oscuro)
+- Actualizar `index.html`: favicon apuntando al SVG
+- Actualizar `public/sw.js`: iconos de notificacion push apuntando al SVG correcto
 
-**Archivos**: `src/components/VirtualAssistant/AIChatMode.tsx`, `src/components/VirtualAssistant/index.tsx`
+### 2. Arreglar clasificacion IA de leads
+- En `supabase/functions/sara-chat/index.ts`: cambiar el umbral de clasificacion de `count >= 3 && count % 3 === 0` a `count >= 2` para que clasifique desde el segundo mensaje del usuario y en cada mensaje posterior
+- Esto hara que todos los leads nuevos (y los existentes cuando envien otro mensaje) reciban score, analisis y clasificacion automatica
 
----
-
-## 2. Sistema de referidos con codigo en registro
-
-**Problema**: Al registrarse, no hay opcion de ingresar un codigo de referido. Ademas, el link de invitacion debe incluir el codigo de referido para que se auto-rellene al abrir.
-
-**Solucion**:
-
-### 2a. Registro con codigo de referido
-- En `Auth.tsx`, agregar un campo "Codigo de referido" (opcional) en el formulario de registro
-- Al detectar `?ref=CODIGO` en la URL, auto-rellenar ese campo
-- Tras el registro exitoso, buscar en la tabla `profiles` al usuario con ese `referral_code` y crear un registro en la tabla `referrals` vinculando referidor y referido
-- Mostrar el campo de referido en la seccion de datos opcionales del registro
-
-### 2b. Link de invitacion en el perfil del usuario
-- En la pagina de perfil (`Profile.tsx`), agregar una seccion de "Referidos" con:
-  - Mostrar el codigo de referido del usuario
-  - Un link de invitacion copiable (ej: `solutionsnova.es/auth?ref=NOVAXXXXXX`)
-  - Boton para copiar el link
-
-### 2c. Admin: ver referidos con datos
-- La tabla de referidos en Admin ya existe. Se mejorara para mostrar de donde vino cada usuario referido.
-
-**Archivos**: `src/pages/Auth.tsx`, `src/pages/Profile.tsx`, `src/pages/Admin.tsx`
+### 3. Arreglar notificaciones push
+- Verificar que el `send-push-notification` edge function tiene el header CORS correcto para aceptar llamadas internas con service role key
+- Agregar logs adicionales en `send-push-notification` para diagnosticar problemas
+- Importante: despues de implementar estos cambios, deberas abrir la app en tu movil, ir a tu perfil y activar las notificaciones de nuevo para registrar un nuevo token push
 
 ---
 
-## 3. Icono de app sin borde blanco
+## Seccion tecnica
 
-**Problema**: El icono SVG actual tiene un fondo transparente, lo que causa que el sistema operativo ponga un borde/fondo blanco alrededor al instalarlo como PWA.
+### Archivos a modificar:
+1. `public/nova-icon.svg` - reemplazar con el nuevo icono oficial
+2. `public/manifest.json` - referencias al SVG, mantener theme_color #0f0a1e
+3. `index.html` - favicon SVG
+4. `public/sw.js` - icon/badge en notificaciones push
+5. `supabase/functions/sara-chat/index.ts` - umbral de clasificacion IA (linea 345)
+6. `supabase/functions/send-push-notification/index.ts` - logging mejorado
 
-**Solucion**:
-- Generar iconos PNG en multiples resoluciones (192x192, 512x512) con fondo solido del color de la marca (`#0f0a1e`) rellenando todo el area
-- Actualizar `manifest.json` para usar PNG en lugar de SVG para los iconos
-- Separar el icono `maskable` (con padding) del icono `any` (sin padding extra)
-- Crear el icono maskable con zona segura (el logo centrado en el 80% interior)
-
-**Nota tecnica**: Los iconos SVG no son bien soportados como iconos de PWA en todos los dispositivos. Se necesitan PNGs. Se creara un componente o script que genere las imagenes correctas, o se hara manualmente ajustando el SVG para que tenga fondo solido y exportandolo.
-
-**Solucion practica**: Modificar el SVG actual para que tenga un fondo solido `#0f0a1e` que cubra todo el viewBox, y actualizar manifest.json con entradas separadas para `any` y `maskable`.
-
-**Archivos**: `public/nova-icon.svg`, `public/manifest.json`
-
----
-
-## 4. Analiticas admin: guardar y visualizar chats de Sara
-
-**Problema**: Las conversaciones de Sara no se estan guardando correctamente en la base de datos.
-
-**Solucion**:
-- Verificar que la edge function `sara-chat` este insertando correctamente tanto mensajes del usuario como respuestas en `sara_anonymous_messages`
-- Verificar que las conversaciones se crean/actualizan en `sara_anonymous_conversations`
-- Verificar las politicas RLS: las tablas usan `has_role(auth.uid(), 'admin')` pero tambien tienen politicas con `profiles.is_admin`. Asegurar que el admin tenga el rol en `user_roles`
-- Revisar los logs de la edge function para detectar errores
-
-**Archivos**: `supabase/functions/sara-chat/index.ts` (verificar), posible migracion de datos
-
----
-
-## 5. Notificaciones push con badges
-
-**Problema**: Se necesita que al iniciar sesion en la app movil, se mantenga la sesion y lleguen notificaciones push con badges en el icono.
-
-**Solucion**:
-- La sesion ya se persiste via `localStorage` (configurado en el cliente de Supabase)
-- Se necesita generar claves VAPID reales para las notificaciones push
-- Crear una edge function `send-push-notification` que envie notificaciones a los endpoints suscritos
-- Integrar el envio de push en eventos clave (nuevo mensaje de Sara, nuevo usuario registrado)
-- El service worker ya existe en `public/sw.js` y maneja push y badges
-
-**Pasos tecnicos**:
-1. Generar par de claves VAPID (publica/privada) y guardar la privada como secret
-2. Actualizar la clave publica en `usePushNotifications.ts`
-3. Crear edge function `send-push-notification` usando la libreria `web-push`
-4. Llamar a esta funcion desde `sara-chat` y desde triggers relevantes
-5. En el Dashboard, solicitar permiso de notificaciones al usuario admin
-
-**Archivos**: `src/hooks/usePushNotifications.ts`, `public/sw.js`, nueva edge function `supabase/functions/send-push-notification/index.ts`, `src/pages/Dashboard.tsx`
-
----
-
-## 6. Tab de usuarios admin con exportacion
-
-**Problema**: El tab de usuarios ya existe pero necesita opciones de exportacion.
-
-**Solucion**:
-- Agregar boton "Exportar CSV" en el tab de usuarios del admin
-- El boton generara un CSV con todos los datos de los perfiles (nombre, email, telefono, empresa, sector, web, fecha de registro, codigo de referido)
-- Descargar el archivo automaticamente
-
-**Archivos**: `src/pages/Admin.tsx`
-
----
-
-## Detalles tecnicos
-
-### Migraciones de base de datos
-- Agregar columna `referred_by_code` a la tabla `profiles` para registrar el codigo de referido usado al registrarse (texto, nullable)
-
-### Edge functions
-- Actualizar `sara-chat` si es necesario para corregir persistencia
-- Crear `send-push-notification` para enviar notificaciones push reales
-
-### Orden de implementacion
-1. Fix scroll movil del chat (rapido)
-2. Icono PWA sin borde blanco
-3. Sistema de referidos en registro
-4. Analiticas y persistencia de conversaciones Sara
-5. Exportacion CSV en admin
-6. Notificaciones push con VAPID (requiere secret key)
+### Sobre las VAPID keys:
+Las claves VAPID estan correctamente guardadas como secretos del proyecto (VAPID_PUBLIC_KEY y VAPID_PRIVATE_KEY). El problema NO son las claves, sino que la tabla de suscripciones push esta vacia porque el token anterior expiro y fue eliminado. Solo necesitas volver a activar las notificaciones desde la app.
 
