@@ -1,92 +1,76 @@
 
 
-# Plan: Icono definitivo, notificaciones push funcionales y badge de alertas
+# Plan: Arreglar notificaciones push y marcar alertas como leidas
 
-## Problemas encontrados
+## Problema 1: Las notificaciones push NO llegan al PC
 
-### 1. Icono con marco blanco (PC y movil)
-El SVG actual no se renderiza bien como icono de app/favicon en algunos contextos. La solucion definitiva es usar el nuevo SVG que has proporcionado (`Favi_icon_Nova_logo_de_app_y_pc-4.svg`) y copiarlo como `public/nova-icon.svg`, reemplazando el anterior.
+**Causa raiz encontrada**: El proyecto usa `vite-plugin-pwa` con `registerType: "autoUpdate"`, que genera su propio Service Worker via Workbox. Este SW generado automaticamente **reemplaza** al archivo `/sw.js` manual donde estan los handlers de push. El resultado: los push llegan exitosamente al servidor de Google (FCM devuelve 200 OK, los logs lo confirman), pero el Service Worker activo en el navegador no tiene handlers para el evento `push`, asi que la notificacion se descarta silenciosamente.
 
-### 2. Notificaciones push NO llegan (error 403 VAPID)
-Este es el problema principal. Los logs del servidor muestran este error claro:
+**Solucion**: Configurar `vite-plugin-pwa` para inyectar el codigo de push dentro del SW generado, usando la opcion `injectManifest` en lugar de `generateSW`, o mejor aun: usar la opcion `customWorkerEntry` / importar el sw.js como archivo custom. La forma mas limpia es cambiar la estrategia a `injectManifest` que permite escribir un SW custom con caching de Workbox + handlers de push.
 
-```text
-403: the VAPID credentials in the authorization header 
-do not correspond to the credentials used to create 
-the subscriptions.
-```
+## Problema 2: Marcar alertas como leidas al abrir la seccion
 
-Esto significa que la clave publica VAPID que usa el frontend para crear la suscripcion (`BIuPxNAgh93iY84V...`) **NO coincide** con las claves VAPID guardadas como secretos del proyecto. Cuando creaste las claves VAPID en una web y me las diste, se guardaron como secretos del servidor. Pero la clave publica que esta hardcodeada en el frontend es diferente.
-
-**Solucion**: Mover la clave publica VAPID a una variable de entorno para que sea consistente. Y lo mas importante: necesitas **verificar** que la clave publica VAPID que tienes guardada en un lugar seguro coincide con la que esta en el frontend. Si no coincide, necesitaremos actualizarla.
-
-**Pasos concretos**:
-- Cambiar el frontend para usar `VITE_VAPID_PUBLIC_KEY` como variable de entorno en vez de tener la clave hardcodeada
-- Alternativamente, puedo leer la clave publica desde el secreto del servidor a traves de un endpoint seguro
-- **Despues de arreglar las claves**, hay que borrar la suscripcion actual (que fue creada con la clave incorrecta) y re-suscribirse
-
-### 3. Punto rojo de notificaciones tipo Facebook/WhatsApp
-Actualmente el badge de notificaciones solo aparece dentro del panel de admin. Hay que agregar un indicador visual permanente (punto rojo con numero) en la Navbar, visible en todo momento cuando el admin esta logueado, usando realtime para actualizarse automaticamente.
+El usuario quiere que cuando entre en el panel admin y vea las alertas, estas se marquen automaticamente como leidas (y el badge rojo desaparezca). Actualmente solo se marcan una por una al hacer clic.
 
 ## Cambios a realizar
 
-### Archivo 1: `public/nova-icon.svg`
-- Reemplazar con el nuevo SVG proporcionado (fondo transparente, sin marco)
+### Archivo 1: `vite.config.ts`
+- Cambiar la estrategia de PWA de `generateSW` (default) a `injectManifest`
+- Apuntar al nuevo archivo source del service worker
 
-### Archivo 2: `index.html`
-- Sin cambios (ya apunta a `/nova-icon.svg`)
+### Archivo 2: `src/sw.ts` (nuevo)
+- Crear un service worker que combine:
+  - La logica de precaching de Workbox (via `precacheAndRoute`)
+  - Los handlers de push notification (evento `push`, `notificationclick`)
+  - El handler de badge (`message`)
+- Este archivo sera procesado por vite-plugin-pwa para generar el SW final
 
-### Archivo 3: `public/manifest.json`
-- Sin cambios (ya apunta a `/nova-icon.svg` con purpose any/maskable)
+### Archivo 3: `public/sw.js` (eliminar)
+- Ya no se necesita porque el SW se genera desde `src/sw.ts`
 
 ### Archivo 4: `src/hooks/usePushNotifications.ts`
-- Crear un mecanismo para obtener la clave publica VAPID correcta
-- Opcion recomendada: usar una variable de entorno `VITE_VAPID_PUBLIC_KEY` o leerla del secreto del servidor
-- La clave publica VAPID del frontend DEBE coincidir con el par de claves del servidor
+- Eliminar el registro manual de `/sw.js` (linea 52) ya que vite-plugin-pwa lo registra automaticamente
+- Usar el SW ya registrado por el plugin para obtener la suscripcion push
 
-### Archivo 5: `src/components/Navbar.tsx`
-- Agregar indicador de notificaciones (punto rojo con numero) para el admin
-- Consultar `admin_notifications` con filtro `read = false` y mostrar el conteo
-- Suscripcion realtime a cambios en `admin_notifications` para actualizar en tiempo real
-- Al hacer clic, navegar al panel de admin en la pestana de Sara IA / Alertas
-
-### Archivo 6: `src/pages/Admin.tsx`
-- Agregar auto-suscripcion a push notifications cuando el admin accede al panel (si aun no esta suscrito)
-
-### Archivo 7: `supabase/functions/send-push-notification/index.ts`
-- Agregar un endpoint GET que devuelva la clave publica VAPID (para que el frontend la lea de forma segura y siempre coincida con el servidor)
+### Archivo 5: `src/components/SaraLeadIntelligence.tsx`
+- Agregar un efecto que al montar el tab de "notifications" marque todas las no leidas como leidas automaticamente
+- Esto hara que el badge rojo del Navbar se limpie al ver las alertas
 
 ## Seccion tecnica
 
-### Sobre las claves VAPID
-El error 403 es definitivo: la clave publica en el frontend (`BIuPxNAgh93iY84VXiCUywI5ucFgeJ7pfgYDhOh0eZXYLh7EA7lHhFJCYtIEfqUHkkWdK5P277KHVQPG7Eo_yxc`) NO es la misma que el par guardado como secreto del servidor. 
-
-Para solucionarlo de raiz, creare un nuevo endpoint que devuelve la clave publica VAPID desde el servidor, y el frontend la usara para suscribirse. Asi siempre coincidiran.
-
-### Flujo de notificacion corregido
+### Cambio en vite.config.ts
 ```text
-1. Admin abre Dashboard/Admin -> se suscribe automaticamente
-2. Frontend pide la clave publica VAPID al servidor
-3. Se crea suscripcion push con la clave correcta
-4. Sara clasifica lead con score >= 50
-5. sara-chat llama a send-push-notification
-6. send-push-notification envia push con las claves correctas
-7. El movil/PC recibe la notificacion nativa
-8. Badge rojo en Navbar se actualiza en tiempo real
+VitePWA({
+  registerType: "autoUpdate",
+  strategies: "injectManifest",       // <-- cambio clave
+  srcDir: "src",                      // <-- donde esta el SW source
+  filename: "sw.ts",                  // <-- archivo source del SW
+  manifest: false,
+  injectManifest: {
+    globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+  },
+})
 ```
 
-### Badge en Navbar (punto rojo)
-- Solo visible para el admin (email === 'info@solutionsnova.es')
-- Consulta inicial de `admin_notifications` con `read = false`
-- Suscripcion realtime para actualizacion instantanea
-- Punto rojo con numero (estilo WhatsApp/Facebook)
-- Al pulsar, redirige a `/admin` (tab Sara IA)
+### Nuevo src/sw.ts
+Combinara Workbox precaching + push handlers:
+```text
+import { precacheAndRoute } from 'workbox-precaching';
 
-### Pasos post-implementacion
-Despues de aplicar los cambios:
-1. Borrar los datos de la app instalada en PC y movil (o desinstalar y reinstalar)
-2. Volver a abrir la app
-3. Iniciar sesion como admin
-4. Aceptar el permiso de notificaciones cuando aparezca
-5. Enviar un mensaje de prueba a Sara para verificar que llega la notificacion
+// Workbox precaching (injected by vite-plugin-pwa)
+precacheAndRoute(self.__WB_MANIFEST);
+
+// Push notification handler
+self.addEventListener('push', (event) => { ... });
+self.addEventListener('notificationclick', (event) => { ... });
+self.addEventListener('message', (event) => { ... });
+```
+
+### Auto-marcar leidas en SaraLeadIntelligence
+Cuando el tab "notifications" este activo, se ejecutara un UPDATE masivo:
+```text
+UPDATE admin_notifications SET read = true WHERE read = false
+```
+Esto limpiara el badge rojo automaticamente via la suscripcion realtime del Navbar.
 
