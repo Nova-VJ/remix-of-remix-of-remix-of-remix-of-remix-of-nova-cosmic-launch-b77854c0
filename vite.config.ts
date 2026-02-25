@@ -15,11 +15,11 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.png"],
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       manifest: false,
-      workbox: {
-        navigateFallback: null,
-        navigateFallbackDenylist: [/^\/~oauth/],
+      injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },

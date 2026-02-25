@@ -46,11 +46,7 @@ export const usePushNotifications = () => {
     }
   }, []);
 
-  // Register the push SW
-  useEffect(() => {
-    if (!isSupported) return;
-    navigator.serviceWorker.register('/sw.js').catch(console.error);
-  }, [isSupported]);
+  // vite-plugin-pwa registers the SW automatically via injectManifest
 
   // Check existing subscription
   useEffect(() => {

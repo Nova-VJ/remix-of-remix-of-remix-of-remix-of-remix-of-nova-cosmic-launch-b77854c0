@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -95,6 +95,22 @@ const SaraLeadIntelligence = ({ conversations, messages, notifications, onRefres
   const [activeTab, setActiveTab] = useState<'conversations' | 'analytics' | 'notifications'>('conversations');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+
+  // Auto-mark all notifications as read when viewing the notifications tab
+  useEffect(() => {
+    if (activeTab !== 'notifications') return;
+    const unread = notifications.filter(n => !n.read);
+    if (unread.length === 0) return;
+
+    const markAllRead = async () => {
+      await supabase
+        .from('admin_notifications')
+        .update({ read: true })
+        .eq('read', false);
+      onRefresh();
+    };
+    markAllRead();
+  }, [activeTab, notifications, onRefresh]);
 
   // Quick date range presets
   const setPreset = (preset: 'today' | 'week' | 'month' | '3months') => {

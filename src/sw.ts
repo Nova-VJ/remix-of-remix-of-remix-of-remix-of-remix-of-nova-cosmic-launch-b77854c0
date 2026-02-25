@@ -1,12 +1,19 @@
-// Nova Marketing Solutions – Push Notification Service Worker
+/// <reference lib="webworker" />
+import { precacheAndRoute } from 'workbox-precaching';
 
+declare const self: ServiceWorkerGlobalScope;
+
+// Workbox precaching (manifest injected by vite-plugin-pwa)
+precacheAndRoute(self.__WB_MANIFEST);
+
+// ─── Push notification handler ───
 self.addEventListener('push', (event) => {
-  let data = { title: 'Nova Marketing', body: 'Tienes una nueva notificación', url: '/' };
+  let data = { title: 'Nova Marketing', body: 'Tienes una nueva notificación', url: '/' } as any;
 
   if (event.data) {
     try {
       data = { ...data, ...event.data.json() };
-    } catch (e) {
+    } catch {
       data.body = event.data.text();
     }
   }
@@ -17,39 +24,39 @@ self.addEventListener('push', (event) => {
     badge: '/nova-icon.svg',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/' },
-    actions: data.actions || [],
     tag: data.tag || 'nova-notification',
     renotify: true,
-  };
+  } as any;
 
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
+// ─── Notification click handler ───
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(url);
-          return client.focus();
+          (client as WindowClient).navigate(url);
+          return (client as WindowClient).focus();
         }
       }
-      return clients.openWindow(url);
+      return self.clients.openWindow(url);
     })
   );
 });
 
-// Set badge count
+// ─── Badge count via postMessage ───
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SET_BADGE') {
-    if (navigator.setAppBadge) {
+    if ('setAppBadge' in navigator) {
       if (event.data.count > 0) {
-        navigator.setAppBadge(event.data.count);
+        (navigator as any).setAppBadge(event.data.count);
       } else {
-        navigator.clearAppBadge();
+        (navigator as any).clearAppBadge();
       }
     }
   }
