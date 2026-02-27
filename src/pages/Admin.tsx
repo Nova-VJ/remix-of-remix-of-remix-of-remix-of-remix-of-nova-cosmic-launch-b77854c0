@@ -109,6 +109,17 @@ interface SuccessStory {
   created_at: string;
 }
 
+// Helper: send push notification to a specific user after admin actions
+const sendUserPush = async (userId: string, title: string, body: string, url: string = '/dashboard') => {
+  try {
+    await supabase.functions.invoke('send-push-notification', {
+      body: { title, body, url, type: 'user-notification', target: userId }
+    });
+  } catch (e) {
+    console.error('Push to user failed:', e);
+  }
+};
+
 const AVAILABLE_SERVICES = [
   { id: 'web-basic', name: 'Página Web Básica', basePrice: 497 },
   { id: 'web-pro', name: 'Página Web Profesional', basePrice: 997 },
@@ -308,6 +319,7 @@ const Admin = () => {
           type: 'ticket',
           link: '/dashboard'
         });
+        sendUserPush(ticket.user_id, 'Actualización de ticket', `Tu ticket #${ticket.ticket_number} ha sido actualizado a: ${status}`, '/dashboard');
       }
       toast({ title: "Actualizado", description: "Estado del ticket actualizado" });
       fetchData();
@@ -339,6 +351,7 @@ const Admin = () => {
           type: 'project',
           link: '/dashboard'
         });
+        sendUserPush(project.user_id, 'Actualización de proyecto', `Tu proyecto "${project.name}" ha cambiado a: ${statusLabels[status] || status}`, '/dashboard');
       }
       toast({ title: "Actualizado", description: "Estado del proyecto actualizado" });
       fetchData();
@@ -380,6 +393,7 @@ const Admin = () => {
           type: 'project',
           link: '/profile'
         });
+        sendUserPush(project.user_id, 'Actualización de proyecto', `Tu proyecto "${project.name}" ha avanzado a: ${stageLabels[stage] || stage}`, '/profile');
       }
       toast({ title: "Actualizado", description: "Fase del proyecto actualizada" });
       fetchData();
@@ -464,6 +478,7 @@ const Admin = () => {
           type: 'milestone',
           link: '/dashboard'
         });
+        sendUserPush(project.user_id, 'Nuevo hito en tu proyecto', `Se ha añadido un nuevo hito "${newMilestone.title}" a tu proyecto "${project.name}"`, '/dashboard');
       }
       toast({ title: "Creado", description: "Hito creado correctamente" });
       setShowCreateMilestone(false);
@@ -496,6 +511,7 @@ const Admin = () => {
           type: 'maintenance',
           link: '/dashboard'
         });
+        sendUserPush(project.user_id, 'Mantenimiento realizado', `Se ha realizado mantenimiento ${newMaintenance.type} en tu proyecto "${project.name}"`, '/dashboard');
       }
       toast({ title: "Creado", description: "Log de mantenimiento creado" });
       setShowCreateMaintenance(false);
@@ -573,6 +589,7 @@ const Admin = () => {
           type: 'budget',
           link: '/dashboard'
         });
+        sendUserPush(clientUserId, 'Nuevo presupuesto disponible', `Tienes un nuevo presupuesto por €${getBudgetTotal().toFixed(2)} pendiente de aprobación`, '/dashboard');
       }
       toast({ title: "Creado", description: "Presupuesto enviado correctamente" });
       setShowCreateBudget(false);
