@@ -1,76 +1,66 @@
 
 
-# Plan: Arreglar notificaciones push y marcar alertas como leidas
+# Plan: Mejorar icono PWA en moviles + Push notifications para usuarios normales
 
-## Problema 1: Las notificaciones push NO llegan al PC
+## Problema 1: Icono de la app se ve mal en moviles
 
-**Causa raiz encontrada**: El proyecto usa `vite-plugin-pwa` con `registerType: "autoUpdate"`, que genera su propio Service Worker via Workbox. Este SW generado automaticamente **reemplaza** al archivo `/sw.js` manual donde estan los handlers de push. El resultado: los push llegan exitosamente al servidor de Google (FCM devuelve 200 OK, los logs lo confirman), pero el Service Worker activo en el navegador no tiene handlers para el evento `push`, asi que la notificacion se descarta silenciosamente.
+En la captura se ve que el icono de Nova en la pantalla de inicio del movil tiene un fondo que no se ajusta bien. El problema es que el manifiesto PWA solo usa el SVG para ambos propositos (`any` y `maskable`), pero no incluye los iconos PNG que ya existen en el proyecto (`nova-icon-192.png` y `nova-icon-512.png`). Los iconos PNG con tamanios fijos se renderizan mucho mejor en las pantallas de inicio de Android.
 
-**Solucion**: Configurar `vite-plugin-pwa` para inyectar el codigo de push dentro del SW generado, usando la opcion `injectManifest` en lugar de `generateSW`, o mejor aun: usar la opcion `customWorkerEntry` / importar el sw.js como archivo custom. La forma mas limpia es cambiar la estrategia a `injectManifest` que permite escribir un SW custom con caching de Workbox + handlers de push.
+**Solucion**: Actualizar `public/manifest.json` para incluir los iconos PNG con sus tamanios correctos (192x192 y 512x512) como iconos principales, manteniendo el SVG como respaldo. Separar los propositos `any` y `maskable` correctamente: los PNG para `any` y el SVG para `maskable` con el fondo oscuro del tema.
 
-## Problema 2: Marcar alertas como leidas al abrir la seccion
+## Problema 2: Los usuarios normales no reciben notificaciones push
 
-El usuario quiere que cuando entre en el panel admin y vea las alertas, estas se marquen automaticamente como leidas (y el badge rojo desaparezca). Actualmente solo se marcan una por una al hacer clic.
+Actualmente el sistema funciona asi:
+- Cuando el admin actualiza un proyecto (estado, fase, hito, mantenimiento, ticket, presupuesto), se inserta un registro en la tabla `notifications` para el usuario
+- El usuario ve esas notificaciones en su Dashboard via realtime
+- El Dashboard ya suscribe automaticamente al usuario a push notifications (`subscribePush()` se llama 3 segundos despues del login)
+- **PERO**: nadie llama a `send-push-notification` cuando se crea una notificacion para un usuario normal
+
+En resumen: los usuarios estan suscritos a push, pero nadie les envia el push cuando hay una notificacion nueva.
+
+**Solucion**: Crear una funcion auxiliar en `Admin.tsx` que, despues de insertar en la tabla `notifications`, tambien llame a la edge function `send-push-notification` con el `user_id` del usuario como `target`. Asi el usuario recibira la notificacion push en su PC o movil.
 
 ## Cambios a realizar
 
-### Archivo 1: `vite.config.ts`
-- Cambiar la estrategia de PWA de `generateSW` (default) a `injectManifest`
-- Apuntar al nuevo archivo source del service worker
+### 1. `public/manifest.json`
+Agregar los iconos PNG al manifiesto con tamanios especificos:
+- `nova-icon-192.png` con size `192x192`, purpose `any`
+- `nova-icon-512.png` con size `512x512`, purpose `any`
+- Mantener el SVG como `maskable` (con fondo adaptable al tema)
 
-### Archivo 2: `src/sw.ts` (nuevo)
-- Crear un service worker que combine:
-  - La logica de precaching de Workbox (via `precacheAndRoute`)
-  - Los handlers de push notification (evento `push`, `notificationclick`)
-  - El handler de badge (`message`)
-- Este archivo sera procesado por vite-plugin-pwa para generar el SW final
+### 2. `src/pages/Admin.tsx`
+Crear una funcion `sendUserPushNotification(userId, title, message, url)` que llame a la edge function `send-push-notification` con `target: userId`. Luego, en cada lugar donde se inserta en la tabla `notifications` (hay 6 lugares), agregar una llamada a esta funcion justo despues de la insercion:
 
-### Archivo 3: `public/sw.js` (eliminar)
-- Ya no se necesita porque el SW se genera desde `src/sw.ts`
+1. **Actualizacion de ticket** (linea 304) - enviar push al usuario del ticket
+2. **Actualizacion de estado de proyecto** (linea 335) - enviar push al usuario del proyecto
+3. **Actualizacion de fase de proyecto** (linea 376) - enviar push al usuario del proyecto
+4. **Nuevo hito** (linea 460) - enviar push al usuario del proyecto
+5. **Mantenimiento realizado** (linea 492) - enviar push al usuario del proyecto
+6. **Nuevo presupuesto** (linea 569) - enviar push al usuario
 
-### Archivo 4: `src/hooks/usePushNotifications.ts`
-- Eliminar el registro manual de `/sw.js` (linea 52) ya que vite-plugin-pwa lo registra automaticamente
-- Usar el SW ya registrado por el plugin para obtener la suscripcion push
+### Seccion tecnica
 
-### Archivo 5: `src/components/SaraLeadIntelligence.tsx`
-- Agregar un efecto que al montar el tab de "notifications" marque todas las no leidas como leidas automaticamente
-- Esto hara que el badge rojo del Navbar se limpie al ver las alertas
-
-## Seccion tecnica
-
-### Cambio en vite.config.ts
+**Funcion auxiliar en Admin.tsx:**
 ```text
-VitePWA({
-  registerType: "autoUpdate",
-  strategies: "injectManifest",       // <-- cambio clave
-  srcDir: "src",                      // <-- donde esta el SW source
-  filename: "sw.ts",                  // <-- archivo source del SW
-  manifest: false,
-  injectManifest: {
-    globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-  },
-})
+const sendUserPush = async (userId: string, title: string, body: string, url: string = '/dashboard') => {
+  try {
+    await supabase.functions.invoke('send-push-notification', {
+      body: { title, body, url, type: 'user-notification', target: userId }
+    });
+  } catch (e) {
+    console.error('Push to user failed:', e);
+  }
+};
 ```
 
-### Nuevo src/sw.ts
-Combinara Workbox precaching + push handlers:
+Esta funcion se llamara justo despues de cada `supabase.from('notifications').insert(...)` exitoso.
+
+**Manifiesto PWA actualizado:**
 ```text
-import { precacheAndRoute } from 'workbox-precaching';
-
-// Workbox precaching (injected by vite-plugin-pwa)
-precacheAndRoute(self.__WB_MANIFEST);
-
-// Push notification handler
-self.addEventListener('push', (event) => { ... });
-self.addEventListener('notificationclick', (event) => { ... });
-self.addEventListener('message', (event) => { ... });
+"icons": [
+  { "src": "/nova-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+  { "src": "/nova-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+  { "src": "/nova-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+]
 ```
-
-### Auto-marcar leidas en SaraLeadIntelligence
-Cuando el tab "notifications" este activo, se ejecutara un UPDATE masivo:
-```text
-UPDATE admin_notifications SET read = true WHERE read = false
-```
-Esto limpiara el badge rojo automaticamente via la suscripcion realtime del Navbar.
 
