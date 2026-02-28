@@ -53,16 +53,9 @@ const VoiceRecordButton = ({ onTranscription, disabled }: VoiceRecordButtonProps
         }
       } catch (err) {
         console.error('Transcription error:', err);
-        const errorMessage = err instanceof Error ? err.message : '';
-        const isProviderBlocked =
-          errorMessage.includes('detected_unusual_activity') ||
-          errorMessage.includes('Transcription failed (401)');
-
         toast({
-          title: isProviderBlocked ? 'Transcripción temporalmente no disponible' : 'Error al transcribir',
-          description: isProviderBlocked
-            ? 'ElevenLabs bloqueó temporalmente esta cuenta para STT. Activa un plan de pago o prueba más tarde.'
-            : 'No se pudo procesar el audio. Inténtalo de nuevo.',
+          title: 'Error al transcribir',
+          description: 'No se pudo procesar el audio. Inténtalo de nuevo.',
           variant: 'destructive',
         });
       } finally {

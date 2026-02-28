@@ -15,6 +15,18 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 
+/** Pick the best Spanish female voice available in the browser */
+const pickSpanishVoice = (): SpeechSynthesisVoice | null => {
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer female-sounding Spanish voices
+  const esVoices = voices.filter(v => v.lang.startsWith('es'));
+  // Try to find one with "female" or common female names
+  const preferred = esVoices.find(v =>
+    /female|femenin|lucia|elena|monica|paula|conchita|ines/i.test(v.name)
+  );
+  return preferred || esVoices[0] || null;
+};
+
 const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const [callState, setCallState] = useState<CallState>('connecting');
   const [isMuted, setIsMuted] = useState(false);
@@ -22,14 +34,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const [statusText, setStatusText] = useState('Conectando...');
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const animFrameRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(true);
-  const ttsFallbackNoticeShownRef = useRef(false);
-  const sttBlockedNoticeShownRef = useRef(false);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
@@ -37,12 +43,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
 
   // Timer
   useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setElapsedTime(t => t + 1);
-    }, 1000);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    timerRef.current = setInterval(() => setElapsedTime(t => t + 1), 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
   const formatTime = (s: number) => {
@@ -51,149 +53,41 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
   };
 
-  // Cleanup on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       activeRef.current = false;
-      cancelAnimationFrame(animFrameRef.current);
-      audioContextRef.current?.close();
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     };
   }, []);
 
-  // Browser TTS fallback when ElevenLabs is temporarily unavailable
-  const playBrowserTTS = useCallback((text: string): Promise<void> => {
+  // Browser TTS
+  const playTTS = useCallback((text: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!('speechSynthesis' in window)) {
-        reject(new Error('Browser speech synthesis is not available'));
+        reject(new Error('speechSynthesis not available'));
         return;
       }
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'es-ES';
-      utterance.rate = 1;
-      utterance.pitch = 1;
+      utterance.rate = 1.05;
+      utterance.pitch = 1.1; // Slightly higher for a younger voice
+      utterance.volume = 1;
 
-      utterance.onstart = () => setAudioLevel(0.25);
-      utterance.onend = () => {
-        setAudioLevel(0);
-        resolve();
-      };
-      utterance.onerror = () => {
-        setAudioLevel(0);
-        reject(new Error('Browser TTS failed'));
-      };
+      const voice = pickSpanishVoice();
+      if (voice) utterance.voice = voice;
+
+      utterance.onstart = () => setAudioLevel(0.3);
+      utterance.onend = () => { setAudioLevel(0); resolve(); };
+      utterance.onerror = () => { setAudioLevel(0); reject(new Error('TTS failed')); };
 
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     });
   }, []);
 
-  // TTS playback with analyser
-  const playTTS = useCallback(async (text: string): Promise<void> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            },
-            body: JSON.stringify({ text }),
-          }
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          let shouldUseBrowserFallback = false;
-
-          try {
-            const parsedError = JSON.parse(errorText);
-            shouldUseBrowserFallback =
-              response.status === 401 &&
-              parsedError?.detail?.status === 'detected_unusual_activity';
-          } catch {
-            // Keep default false if response is not JSON
-          }
-
-          if (shouldUseBrowserFallback) {
-            if (!ttsFallbackNoticeShownRef.current) {
-              ttsFallbackNoticeShownRef.current = true;
-              toast({
-                title: 'Modo voz temporal activado',
-                description: 'Usaremos voz del navegador mientras ElevenLabs vuelve a estar disponible.',
-              });
-            }
-            await playBrowserTTS(text);
-            resolve();
-            return;
-          }
-
-          throw new Error(`TTS failed (${response.status})`);
-        }
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        audioRef.current = audio;
-
-        // Set up Web Audio analyser
-        if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
-          audioContextRef.current = new AudioContext();
-        }
-        const ctx = audioContextRef.current;
-        const source = ctx.createMediaElementSource(audio);
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
-        analyser.connect(ctx.destination);
-        analyserRef.current = analyser;
-
-        // Animate based on frequency data
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const animate = () => {
-          if (!activeRef.current) return;
-          analyser.getByteFrequencyData(dataArray);
-          const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          setAudioLevel(avg / 255);
-          animFrameRef.current = requestAnimationFrame(animate);
-        };
-
-        audio.onplay = () => animate();
-        audio.onended = () => {
-          cancelAnimationFrame(animFrameRef.current);
-          setAudioLevel(0);
-          URL.revokeObjectURL(audioUrl);
-          resolve();
-        };
-        audio.onerror = () => {
-          URL.revokeObjectURL(audioUrl);
-          reject(new Error('Audio playback failed'));
-        };
-
-        await audio.play();
-      } catch (err) {
-        console.error('TTS playback error. Attempting browser fallback:', err);
-        try {
-          await playBrowserTTS(text);
-          resolve();
-        } catch (fallbackErr) {
-          reject(fallbackErr);
-        }
-      }
-    });
-  }, [playBrowserTTS, toast]);
-
-  // STT transcription
+  // Deepgram STT
   const transcribe = useCallback(async (blob: Blob): Promise<string> => {
     const formData = new FormData();
     formData.append('audio', blob, 'recording.webm');
@@ -219,29 +113,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     return data.text || '';
   }, []);
 
-  const handleSTTUnavailable = useCallback((err: unknown) => {
-    const message = err instanceof Error ? err.message : String(err);
-    const isProviderBlocked =
-      message.includes('detected_unusual_activity') || message.includes('STT failed (401)');
-
-    if (!isProviderBlocked || !activeRef.current) return false;
-
-    setCallState('idle');
-    setStatusText('Transcripción no disponible temporalmente.');
-
-    if (!sttBlockedNoticeShownRef.current) {
-      sttBlockedNoticeShownRef.current = true;
-      toast({
-        title: 'STT no disponible temporalmente',
-        description: 'ElevenLabs bloqueó temporalmente esta cuenta para transcripción. Activa un plan de pago o prueba más tarde.',
-        variant: 'destructive',
-      });
-    }
-
-    return true;
-  }, [toast]);
-
-  // Main conversation loop
+  // Conversation loop
   const converse = useCallback(async (text: string) => {
     if (!activeRef.current) return;
 
@@ -257,10 +129,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       }
 
       const { reply } = await sendToSara(text, accessToken, sid);
-
       if (!activeRef.current) return;
 
-      // Clean reply for TTS (remove cart proposals, placeholders)
       const cleanReply = reply
         .replace(/\[PROPUESTA_CARRITO:[^\]]*\]/g, '')
         .replace(/\[LINK_WHATSAPP\]/gi, '')
@@ -273,10 +143,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       setStatusText('Sara está hablando...');
       await playTTS(cleanReply || 'No pude procesar tu mensaje.');
 
-      if (!activeRef.current) return;
-
-      // Start listening again
-      startListening();
+      if (activeRef.current) startListening();
     } catch (err) {
       console.error('Conversation error:', err);
       if (activeRef.current) {
@@ -298,7 +165,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     setStatusText('Escuchando...');
     await startRecording();
 
-    // Auto-stop after 15 seconds
     setTimeout(async () => {
       if (!activeRef.current) return;
       const blob = await stopRecording();
@@ -312,28 +178,35 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         if (text.trim()) {
           await converse(text.trim());
         } else {
-          // No speech detected, listen again
           startListening();
         }
       } catch (err) {
         console.error('Transcription error:', err);
-        if (activeRef.current && !handleSTTUnavailable(err)) {
+        if (activeRef.current) {
+          toast({ title: 'Error de transcripción', description: 'No se pudo procesar el audio.', variant: 'destructive' });
           startListening();
         }
       }
     }, 8000);
-  }, [isMuted, startRecording, stopRecording, transcribe, converse, handleSTTUnavailable]);
+  }, [isMuted, startRecording, stopRecording, transcribe, converse, toast]);
 
   // Initial greeting
   useEffect(() => {
+    // Ensure voices are loaded
     const init = async () => {
+      // Some browsers load voices async
+      if (window.speechSynthesis.getVoices().length === 0) {
+        await new Promise<void>(r => {
+          window.speechSynthesis.onvoiceschanged = () => r();
+          setTimeout(r, 1000);
+        });
+      }
+
       try {
         setCallState('greeting');
         setStatusText('Sara está hablando...');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
-        if (activeRef.current) {
-          startListening();
-        }
+        if (activeRef.current) startListening();
       } catch (err) {
         console.error('Greeting error:', err);
         if (activeRef.current) {
@@ -347,12 +220,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
 
   const handleEndCall = () => {
     activeRef.current = false;
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     stopRecording();
     onEnd();
   };
@@ -370,10 +238,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
           } else {
             startListening();
           }
-        } catch (err) {
-          if (!handleSTTUnavailable(err)) {
-            startListening();
-          }
+        } catch {
+          startListening();
         }
       }
     } else if (callState === 'idle') {
@@ -390,70 +256,44 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     }
   };
 
-  // Orb scale based on state
   const getOrbScale = () => {
     switch (callState) {
-      case 'speaking':
-        return 1 + audioLevel * 0.6;
-      case 'listening':
-        return 1.05;
-      case 'processing':
-        return 0.95;
-      default:
-        return 1;
+      case 'speaking': return 1 + audioLevel * 0.6;
+      case 'listening': return 1.05;
+      case 'processing': return 0.95;
+      default: return 1;
     }
   };
 
   const getOrbColor = () => {
     switch (callState) {
-      case 'listening':
-        return 'from-blue-500 to-cyan-400';
-      case 'speaking':
-        return 'from-violet-500 to-purple-400';
-      case 'processing':
-        return 'from-amber-400 to-orange-400';
-      default:
-        return 'from-slate-400 to-slate-500';
+      case 'listening': return 'from-blue-500 to-cyan-400';
+      case 'speaking': return 'from-violet-500 to-purple-400';
+      case 'processing': return 'from-amber-400 to-orange-400';
+      default: return 'from-slate-400 to-slate-500';
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-between h-full bg-background p-6">
-      {/* Timer */}
       <div className="text-center">
         <p className="text-sm font-medium text-muted-foreground">{formatTime(elapsedTime)}</p>
         <p className="text-xs text-muted-foreground mt-1">Llamada con Sara</p>
       </div>
 
-      {/* Animated Orb */}
       <div className="flex-1 flex items-center justify-center">
         <div className="relative">
-          {/* Outer glow */}
           <motion.div
             className={`absolute inset-0 rounded-full bg-gradient-to-br ${getOrbColor()} blur-2xl opacity-30`}
-            animate={{
-              scale: [getOrbScale() * 1.2, getOrbScale() * 1.4, getOrbScale() * 1.2],
-            }}
-            transition={{
-              duration: callState === 'speaking' ? 0.3 : 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            animate={{ scale: [getOrbScale() * 1.2, getOrbScale() * 1.4, getOrbScale() * 1.2] }}
+            transition={{ duration: callState === 'speaking' ? 0.3 : 2, repeat: Infinity, ease: 'easeInOut' }}
             style={{ width: 180, height: 180 }}
           />
-
-          {/* Main orb */}
           <motion.div
             className={`relative w-[140px] h-[140px] rounded-full bg-gradient-to-br ${getOrbColor()} shadow-2xl flex items-center justify-center`}
-            animate={{
-              scale: getOrbScale(),
-            }}
-            transition={{
-              duration: callState === 'speaking' ? 0.15 : 0.6,
-              ease: 'easeOut',
-            }}
+            animate={{ scale: getOrbScale() }}
+            transition={{ duration: callState === 'speaking' ? 0.15 : 0.6, ease: 'easeOut' }}
           >
-            {/* Inner pulse ring */}
             <AnimatePresence>
               {(callState === 'listening' || callState === 'speaking') && (
                 <motion.div
@@ -465,8 +305,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
                 />
               )}
             </AnimatePresence>
-
-            {/* Icon */}
             {callState === 'processing' ? (
               <Loader2 className="w-10 h-10 text-white animate-spin" />
             ) : callState === 'listening' ? (
@@ -480,39 +318,16 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         </div>
       </div>
 
-      {/* Status */}
       <p className="text-sm text-muted-foreground mb-4">{statusText}</p>
 
-      {/* Controls */}
       <div className="flex items-center gap-6 mb-4">
-        {/* Mute */}
-        <Button
-          variant="outline"
-          size="icon"
-          className="w-12 h-12 rounded-full"
-          onClick={handleMuteToggle}
-        >
+        <Button variant="outline" size="icon" className="w-12 h-12 rounded-full" onClick={handleMuteToggle}>
           {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
         </Button>
-
-        {/* End call */}
-        <Button
-          variant="destructive"
-          size="icon"
-          className="w-14 h-14 rounded-full"
-          onClick={handleEndCall}
-        >
+        <Button variant="destructive" size="icon" className="w-14 h-14 rounded-full" onClick={handleEndCall}>
           <PhoneOff className="w-6 h-6" />
         </Button>
-
-        {/* Manual mic toggle */}
-        <Button
-          variant="outline"
-          size="icon"
-          className="w-12 h-12 rounded-full"
-          onClick={handleMicToggle}
-          disabled={callState === 'processing' || callState === 'speaking'}
-        >
+        <Button variant="outline" size="icon" className="w-12 h-12 rounded-full" onClick={handleMicToggle} disabled={callState === 'processing' || callState === 'speaking'}>
           <Phone className="w-5 h-5" />
         </Button>
       </div>
