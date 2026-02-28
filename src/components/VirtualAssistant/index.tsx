@@ -15,6 +15,7 @@ import AgentForm from './forms/AgentForm';
 import ServicePackViewer from './ServicePackViewer';
 import FAQViewer from './FAQViewer';
 import AIChatMode from './AIChatMode';
+import SaraVoiceCallMode from './SaraVoiceCallMode';
 import { FAQ_CATEGORIES, SERVICES_DATA, WHATSAPP_NUMBER } from '@/data/chatFlowData';
 import saraAvatar from '@/assets/sara-avatar.png';
 import { 
@@ -30,7 +31,8 @@ import {
   Share2,
   Palette,
   Bot,
-  Download
+  Download,
+  PhoneCall
 } from 'lucide-react';
 
 type FlowState = 
@@ -48,6 +50,7 @@ type FlowState =
   | 'ticket'
   | 'client-portal'
   | 'ai-chat'
+  | 'voice-call'
   | 'install-app';
 
 interface Message {
@@ -137,6 +140,10 @@ const VirtualAssistant = () => {
         setSelectedService('cybersecurity');
         setFlowState('service-category');
         break;
+      case 'voice-call':
+        addUserMessage('Llamar a Sara');
+        setFlowState('voice-call');
+        break;
       case 'install-app':
         addUserMessage('Instalar App');
         navigate('/instalar-app');
@@ -195,6 +202,7 @@ const VirtualAssistant = () => {
       case 'agent':
       case 'client-portal':
       case 'ai-chat':
+      case 'voice-call':
       case 'install-app':
         setFlowState('welcome');
         break;
@@ -231,6 +239,7 @@ const VirtualAssistant = () => {
 
   const mainOptions: ChatOption[] = [
     { id: 'ai-chat', label: 'Chat con Sara (IA)', icon: <Bot className="w-4 h-4" /> },
+    { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
     { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'services', label: 'Ver servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
@@ -453,6 +462,7 @@ const VirtualAssistant = () => {
         );
 
       case 'ai-chat':
+      case 'voice-call':
         return null; // Rendered outside ScrollArea
 
       default:
@@ -491,7 +501,11 @@ const VirtualAssistant = () => {
             </div>
           </div>
 
-          {flowState === 'ai-chat' ? (
+          {flowState === 'voice-call' ? (
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col" style={{ height: '500px', maxHeight: '60vh' }}>
+              <SaraVoiceCallMode onEnd={handleBack} />
+            </div>
+          ) : flowState === 'ai-chat' ? (
             <div className="flex-1 min-h-0 overflow-hidden flex flex-col" style={{ height: '500px', maxHeight: '60vh' }}>
               <AIChatMode onBack={handleBack} />
             </div>

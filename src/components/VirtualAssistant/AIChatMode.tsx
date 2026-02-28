@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText } from 'lucide-react';
+import VoiceRecordButton from './VoiceRecordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -282,6 +283,13 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
             placeholder={demoLimitReached ? "Inicia sesión para continuar" : "Escribe tu mensaje..."}
             disabled={isLoading || demoLimitReached}
             className="flex-1 text-sm"
+          />
+          <VoiceRecordButton
+            onTranscription={async (text) => {
+              setInputValue('');
+              await sendMessage(text);
+            }}
+            disabled={isLoading || demoLimitReached}
           />
           <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim() || demoLimitReached}>
             <Send className="w-4 h-4" />
