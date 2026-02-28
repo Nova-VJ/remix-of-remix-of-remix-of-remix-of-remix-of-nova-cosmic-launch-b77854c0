@@ -45,8 +45,21 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let providerStatus = "unknown";
+      let providerMessage = errorText;
+
+      try {
+        const parsedError = JSON.parse(errorText);
+        providerStatus = parsedError?.detail?.status ?? parsedError?.status ?? "unknown";
+        providerMessage = parsedError?.detail?.message ?? parsedError?.message ?? errorText;
+      } catch {
+        // Keep raw response text
+      }
+
       console.error("ElevenLabs STT error:", response.status, errorText);
-      throw new Error(`ElevenLabs STT failed: ${response.status}`);
+      throw new Error(
+        `ElevenLabs STT failed: ${response.status} [${providerStatus}] ${providerMessage}`
+      );
     }
 
     const transcription = await response.json();
@@ -57,9 +70,12 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("STT error:", error);
+    const errorMessage = error instanceof Error ? error.message : "STT failed";
+    const status = errorMessage.includes("detected_unusual_activity") ? 503 : 500;
+
     return new Response(
-      JSON.stringify({ error: error.message || "STT failed" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: errorMessage }),
+      { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

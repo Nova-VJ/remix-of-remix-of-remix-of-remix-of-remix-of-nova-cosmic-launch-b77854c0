@@ -29,6 +29,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(true);
   const ttsFallbackNoticeShownRef = useRef(false);
+  const sttBlockedNoticeShownRef = useRef(false);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
@@ -209,10 +210,36 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       }
     );
 
-    if (!response.ok) throw new Error('STT failed');
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`STT failed (${response.status}): ${errorText}`);
+    }
+
     const data = await response.json();
     return data.text || '';
   }, []);
+
+  const handleSTTUnavailable = useCallback((err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err);
+    const isProviderBlocked =
+      message.includes('detected_unusual_activity') || message.includes('STT failed (401)');
+
+    if (!isProviderBlocked || !activeRef.current) return false;
+
+    setCallState('idle');
+    setStatusText('Transcripción no disponible temporalmente.');
+
+    if (!sttBlockedNoticeShownRef.current) {
+      sttBlockedNoticeShownRef.current = true;
+      toast({
+        title: 'STT no disponible temporalmente',
+        description: 'ElevenLabs bloqueó temporalmente esta cuenta para transcripción. Activa un plan de pago o prueba más tarde.',
+        variant: 'destructive',
+      });
+    }
+
+    return true;
+  }, [toast]);
 
   // Main conversation loop
   const converse = useCallback(async (text: string) => {
@@ -290,10 +317,12 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         }
       } catch (err) {
         console.error('Transcription error:', err);
-        if (activeRef.current) startListening();
+        if (activeRef.current && !handleSTTUnavailable(err)) {
+          startListening();
+        }
       }
     }, 8000);
-  }, [isMuted, startRecording, stopRecording, transcribe, converse]);
+  }, [isMuted, startRecording, stopRecording, transcribe, converse, handleSTTUnavailable]);
 
   // Initial greeting
   useEffect(() => {
@@ -341,8 +370,10 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
           } else {
             startListening();
           }
-        } catch {
-          startListening();
+        } catch (err) {
+          if (!handleSTTUnavailable(err)) {
+            startListening();
+          }
         }
       }
     } else if (callState === 'idle') {
