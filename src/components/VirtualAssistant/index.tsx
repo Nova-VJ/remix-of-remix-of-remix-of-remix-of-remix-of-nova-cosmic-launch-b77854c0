@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, ArrowLeft, User, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ChatButton from './ChatButton';
@@ -496,7 +496,7 @@ const VirtualAssistant = () => {
               <AIChatMode onBack={handleBack} />
             </div>
           ) : (
-            <ScrollArea className="flex-1 p-4" style={{ maxHeight: '400px' }} ref={scrollRef}>
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ maxHeight: '400px', WebkitOverflowScrolling: 'touch' as any, touchAction: 'pan-y' }}>
               {messages.map((msg) => (
                 <ChatMessage
                   key={msg.id}
@@ -510,7 +510,7 @@ const VirtualAssistant = () => {
               <div className="mt-2">
                 {renderContent()}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </div>
       )}
