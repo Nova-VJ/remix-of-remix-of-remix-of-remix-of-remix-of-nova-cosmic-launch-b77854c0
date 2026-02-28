@@ -36,7 +36,10 @@ const VoiceRecordButton = ({ onTranscription, disabled }: VoiceRecordButtonProps
           }
         );
 
-        if (!response.ok) throw new Error('Transcription failed');
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Transcription failed (${response.status}): ${errorText}`);
+        }
         const data = await response.json();
         
         if (data.text && data.text.trim()) {
@@ -50,9 +53,16 @@ const VoiceRecordButton = ({ onTranscription, disabled }: VoiceRecordButtonProps
         }
       } catch (err) {
         console.error('Transcription error:', err);
+        const errorMessage = err instanceof Error ? err.message : '';
+        const isProviderBlocked =
+          errorMessage.includes('detected_unusual_activity') ||
+          errorMessage.includes('Transcription failed (401)');
+
         toast({
-          title: 'Error al transcribir',
-          description: 'No se pudo procesar el audio. Inténtalo de nuevo.',
+          title: isProviderBlocked ? 'Transcripción temporalmente no disponible' : 'Error al transcribir',
+          description: isProviderBlocked
+            ? 'ElevenLabs bloqueó temporalmente esta cuenta para STT. Activa un plan de pago o prueba más tarde.'
+            : 'No se pudo procesar el audio. Inténtalo de nuevo.',
           variant: 'destructive',
         });
       } finally {
