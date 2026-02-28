@@ -28,6 +28,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const animFrameRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(true);
+  const ttsFallbackNoticeShownRef = useRef(false);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
@@ -59,7 +60,38 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     };
+  }, []);
+
+  // Browser TTS fallback when ElevenLabs is temporarily unavailable
+  const playBrowserTTS = useCallback((text: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!('speechSynthesis' in window)) {
+        reject(new Error('Browser speech synthesis is not available'));
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      utterance.rate = 1;
+      utterance.pitch = 1;
+
+      utterance.onstart = () => setAudioLevel(0.25);
+      utterance.onend = () => {
+        setAudioLevel(0);
+        resolve();
+      };
+      utterance.onerror = () => {
+        setAudioLevel(0);
+        reject(new Error('Browser TTS failed'));
+      };
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    });
   }, []);
 
   // TTS playback with analyser
@@ -79,7 +111,34 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
           }
         );
 
-        if (!response.ok) throw new Error('TTS failed');
+        if (!response.ok) {
+          const errorText = await response.text();
+          let shouldUseBrowserFallback = false;
+
+          try {
+            const parsedError = JSON.parse(errorText);
+            shouldUseBrowserFallback =
+              response.status === 401 &&
+              parsedError?.detail?.status === 'detected_unusual_activity';
+          } catch {
+            // Keep default false if response is not JSON
+          }
+
+          if (shouldUseBrowserFallback) {
+            if (!ttsFallbackNoticeShownRef.current) {
+              ttsFallbackNoticeShownRef.current = true;
+              toast({
+                title: 'Modo voz temporal activado',
+                description: 'Usaremos voz del navegador mientras ElevenLabs vuelve a estar disponible.',
+              });
+            }
+            await playBrowserTTS(text);
+            resolve();
+            return;
+          }
+
+          throw new Error(`TTS failed (${response.status})`);
+        }
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -122,10 +181,16 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
 
         await audio.play();
       } catch (err) {
-        reject(err);
+        console.error('TTS playback error. Attempting browser fallback:', err);
+        try {
+          await playBrowserTTS(text);
+          resolve();
+        } catch (fallbackErr) {
+          reject(fallbackErr);
+        }
       }
     });
-  }, []);
+  }, [playBrowserTTS, toast]);
 
   // STT transcription
   const transcribe = useCallback(async (blob: Blob): Promise<string> => {
@@ -255,6 +320,9 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     activeRef.current = false;
     if (audioRef.current) {
       audioRef.current.pause();
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
     stopRecording();
     onEnd();
