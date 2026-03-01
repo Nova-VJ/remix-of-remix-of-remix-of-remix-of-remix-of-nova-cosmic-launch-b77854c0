@@ -15,16 +15,21 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 
-/** Pick the best Spanish female voice available in the browser */
-const pickSpanishVoice = (): SpeechSynthesisVoice | null => {
-  const voices = window.speechSynthesis.getVoices();
-  // Prefer female-sounding Spanish voices
-  const esVoices = voices.filter(v => v.lang.startsWith('es'));
-  // Try to find one with "female" or common female names
-  const preferred = esVoices.find(v =>
-    /female|femenin|lucia|elena|monica|paula|conchita|ines/i.test(v.name)
-  );
-  return preferred || esVoices[0] || null;
+/** Browser TTS fallback */
+const playBrowserTTS = (text: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!('speechSynthesis' in window)) { reject(new Error('no speechSynthesis')); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-ES'; u.rate = 1.05; u.pitch = 1.1; u.volume = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const esVoice = voices.filter(v => v.lang.startsWith('es'))
+      .find(v => /female|femenin|lucia|elena|monica|paula|conchita|ines/i.test(v.name)) || voices.find(v => v.lang.startsWith('es'));
+    if (esVoice) u.voice = esVoice;
+    u.onend = () => resolve();
+    u.onerror = () => reject(new Error('TTS failed'));
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  });
 };
 
 const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
@@ -36,6 +41,10 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeRef = useRef(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioQueueRef = useRef<string[]>([]);
+  const isPlayingRef = useRef(false);
+  const animFrameRef = useRef<number | null>(null);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
@@ -53,45 +62,115 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
   };
 
+  // Stop current audio helper
+  const stopCurrentAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
+    }
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setAudioLevel(0);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }, []);
+
   // Cleanup
   useEffect(() => {
     return () => {
       activeRef.current = false;
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      stopCurrentAudio();
     };
-  }, []);
+  }, [stopCurrentAudio]);
 
-  // Browser TTS
-  const playTTS = useCallback((text: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (!('speechSynthesis' in window)) {
-        reject(new Error('speechSynthesis not available'));
-        return;
+  // Google TTS
+  const playGoogleTTS = useCallback((text: string): Promise<void> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-tts`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ text }),
+          }
+        );
+
+        if (!res.ok) {
+          const errData = await res.text();
+          throw new Error(`Google TTS failed (${res.status}): ${errData}`);
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audioRef.current = audio;
+
+        // Animate audio level with a simple oscillator
+        const animateLevel = () => {
+          if (!activeRef.current || audio.paused) { setAudioLevel(0); return; }
+          setAudioLevel(0.2 + Math.random() * 0.5);
+          animFrameRef.current = requestAnimationFrame(animateLevel);
+        };
+
+        audio.onplay = () => animateLevel();
+        audio.onended = () => {
+          setAudioLevel(0);
+          URL.revokeObjectURL(url);
+          audioRef.current = null;
+          resolve();
+        };
+        audio.onerror = () => {
+          setAudioLevel(0);
+          URL.revokeObjectURL(url);
+          audioRef.current = null;
+          reject(new Error('Audio playback failed'));
+        };
+
+        await audio.play();
+      } catch (err) {
+        reject(err);
       }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES';
-      utterance.rate = 1.05;
-      utterance.pitch = 1.1; // Slightly higher for a younger voice
-      utterance.volume = 1;
-
-      const voice = pickSpanishVoice();
-      if (voice) utterance.voice = voice;
-
-      utterance.onstart = () => setAudioLevel(0.3);
-      utterance.onend = () => { setAudioLevel(0); resolve(); };
-      utterance.onerror = () => { setAudioLevel(0); reject(new Error('TTS failed')); };
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
     });
   }, []);
+
+  // Play with fallback
+  const playTTS = useCallback(async (text: string) => {
+    try {
+      await playGoogleTTS(text);
+    } catch (err) {
+      console.warn('Google TTS failed, falling back to browser:', err);
+      toast({ title: 'Usando voz del navegador', description: 'La voz de Google no está disponible temporalmente.' });
+      await playBrowserTTS(text);
+    }
+  }, [playGoogleTTS, toast]);
+
+  // Audio queue processor
+  const processQueue = useCallback(async () => {
+    if (isPlayingRef.current || audioQueueRef.current.length === 0 || !activeRef.current) return;
+    isPlayingRef.current = true;
+    while (audioQueueRef.current.length > 0 && activeRef.current) {
+      const nextText = audioQueueRef.current.shift()!;
+      setCallState('speaking');
+      setStatusText('Sara está hablando...');
+      try {
+        await playTTS(nextText);
+      } catch { break; }
+    }
+    isPlayingRef.current = false;
+  }, [playTTS]);
 
   // Deepgram STT
   const transcribe = useCallback(async (blob: Blob): Promise<string> => {
     const formData = new FormData();
     formData.append('audio', blob, 'recording.webm');
-
     const response = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-stt`,
       {
@@ -103,12 +182,10 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         body: formData,
       }
     );
-
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`STT failed (${response.status}): ${errorText}`);
     }
-
     const data = await response.json();
     return data.text || '';
   }, []);
@@ -116,17 +193,13 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   // Conversation loop
   const converse = useCallback(async (text: string) => {
     if (!activeRef.current) return;
-
     setCallState('processing');
     setStatusText('Sara está pensando...');
 
     try {
       const accessToken = session?.access_token;
       let sid = localStorage.getItem(SARA_SESSION_KEY);
-      if (!sid) {
-        sid = crypto.randomUUID();
-        localStorage.setItem(SARA_SESSION_KEY, sid);
-      }
+      if (!sid) { sid = crypto.randomUUID(); localStorage.setItem(SARA_SESSION_KEY, sid); }
 
       const { reply } = await sendToSara(text, accessToken, sid);
       if (!activeRef.current) return;
@@ -139,9 +212,9 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         .replace(/https?:\/\/[^\s]+/g, '')
         .trim();
 
-      setCallState('speaking');
-      setStatusText('Sara está hablando...');
-      await playTTS(cleanReply || 'No pude procesar tu mensaje.');
+      // Enqueue and process
+      audioQueueRef.current.push(cleanReply || 'No pude procesar tu mensaje.');
+      await processQueue();
 
       if (activeRef.current) startListening();
     } catch (err) {
@@ -151,7 +224,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         setStatusText('Error. Toca el micrófono para reintentar.');
       }
     }
-  }, [session, playTTS]);
+  }, [session, processQueue]);
 
   // Start listening
   const startListening = useCallback(async () => {
@@ -160,6 +233,9 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       setStatusText('Micrófono silenciado');
       return;
     }
+
+    // Stop any ongoing audio when user starts listening
+    stopCurrentAudio();
 
     setCallState('listening');
     setStatusText('Escuchando...');
@@ -188,20 +264,11 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         }
       }
     }, 8000);
-  }, [isMuted, startRecording, stopRecording, transcribe, converse, toast]);
+  }, [isMuted, startRecording, stopRecording, transcribe, converse, toast, stopCurrentAudio]);
 
   // Initial greeting
   useEffect(() => {
-    // Ensure voices are loaded
     const init = async () => {
-      // Some browsers load voices async
-      if (window.speechSynthesis.getVoices().length === 0) {
-        await new Promise<void>(r => {
-          window.speechSynthesis.onvoiceschanged = () => r();
-          setTimeout(r, 1000);
-        });
-      }
-
       try {
         setCallState('greeting');
         setStatusText('Sara está hablando...');
@@ -220,7 +287,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
 
   const handleEndCall = () => {
     activeRef.current = false;
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    stopCurrentAudio();
     stopRecording();
     onEnd();
   };
@@ -233,14 +300,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         setStatusText('Transcribiendo...');
         try {
           const text = await transcribe(blob);
-          if (text.trim()) {
-            await converse(text.trim());
-          } else {
-            startListening();
-          }
-        } catch {
-          startListening();
-        }
+          if (text.trim()) { await converse(text.trim()); } else { startListening(); }
+        } catch { startListening(); }
       }
     } else if (callState === 'idle') {
       startListening();
@@ -254,6 +315,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       setCallState('idle');
       setStatusText('Micrófono silenciado');
     }
+    stopCurrentAudio();
   };
 
   const getOrbScale = () => {
