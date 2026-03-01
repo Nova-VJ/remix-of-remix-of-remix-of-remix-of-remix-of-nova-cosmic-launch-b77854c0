@@ -1,117 +1,89 @@
 
 
-# Plan: Notas de voz + Modo llamada con Sara (ElevenLabs)
+# Google Cloud TTS para Sara
 
 ## Resumen
+Reemplazar la voz nativa del navegador (`speechSynthesis`) por Google Cloud Text-to-Speech con el modelo **Gemini 2.5 Flash TTS**, voz **Achernar** y estilo juvenil castellano. Se creara una edge function backend que autentica con la cuenta de servicio de Google y devuelve audio MP3. El frontend reproducira el audio con cola y control de mute/stop, con fallback a texto si falla.
 
-Se agregaran dos funcionalidades al chat de Sara:
-1. **Notas de voz**: Un boton de microfono en el chat para enviar mensajes por voz (Speech-to-Text)
-2. **Modo llamada**: Una pantalla tipo "llamada" con animacion visual que se mueve con la voz de Sara (Text-to-Speech), similar a ChatGPT
+## Secretos necesarios
 
-## Arquitectura
+Se almacenaran dos secretos en el backend:
+- **GOOGLE_TTS_API_KEY**: `AQ.Ab8RN6IzGOhGDAD6fGHsqocUZY81flSxGtB60r3idXQRQU6q7Q`
+- **GOOGLE_SERVICE_ACCOUNT_JSON**: El contenido completo del archivo JSON de cuenta de servicio (para autenticacion OAuth si la API key no soporta el modelo Gemini TTS)
 
-```text
-Usuario habla (microfono)
-       |
-       v
-[ElevenLabs STT] --- transcribe ---> texto
-       |
-       v
-[sara-chat edge function] --- responde ---> texto de Sara
-       |
-       v
-[ElevenLabs TTS] --- genera audio ---> voz de Sara
-       |
-       v
-Animacion visual + reproduccion de audio
+## Cambios
+
+### 1. Nueva edge function: `google-tts`
+
+Archivo: `supabase/functions/google-tts/index.ts`
+
+- Recibe POST con `{ "text": "..." }`
+- Intenta primero con API key (mas simple), si falla con 403/401, usa la cuenta de servicio para generar un access token OAuth2
+- Llama a `https://eu-texttospeech.googleapis.com/v1/text:synthesize` con:
+  ```json
+  {
+    "input": {
+      "text": "TEXTO",
+      "prompt": "Juvenil. Acento Valladolid. Castilla y Leon Espana."
+    },
+    "voice": {
+      "languageCode": "es-ES",
+      "name": "Achernar",
+      "model_name": "gemini-2.5-flash-tts"
+    },
+    "audioConfig": { "audioEncoding": "MP3" }
+  }
+  ```
+- Decodifica `audioContent` (base64) y responde con `Content-Type: audio/mpeg` y los bytes MP3
+- Si falla, devuelve JSON con error y status apropiado
+
+Para la autenticacion con cuenta de servicio se generara un JWT firmado con RS256 usando la clave privada del JSON, se intercambiara por un access token en `https://oauth2.googleapis.com/token`, y se usara como `Authorization: Bearer <token>`.
+
+### 2. Actualizar `supabase/config.toml`
+
+Anadir configuracion para la nueva funcion:
+```toml
+[functions.google-tts]
+verify_jwt = false
 ```
 
-## Componentes nuevos a crear
+### 3. Actualizar `SaraVoiceCallMode.tsx`
 
-### 1. Edge function: `elevenlabs-tts` (Text-to-Speech)
-- Recibe texto y lo convierte en audio MP3 usando ElevenLabs
-- Usa el modelo `eleven_multilingual_v2` para voz en espanol
-- Voz femenina profesional (Laura - FGY2WhTYpPnrIDTdsKH5, voz femenina con acento europeo)
-- Devuelve audio binario
+- Reemplazar la funcion `playTTS` (browser `speechSynthesis`) por una nueva `playGoogleTTS` que:
+  - Llama a la edge function `google-tts` con el texto
+  - Recibe bytes MP3
+  - Crea un `Blob` -> `URL.createObjectURL` -> `new Audio()` y reproduce
+  - Resuelve la promesa cuando el audio termina (`onended`)
+  - Actualiza `audioLevel` durante la reproduccion para animar el orbe
+- Anadir referencia `audioRef` para controlar el `Audio` activo (stop/pause)
+- En `handleEndCall` y `handleMuteToggle`: parar el audio actual (`audioRef.current.pause()`)
+- Si el usuario empieza a hablar (listening), detener cualquier audio en curso
+- **Fallback**: Si la llamada a `google-tts` falla, usar `speechSynthesis` del navegador como respaldo y mostrar toast informativo
 
-### 2. Edge function: `elevenlabs-stt` (Speech-to-Text)
-- Recibe audio grabado desde el microfono del usuario
-- Usa el modelo `scribe_v2` para transcribir a texto
-- Idioma: espanol (`spa`)
-- Devuelve el texto transcrito
+### 4. Cola de audio
 
-### 3. Componente: `SaraVoiceCallMode.tsx`
-- Pantalla completa dentro del widget de chat
-- Animacion circular/orbe que pulsa con la voz de Sara (similar a ChatGPT)
-- Estados visuales:
-  - **Escuchando**: Orbe azul pulsante, icono de microfono activo
-  - **Procesando**: Orbe con animacion de carga
-  - **Sara hablando**: Orbe grande pulsando con la amplitud del audio
-  - **Pausa**: Orbe estatico, boton para hablar
-- Boton rojo para colgar/terminar la llamada
-- Boton de mute para silenciar microfono
+Implementar una cola simple en `SaraVoiceCallMode`:
+- `audioQueueRef = useRef<string[]>([])` para encolar textos pendientes
+- Funcion `processQueue` que toma el siguiente texto, llama a `playGoogleTTS`, y al terminar procesa el siguiente
+- Si el usuario habla o hace mute, vaciar la cola y parar el audio actual
 
-### 4. Boton de microfono en AIChatMode
-- Al lado del boton de enviar, un boton de microfono
-- Al presionar: graba audio, lo transcribe con STT, y envia el texto como mensaje normal
-- Indicador visual de grabacion (punto rojo pulsante)
+### 5. Limpieza
 
-### 5. Boton de "Llamar a Sara" en el menu principal del asistente
-- Nueva opcion en el menu con icono de telefono
-- Abre directamente el modo llamada
+- Eliminar `pickSpanishVoice` y toda la logica de `speechSynthesis` como TTS principal (mantener solo como fallback)
+- La edge function `elevenlabs-tts` queda sin uso y se puede eliminar opcionalmente
 
-## Flujo del modo llamada
+## Secuencia del flujo
 
-1. Usuario toca "Llamar a Sara"
-2. Se pide permiso de microfono
-3. Aparece la pantalla de llamada con animacion
-4. Sara saluda con voz: "Hola, soy Sara, tu asistente de Nova. En que puedo ayudarte?"
-5. El usuario habla, su voz se transcribe (STT)
-6. El texto se envia a sara-chat
-7. La respuesta de Sara se convierte en audio (TTS)
-8. Se reproduce el audio con animacion visual sincronizada
-9. Se repite el ciclo hasta que el usuario "cuelga"
-
-## Flujo de nota de voz en chat
-
-1. Usuario toca icono de microfono en el chat
-2. Se graba audio (MediaRecorder API)
-3. Al soltar/parar, se envia a STT
-4. El texto transcrito aparece como mensaje del usuario
-5. Sara responde normalmente por texto (y opcionalmente se puede activar TTS)
-
-## Archivos a crear/modificar
-
-| Archivo | Accion |
-|---------|--------|
-| `supabase/functions/elevenlabs-tts/index.ts` | Crear - Edge function TTS |
-| `supabase/functions/elevenlabs-stt/index.ts` | Crear - Edge function STT |
-| `supabase/config.toml` | Modificar - Agregar funciones TTS y STT |
-| `src/components/VirtualAssistant/SaraVoiceCallMode.tsx` | Crear - Modo llamada con animacion |
-| `src/components/VirtualAssistant/VoiceRecordButton.tsx` | Crear - Boton microfono para chat |
-| `src/components/VirtualAssistant/AIChatMode.tsx` | Modificar - Agregar boton de microfono |
-| `src/components/VirtualAssistant/index.tsx` | Modificar - Agregar opcion "Llamar a Sara" y estado voice-call |
-| `src/hooks/useVoiceRecorder.ts` | Crear - Hook para grabar audio del microfono |
+```text
+Usuario habla --> Deepgram STT --> texto --> Sara API --> respuesta texto
+    --> google-tts edge function --> MP3 bytes --> Audio() --> reproducir
+    --> al terminar: volver a escuchar
+```
 
 ## Detalles tecnicos
 
-### Animacion del orbe
-- Usara framer-motion (ya instalado) para animar un circulo/orbe
-- La amplitud se calculara con `AnalyserNode` del Web Audio API durante la reproduccion del audio de Sara
-- Colores: degradado del tema de Nova (morado/azul)
-- Efecto de "respiracion" cuando esta en espera
-
-### Grabacion de audio
-- `MediaRecorder` API del navegador
-- Formato: webm/opus (compatible con ElevenLabs STT)
-- Deteccion automatica de silencio para modo llamada (VAD simple)
-
-### Permisos de microfono
-- Se pedira permiso antes de iniciar grabacion
-- Si se deniega, se mostrara un mensaje explicativo
-
-### Compatibilidad movil
-- Touch events para el boton de grabar
-- `-webkit-overflow-scrolling: touch` donde sea necesario
-- Funciona en iOS Safari y Android Chrome
+- La firma JWT RS256 en Deno se hara importando la clave privada PEM con `crypto.subtle.importKey` y firmando con `crypto.subtle.sign`
+- El token OAuth tiene 1h de validez; se puede cachear en memoria de la edge function
+- El texto se limita a 5000 caracteres por llamada (limite de Google)
+- El audio se reproduce con la Web Audio API estandar (`HTMLAudioElement`)
 
