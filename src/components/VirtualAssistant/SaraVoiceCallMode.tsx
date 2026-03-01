@@ -14,6 +14,8 @@ interface SaraVoiceCallModeProps {
 type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speaking' | 'idle';
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
+const MAX_EMPTY_RETRIES = 3;
+const LISTEN_DURATION_MS = 8000;
 
 /** Browser TTS fallback */
 const playBrowserTTS = (text: string): Promise<void> => {
@@ -45,6 +47,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const audioQueueRef = useRef<string[]>([]);
   const isPlayingRef = useRef(false);
   const animFrameRef = useRef<number | null>(null);
+  const emptyRetriesRef = useRef(0);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
@@ -113,7 +116,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         const audio = new Audio(url);
         audioRef.current = audio;
 
-        // Animate audio level with a simple oscillator
         const animateLevel = () => {
           if (!activeRef.current || audio.paused) { setAudioLevel(0); return; }
           setAudioLevel(0.2 + Math.random() * 0.5);
@@ -193,6 +195,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   // Conversation loop
   const converse = useCallback(async (text: string) => {
     if (!activeRef.current) return;
+    emptyRetriesRef.current = 0; // Reset on successful speech
     setCallState('processing');
     setStatusText('Sara está pensando...');
 
@@ -212,7 +215,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         .replace(/https?:\/\/[^\s]+/g, '')
         .trim();
 
-      // Enqueue and process
       audioQueueRef.current.push(cleanReply || 'No pude procesar tu mensaje.');
       await processQueue();
 
@@ -252,18 +254,29 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       try {
         const text = await transcribe(blob);
         if (text.trim()) {
+          emptyRetriesRef.current = 0;
           await converse(text.trim());
         } else {
-          startListening();
+          // Empty transcript - retry with limit
+          emptyRetriesRef.current++;
+          if (emptyRetriesRef.current >= MAX_EMPTY_RETRIES) {
+            emptyRetriesRef.current = 0;
+            setCallState('idle');
+            setStatusText('No te escucho. Toca el micrófono para hablar.');
+          } else {
+            setStatusText('No te he escuchado, intentando de nuevo...');
+            startListening();
+          }
         }
       } catch (err) {
         console.error('Transcription error:', err);
         if (activeRef.current) {
           toast({ title: 'Error de transcripción', description: 'No se pudo procesar el audio.', variant: 'destructive' });
-          startListening();
+          setCallState('idle');
+          setStatusText('Error. Toca el micrófono para reintentar.');
         }
       }
-    }, 8000);
+    }, LISTEN_DURATION_MS);
   }, [isMuted, startRecording, stopRecording, transcribe, converse, toast, stopCurrentAudio]);
 
   // Initial greeting
@@ -273,7 +286,11 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         setCallState('greeting');
         setStatusText('Sara está hablando...');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
-        if (activeRef.current) startListening();
+        if (activeRef.current) {
+          // Small delay after greeting to ensure audio system is ready
+          await new Promise(r => setTimeout(r, 500));
+          startListening();
+        }
       } catch (err) {
         console.error('Greeting error:', err);
         if (activeRef.current) {
@@ -304,6 +321,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         } catch { startListening(); }
       }
     } else if (callState === 'idle') {
+      emptyRetriesRef.current = 0;
       startListening();
     }
   };
