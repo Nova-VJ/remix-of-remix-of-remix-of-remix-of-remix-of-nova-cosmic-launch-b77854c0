@@ -36,6 +36,12 @@ INSTRUCCIONES:
 6. Responde siempre en español
 7. Si preguntan por servicios no relacionados con Nova, indica que solo puedes ayudar con temas de Nova
 
+FORMATO DE RESPUESTA (CRITICO):
+- NUNCA uses asteriscos (*), negritas (**), cursivas, ni ningun formato markdown
+- Escribe texto plano siempre, sin formato especial
+- No uses listas con guiones ni numeradas a menos que sea estrictamente necesario
+- Tus respuestas se leen en voz alta, asi que escribe de forma natural y conversacional
+
 LINKS Y FORMULARIOS (OBLIGATORIO):
 - NUNCA escribas URLs como "solutionsnova.es/formulario" ni ninguna URL de formulario inventada
 - Para referir al formulario de briefing SIEMPRE usa el texto exacto: [LINK_FORMULARIO]
@@ -64,7 +70,7 @@ CUÁNDO generar propuesta (SIEMPRE en estos casos):
 - Básicamente: si se habla de un servicio, SIEMPRE va el tag
 
 EJEMPLO:
-"¡Genial! Para tu restaurante te recomiendo una página web profesional. Aquí tienes el servicio para que puedas agregarlo:
+"Genial! Para tu restaurante te recomiendo una página web profesional. Aquí tienes el servicio para que puedas agregarlo:
 [PROPUESTA_CARRITO:{"items":[{"id":"web","name":"Página Web Profesional","price":600,"type":"service"}],"description":"Web para restaurante"}]"
 
 FORMATO:
@@ -120,13 +126,38 @@ function cleanupRateLimitMap() {
   }
 }
 
-async function classifyConversation(
-  messages: { role: string; content: string }[],
+// Background task runner - fire and forget
+function runInBackground(fn: () => Promise<void>) {
+  fn().catch(err => console.error("Background task error:", err));
+}
+
+async function classifyAndNotify(
+  conversationId: string,
+  supabase: any,
   apiKey: string
-): Promise<any> {
+) {
+  const { data: conv } = await supabase
+    .from("sara_anonymous_conversations")
+    .select("message_count")
+    .eq("id", conversationId)
+    .single();
+
+  const count = conv?.message_count || 0;
+  if (count < 2) return;
+
+  const { data: fullHistory } = await supabase
+    .from("sara_anonymous_messages")
+    .select("role, content")
+    .eq("conversation_id", conversationId)
+    .order("created_at", { ascending: true });
+
+  if (!fullHistory || fullHistory.length < 3) return;
+
+  // Classify
+  let classification: any = null;
   try {
-    const conversationText = messages
-      .map(m => `${m.role === 'user' ? 'Usuario' : 'Sara'}: ${m.content}`)
+    const conversationText = fullHistory
+      .map((m: any) => `${m.role === 'user' ? 'Usuario' : 'Sara'}: ${m.content}`)
       .join('\n');
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -136,7 +167,7 @@ async function classifyConversation(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: CLASSIFICATION_PROMPT },
           { role: "user", content: `Conversación:\n${conversationText}` }
@@ -145,17 +176,64 @@ async function classifyConversation(
       }),
     });
 
-    if (!response.ok) return null;
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || '';
-    
-    // Parse JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    return JSON.parse(jsonMatch[0]);
+    if (response.ok) {
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) classification = JSON.parse(jsonMatch[0]);
+    }
   } catch (e) {
     console.error("Classification error:", e);
-    return null;
+  }
+
+  if (!classification) return;
+
+  await supabase.from("sara_anonymous_conversations").update({
+    ai_title: classification.title,
+    ai_service: classification.service,
+    ai_stage: classification.stage,
+    ai_urgency: classification.urgency,
+    ai_quality: classification.quality,
+    ai_score: Math.min(100, Math.max(0, parseInt(classification.score) || 0)),
+    ai_summary: classification.summary,
+    ai_next_action: classification.next_action,
+    contact_name: classification.contact_name,
+    contact_email: classification.contact_email,
+    contact_phone: classification.contact_phone,
+    contact_city: classification.contact_city,
+    contact_website: classification.contact_website,
+    classified_at: new Date().toISOString()
+  }).eq("id", conversationId);
+
+  if ((classification.score || 0) >= 50) {
+    await supabase.from("admin_notifications").insert({
+      type: 'high_priority_lead',
+      title: `🚀 Lead de alta prioridad detectado (Score: ${classification.score})`,
+      message: `${classification.title} – ${classification.service} – ${classification.stage}`,
+      data: { conversation_id: conversationId, ...classification }
+    });
+
+    // Push notification
+    const SUPABASE_URL_VAL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    try {
+      await fetch(`${SUPABASE_URL_VAL}/functions/v1/send-push-notification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
+        },
+        body: JSON.stringify({
+          title: `🚀 Lead Score: ${classification.score}`,
+          body: `${classification.title} – ${classification.service}`,
+          url: "/admin",
+          type: "high_priority_lead",
+          target: "admin",
+        }),
+      });
+    } catch (pushErr) {
+      console.error("Push notification error:", pushErr);
+    }
   }
 }
 
@@ -215,7 +293,6 @@ serve(async (req) => {
 
     const effectiveAnonId = userId || anon_id || "unknown";
     
-    // Always use sara_anonymous_conversations for admin visibility
     let conversationId: string | null = null;
     let allMessages: { role: string; content: string }[] = [];
     
@@ -252,29 +329,30 @@ serve(async (req) => {
         content: message.substring(0, 2000)
       });
 
-      // Load conversation history for context
+      // Load only last 6 messages for context (reduced from 20)
       const { data: history } = await supabase
         .from("sara_anonymous_messages")
         .select("role, content")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true })
-        .limit(20);
+        .limit(10);
       allMessages = history || [];
     }
 
     console.log(`Processing chat - ID: ${effectiveAnonId}, Authenticated: ${!!userId}, Remaining: ${rateLimitResult.remaining}`);
 
-    // Build API messages with history for context
+    // Build API messages - only last 6 for speed
+    const recentMessages = allMessages.slice(-6);
     const apiMessages = [
       { role: "system", content: SYSTEM_PROMPT },
-      ...allMessages.slice(-10).map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
-      { role: "user", content: message }
+      ...recentMessages.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
     ];
-    // Deduplicate last user message if already in history
-    const lastHistoryMsg = allMessages[allMessages.length - 1];
-    const finalMessages = lastHistoryMsg?.role === 'user' && lastHistoryMsg.content === message
-      ? [{ role: "system", content: SYSTEM_PROMPT }, ...allMessages.slice(-10).map(m => ({ role: m.role as "user" | "assistant", content: m.content }))]
-      : apiMessages;
+    // Deduplicate if last message already in history
+    const lastHistoryMsg = recentMessages[recentMessages.length - 1];
+    const needsExtraUserMsg = !(lastHistoryMsg?.role === 'user' && lastHistoryMsg.content === message);
+    if (needsExtraUserMsg) {
+      apiMessages.push({ role: "user", content: message });
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -283,9 +361,9 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: finalMessages,
-        max_tokens: 500,
+        model: "google/gemini-2.5-flash-lite",
+        messages: apiMessages,
+        max_tokens: 300,
       }),
     });
 
@@ -318,107 +396,44 @@ serve(async (req) => {
         role: "assistant",
         content: assistantMessage
       });
-
-      // Create admin notification
-      const senderLabel = userId ? 'Usuario registrado' : 'Anónimo';
-      const notifTitle = `💬 Nuevo mensaje de Sara`;
-      const notifMsg = `${senderLabel} escribió: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`;
-      await supabase.from("admin_notifications").insert({
-        type: 'sara_message',
-        title: notifTitle,
-        message: notifMsg,
-        data: { 
-          conversation_id: conversationId, 
-          anon_id: effectiveAnonId,
-          user_message: message.substring(0, 200)
-        }
-      });
-
-      // Run AI classification every 3 messages (background)
-      const { data: msgCount } = await supabase
-        .from("sara_anonymous_conversations")
-        .select("message_count")
-        .eq("id", conversationId)
-        .single();
-      
-      const count = msgCount?.message_count || 0;
-      if (count >= 2) {
-        const { data: fullHistory } = await supabase
-          .from("sara_anonymous_messages")
-          .select("role, content")
-          .eq("conversation_id", conversationId)
-          .order("created_at", { ascending: true });
-
-        if (fullHistory && fullHistory.length >= 3) {
-          const classification = await classifyConversation(fullHistory, LOVABLE_API_KEY);
-          if (classification) {
-            await supabase.from("sara_anonymous_conversations").update({
-              ai_title: classification.title,
-              ai_service: classification.service,
-              ai_stage: classification.stage,
-              ai_urgency: classification.urgency,
-              ai_quality: classification.quality,
-              ai_score: Math.min(100, Math.max(0, parseInt(classification.score) || 0)),
-              ai_summary: classification.summary,
-              ai_next_action: classification.next_action,
-              contact_name: classification.contact_name,
-              contact_email: classification.contact_email,
-              contact_phone: classification.contact_phone,
-              contact_city: classification.contact_city,
-              contact_website: classification.contact_website,
-              classified_at: new Date().toISOString()
-            }).eq("id", conversationId);
-
-            if ((classification.score || 0) >= 50) {
-              await supabase.from("admin_notifications").insert({
-                type: 'high_priority_lead',
-                title: `🚀 Lead de alta prioridad detectado (Score: ${classification.score})`,
-                message: `${classification.title} – ${classification.service} – ${classification.stage}`,
-                data: { conversation_id: conversationId, ...classification }
-              });
-
-              // Send push notification to admin devices
-              const SUPABASE_URL_VAL = Deno.env.get("SUPABASE_URL")!;
-              const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-              try {
-                const pushRes = await fetch(`${SUPABASE_URL_VAL}/functions/v1/send-push-notification`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${SERVICE_ROLE_KEY}`,
-                  },
-                  body: JSON.stringify({
-                    title: `🚀 Lead Score: ${classification.score}`,
-                    body: `${classification.title} – ${classification.service}`,
-                    url: "/admin",
-                    type: "high_priority_lead",
-                    target: "admin",
-                  }),
-                });
-                const pushResult = await pushRes.text();
-                console.log("Push notification result:", pushRes.status, pushResult);
-              } catch (pushErr) {
-                console.error("Push notification error:", pushErr);
-              }
-            }
-          }
-        }
-      }
     }
 
-    return new Response(
-      JSON.stringify({ 
-        reply: assistantMessage,
-        session_id: session_id || anon_id 
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          "Content-Type": "application/json",
-          "X-RateLimit-Remaining": String(rateLimitResult.remaining)
-        } 
-      }
-    );
+    // *** RETURN RESPONSE IMMEDIATELY ***
+    const responseBody = JSON.stringify({ 
+      reply: assistantMessage,
+      session_id: session_id || anon_id 
+    });
+
+    // *** Background tasks: notifications + classification (non-blocking) ***
+    if (conversationId) {
+      const convId = conversationId;
+      const senderLabel = userId ? 'Usuario registrado' : 'Anónimo';
+      
+      runInBackground(async () => {
+        // Admin notification
+        await supabase.from("admin_notifications").insert({
+          type: 'sara_message',
+          title: `💬 Nuevo mensaje de Sara`,
+          message: `${senderLabel} escribió: "${message.substring(0, 80)}${message.length > 80 ? '...' : ''}"`,
+          data: { 
+            conversation_id: convId, 
+            anon_id: effectiveAnonId,
+            user_message: message.substring(0, 200)
+          }
+        });
+
+        // AI classification
+        await classifyAndNotify(convId, supabase, LOVABLE_API_KEY!);
+      });
+    }
+
+    return new Response(responseBody, { 
+      headers: { 
+        ...corsHeaders, 
+        "Content-Type": "application/json",
+        "X-RateLimit-Remaining": String(rateLimitResult.remaining)
+      } 
+    });
   } catch (error) {
     console.error("sara-chat error:", error);
     return new Response(

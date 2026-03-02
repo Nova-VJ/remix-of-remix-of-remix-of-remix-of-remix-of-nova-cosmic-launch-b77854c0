@@ -1,11 +1,11 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { PhoneOff, Mic, MicOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendToSara } from '@/lib/saraApi';
 import { useToast } from '@/hooks/use-toast';
+import saraAvatar from '@/assets/sara-avatar.png';
 
 interface SaraVoiceCallModeProps {
   onEnd: () => void;
@@ -16,6 +16,7 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 const MAX_EMPTY_RETRIES = 3;
 const LISTEN_DURATION_MS = 8000;
+const NUM_BARS = 24;
 
 /** Browser TTS fallback */
 const playBrowserTTS = (text: string): Promise<void> => {
@@ -32,6 +33,37 @@ const playBrowserTTS = (text: string): Promise<void> => {
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   });
+};
+
+/* ── Equalizer Bars ── */
+const EqualizerBars = ({ active, level }: { active: boolean; level: number }) => {
+  const bars = useMemo(() => Array.from({ length: NUM_BARS }, (_, i) => {
+    const angle = (i / NUM_BARS) * 360;
+    return { angle, delay: i * 0.04 };
+  }), []);
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {bars.map((bar, i) => {
+        const h = active ? 18 + level * 30 + Math.sin(Date.now() / 200 + i) * 8 : 6;
+        return (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: 2.5,
+              height: h,
+              background: `linear-gradient(180deg, rgba(139,92,246,0.9) 0%, rgba(56,189,248,0.7) 100%)`,
+              transformOrigin: 'center 70px',
+              transform: `rotate(${bar.angle}deg) translateY(-70px)`,
+            }}
+            animate={{ height: active ? h : 6, opacity: active ? 0.85 : 0.25 }}
+            transition={{ duration: 0.12, delay: bar.delay }}
+          />
+        );
+      })}
+    </div>
+  );
 };
 
 const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
@@ -195,7 +227,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   // Conversation loop
   const converse = useCallback(async (text: string) => {
     if (!activeRef.current) return;
-    emptyRetriesRef.current = 0; // Reset on successful speech
+    emptyRetriesRef.current = 0;
     setCallState('processing');
     setStatusText('Sara está pensando...');
 
@@ -213,6 +245,9 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         .replace(/\[LINK_FORMULARIO\]/gi, '')
         .replace(/##OPEN_FORM##/g, '')
         .replace(/https?:\/\/[^\s]+/g, '')
+        .replace(/\*+/g, '')        // Strip asterisks for TTS
+        .replace(/#{1,6}\s?/g, '')   // Strip markdown headings
+        .replace(/-{2,}/g, '')       // Strip hr lines
         .trim();
 
       audioQueueRef.current.push(cleanReply || 'No pude procesar tu mensaje.');
@@ -235,10 +270,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       setStatusText('Micrófono silenciado');
       return;
     }
-
-    // Stop any ongoing audio when user starts listening
     stopCurrentAudio();
-
     setCallState('listening');
     setStatusText('Escuchando...');
     await startRecording();
@@ -257,7 +289,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
           emptyRetriesRef.current = 0;
           await converse(text.trim());
         } else {
-          // Empty transcript - retry with limit
           emptyRetriesRef.current++;
           if (emptyRetriesRef.current >= MAX_EMPTY_RETRIES) {
             emptyRetriesRef.current = 0;
@@ -287,7 +318,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         setStatusText('Sara está hablando...');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
         if (activeRef.current) {
-          // Small delay after greeting to ensure audio system is ready
           await new Promise(r => setTimeout(r, 500));
           startListening();
         }
@@ -336,80 +366,210 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     stopCurrentAudio();
   };
 
-  const getOrbScale = () => {
-    switch (callState) {
-      case 'speaking': return 1 + audioLevel * 0.6;
-      case 'listening': return 1.05;
-      case 'processing': return 0.95;
-      default: return 1;
-    }
-  };
-
-  const getOrbColor = () => {
-    switch (callState) {
-      case 'listening': return 'from-blue-500 to-cyan-400';
-      case 'speaking': return 'from-violet-500 to-purple-400';
-      case 'processing': return 'from-amber-400 to-orange-400';
-      default: return 'from-slate-400 to-slate-500';
-    }
-  };
+  const isSpeaking = callState === 'speaking';
+  const isListening = callState === 'listening';
+  const isProcessing = callState === 'processing';
 
   return (
-    <div className="flex flex-col items-center justify-between h-full bg-background p-6">
-      <div className="text-center">
-        <p className="text-sm font-medium text-muted-foreground">{formatTime(elapsedTime)}</p>
-        <p className="text-xs text-muted-foreground mt-1">Llamada con Sara</p>
+    <div className="relative flex flex-col items-center justify-between h-full overflow-hidden select-none"
+      style={{
+        background: 'radial-gradient(ellipse at 50% 30%, #1a103d 0%, #0c0a1a 60%, #050510 100%)',
+      }}
+    >
+      {/* Subtle star particles (CSS) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 40 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full animate-pulse"
+            style={{
+              width: Math.random() * 2 + 1,
+              height: Math.random() * 2 + 1,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              background: 'rgba(200,200,255,0.4)',
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
       </div>
 
-      <div className="flex-1 flex items-center justify-center">
-        <div className="relative">
+      {/* Top bar */}
+      <div className="relative z-10 pt-6 text-center">
+        <p className="text-xs font-medium tracking-[0.25em] uppercase" style={{ color: 'rgba(200,200,255,0.5)' }}>
+          Llamada en curso
+        </p>
+        <p className="text-lg font-light tracking-wider mt-1" style={{ color: 'rgba(255,255,255,0.85)' }}>
+          {formatTime(elapsedTime)}
+        </p>
+      </div>
+
+      {/* Central orb area */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6">
+        {/* Name */}
+        <motion.h2
+          className="text-3xl font-extralight tracking-widest"
+          style={{ color: 'rgba(255,255,255,0.9)' }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          Sara
+        </motion.h2>
+
+        {/* Orb container */}
+        <div className="relative" style={{ width: 200, height: 200 }}>
+          {/* Outer glow rings */}
           <motion.div
-            className={`absolute inset-0 rounded-full bg-gradient-to-br ${getOrbColor()} blur-2xl opacity-30`}
-            animate={{ scale: [getOrbScale() * 1.2, getOrbScale() * 1.4, getOrbScale() * 1.2] }}
-            transition={{ duration: callState === 'speaking' ? 0.3 : 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ width: 180, height: 180 }}
+            className="absolute rounded-full"
+            style={{
+              inset: -30,
+              background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)',
+            }}
+            animate={{
+              scale: isSpeaking ? [1, 1.15, 1] : isListening ? [1, 1.08, 1] : 1,
+              opacity: isSpeaking ? 0.8 : 0.4,
+            }}
+            transition={{ duration: isSpeaking ? 0.4 : 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
           <motion.div
-            className={`relative w-[140px] h-[140px] rounded-full bg-gradient-to-br ${getOrbColor()} shadow-2xl flex items-center justify-center`}
-            animate={{ scale: getOrbScale() }}
-            transition={{ duration: callState === 'speaking' ? 0.15 : 0.6, ease: 'easeOut' }}
+            className="absolute rounded-full"
+            style={{
+              inset: -15,
+              background: 'radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%)',
+            }}
+            animate={{
+              scale: isSpeaking ? [1, 1.1, 1] : 1,
+            }}
+            transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+
+          {/* Equalizer bars (circular) */}
+          <EqualizerBars active={isSpeaking} level={audioLevel} />
+
+          {/* Concentric ring */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              border: '1px solid rgba(139,92,246,0.2)',
+            }}
+            animate={{
+              scale: isListening || isSpeaking ? [1, 1.3, 1] : 1,
+              opacity: isListening || isSpeaking ? [0.6, 0, 0.6] : 0.15,
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+
+          {/* Main orb with glassmorphism */}
+          <motion.div
+            className="absolute inset-4 rounded-full flex items-center justify-center overflow-hidden"
+            style={{
+              background: isListening
+                ? 'linear-gradient(135deg, rgba(56,189,248,0.25) 0%, rgba(99,102,241,0.3) 100%)'
+                : isSpeaking
+                  ? 'linear-gradient(135deg, rgba(139,92,246,0.35) 0%, rgba(56,189,248,0.25) 100%)'
+                  : isProcessing
+                    ? 'linear-gradient(135deg, rgba(251,191,36,0.2) 0%, rgba(245,158,11,0.25) 100%)'
+                    : 'linear-gradient(135deg, rgba(100,100,140,0.15) 0%, rgba(60,60,90,0.2) 100%)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: isSpeaking
+                ? '0 0 60px rgba(139,92,246,0.4), inset 0 0 30px rgba(139,92,246,0.1)'
+                : isListening
+                  ? '0 0 40px rgba(56,189,248,0.3), inset 0 0 20px rgba(56,189,248,0.08)'
+                  : '0 0 20px rgba(100,100,160,0.15)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+            animate={{
+              scale: isSpeaking ? 1 + audioLevel * 0.15 : isListening ? [1, 1.03, 1] : isProcessing ? 0.95 : 1,
+            }}
+            transition={{ duration: isSpeaking ? 0.12 : 1.5, repeat: isListening ? Infinity : 0, ease: 'easeInOut' }}
           >
-            <AnimatePresence>
-              {(callState === 'listening' || callState === 'speaking') && (
-                <motion.div
-                  className="absolute inset-0 rounded-full border-2 border-white/30"
-                  initial={{ scale: 1, opacity: 0.5 }}
-                  animate={{ scale: 1.5, opacity: 0 }}
+            {/* Sara avatar */}
+            <AnimatePresence mode="wait">
+              {isProcessing ? (
+                <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+                  <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'rgba(251,191,36,0.8)' }} />
+                </motion.div>
+              ) : isListening ? (
+                <motion.div key="mic" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+                  <Mic className="w-10 h-10" style={{ color: 'rgba(56,189,248,0.9)' }} />
+                </motion.div>
+              ) : (
+                <motion.img
+                  key="avatar"
+                  src={saraAvatar}
+                  alt="Sara"
+                  className="w-24 h-24 rounded-full object-cover"
+                  style={{ border: '2px solid rgba(255,255,255,0.1)' }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
                 />
               )}
             </AnimatePresence>
-            {callState === 'processing' ? (
-              <Loader2 className="w-10 h-10 text-white animate-spin" />
-            ) : callState === 'listening' ? (
-              <Mic className="w-10 h-10 text-white" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-full bg-white/40" />
-              </div>
-            )}
           </motion.div>
         </div>
+
+        {/* Status text */}
+        <motion.p
+          className="text-sm tracking-wide text-center max-w-[240px]"
+          style={{ color: 'rgba(200,200,255,0.6)' }}
+          key={statusText}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {statusText}
+        </motion.p>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-4">{statusText}</p>
+      {/* Bottom controls */}
+      <div className="relative z-10 flex items-center gap-8 pb-8">
+        {/* Mute */}
+        <motion.button
+          className="w-14 h-14 rounded-full flex items-center justify-center"
+          style={{
+            background: isMuted ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleMuteToggle}
+        >
+          {isMuted
+            ? <MicOff className="w-5 h-5" style={{ color: 'rgba(239,68,68,0.9)' }} />
+            : <Mic className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.7)' }} />}
+        </motion.button>
 
-      <div className="flex items-center gap-6 mb-4">
-        <Button variant="outline" size="icon" className="w-12 h-12 rounded-full" onClick={handleMuteToggle}>
-          {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-        </Button>
-        <Button variant="destructive" size="icon" className="w-14 h-14 rounded-full" onClick={handleEndCall}>
-          <PhoneOff className="w-6 h-6" />
-        </Button>
-        <Button variant="outline" size="icon" className="w-12 h-12 rounded-full" onClick={handleMicToggle} disabled={callState === 'processing' || callState === 'speaking'}>
-          <Phone className="w-5 h-5" />
-        </Button>
+        {/* End call */}
+        <motion.button
+          className="w-16 h-16 rounded-full flex items-center justify-center"
+          style={{
+            background: 'linear-gradient(135deg, rgba(239,68,68,0.9) 0%, rgba(185,28,28,0.9) 100%)',
+            boxShadow: '0 0 30px rgba(239,68,68,0.4)',
+          }}
+          whileTap={{ scale: 0.85 }}
+          onClick={handleEndCall}
+        >
+          <PhoneOff className="w-6 h-6" style={{ color: '#fff' }} />
+        </motion.button>
+
+        {/* Tap to talk */}
+        <motion.button
+          className="w-14 h-14 rounded-full flex items-center justify-center"
+          style={{
+            background: callState === 'idle' ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            opacity: (isProcessing || isSpeaking) ? 0.4 : 1,
+          }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleMicToggle}
+          disabled={isProcessing || isSpeaking}
+        >
+          <Mic className="w-5 h-5" style={{ color: callState === 'idle' ? 'rgba(56,189,248,0.9)' : 'rgba(255,255,255,0.7)' }} />
+        </motion.button>
       </div>
     </div>
   );
