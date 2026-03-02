@@ -1,89 +1,75 @@
 
 
-# Google Cloud TTS para Sara
+# Optimizar velocidad, eliminar asteriscos y UI premium para la llamada de Sara
 
-## Resumen
-Reemplazar la voz nativa del navegador (`speechSynthesis`) por Google Cloud Text-to-Speech con el modelo **Gemini 2.5 Flash TTS**, voz **Achernar** y estilo juvenil castellano. Se creara una edge function backend que autentica con la cuenta de servicio de Google y devuelve audio MP3. El frontend reproducira el audio con cola y control de mute/stop, con fallback a texto si falla.
+## Problema actual
 
-## Secretos necesarios
-
-Se almacenaran dos secretos en el backend:
-- **GOOGLE_TTS_API_KEY**: `AQ.Ab8RN6IzGOhGDAD6fGHsqocUZY81flSxGtB60r3idXQRQU6q7Q`
-- **GOOGLE_SERVICE_ACCOUNT_JSON**: El contenido completo del archivo JSON de cuenta de servicio (para autenticacion OAuth si la API key no soporta el modelo Gemini TTS)
+1. **Lentitud**: La edge function `sara-chat` ejecuta la clasificacion IA y las notificaciones push DE FORMA SINCRONA antes de devolver la respuesta. Esto anade 2-5 segundos innecesarios a cada mensaje.
+2. **Asteriscos**: El system prompt no prohibe markdown, asi que el modelo responde con `**negritas**` y `*cursivas*` que el TTS lee como "asterisco".
+3. **UI basica**: La interfaz de llamada es funcional pero simple, sin aspecto premium.
 
 ## Cambios
 
-### 1. Nueva edge function: `google-tts`
+### 1. Acelerar respuesta de sara-chat (edge function)
 
-Archivo: `supabase/functions/google-tts/index.ts`
+Archivo: `supabase/functions/sara-chat/index.ts`
 
-- Recibe POST con `{ "text": "..." }`
-- Intenta primero con API key (mas simple), si falla con 403/401, usa la cuenta de servicio para generar un access token OAuth2
-- Llama a `https://eu-texttospeech.googleapis.com/v1/text:synthesize` con:
-  ```json
-  {
-    "input": {
-      "text": "TEXTO",
-      "prompt": "Juvenil. Acento Valladolid. Castilla y Leon Espana."
-    },
-    "voice": {
-      "languageCode": "es-ES",
-      "name": "Achernar",
-      "model_name": "gemini-2.5-flash-tts"
-    },
-    "audioConfig": { "audioEncoding": "MP3" }
-  }
-  ```
-- Decodifica `audioContent` (base64) y responde con `Content-Type: audio/mpeg` y los bytes MP3
-- Si falla, devuelve JSON con error y status apropiado
+- **Mover clasificacion y notificaciones a segundo plano**: Usar `EdgeRuntime` o simplemente NO hacer await en la clasificacion. Devolver la respuesta al usuario inmediatamente despues de guardar el mensaje de Sara, y ejecutar clasificacion/notificacion/push sin bloquear.
+- **Usar modelo mas rapido**: Cambiar de `google/gemini-2.5-flash` a `google/gemini-2.5-flash-lite` para respuestas mas agiles (suficiente para un chatbot de ventas).
+- **Reducir max_tokens**: De 500 a 300, ya que respuestas mas cortas son mejores para voz.
+- **Reducir historial**: Cargar solo los ultimos 6 mensajes en vez de 10 para reducir tokens de entrada.
 
-Para la autenticacion con cuenta de servicio se generara un JWT firmado con RS256 usando la clave privada del JSON, se intercambiara por un access token en `https://oauth2.googleapis.com/token`, y se usara como `Authorization: Bearer <token>`.
+### 2. Eliminar asteriscos y markdown del prompt
 
-### 2. Actualizar `supabase/config.toml`
+Archivo: `supabase/functions/sara-chat/index.ts`
 
-Anadir configuracion para la nueva funcion:
-```toml
-[functions.google-tts]
-verify_jwt = false
+Anadir al SYSTEM_PROMPT las siguientes instrucciones:
+
+```
+FORMATO DE RESPUESTA (CRITICO):
+- NUNCA uses asteriscos (*), negritas (**), cursivas, ni ningun formato markdown
+- Escribe texto plano siempre, sin formato especial
+- No uses listas con guiones ni numeradas a menos que sea estrictamente necesario
+- Tus respuestas se leen en voz alta, asi que escribe de forma natural y conversacional
 ```
 
-### 3. Actualizar `SaraVoiceCallMode.tsx`
+Ademas, en el frontend (`SaraVoiceCallMode.tsx`), anadir un regex para limpiar cualquier asterisco residual antes de enviarlo al TTS:
 
-- Reemplazar la funcion `playTTS` (browser `speechSynthesis`) por una nueva `playGoogleTTS` que:
-  - Llama a la edge function `google-tts` con el texto
-  - Recibe bytes MP3
-  - Crea un `Blob` -> `URL.createObjectURL` -> `new Audio()` y reproduce
-  - Resuelve la promesa cuando el audio termina (`onended`)
-  - Actualiza `audioLevel` durante la reproduccion para animar el orbe
-- Anadir referencia `audioRef` para controlar el `Audio` activo (stop/pause)
-- En `handleEndCall` y `handleMuteToggle`: parar el audio actual (`audioRef.current.pause()`)
-- Si el usuario empieza a hablar (listening), detener cualquier audio en curso
-- **Fallback**: Si la llamada a `google-tts` falla, usar `speechSynthesis` del navegador como respaldo y mostrar toast informativo
+```typescript
+.replace(/\*+/g, '')
+```
 
-### 4. Cola de audio
+### 3. Interfaz de llamada premium
 
-Implementar una cola simple en `SaraVoiceCallMode`:
-- `audioQueueRef = useRef<string[]>([])` para encolar textos pendientes
-- Funcion `processQueue` que toma el siguiente texto, llama a `playGoogleTTS`, y al terminar procesa el siguiente
-- Si el usuario habla o hace mute, vaciar la cola y parar el audio actual
+Archivo: `src/components/VirtualAssistant/SaraVoiceCallMode.tsx`
 
-### 5. Limpieza
+Redisenar la interfaz con:
 
-- Eliminar `pickSpanishVoice` y toda la logica de `speechSynthesis` como TTS principal (mantener solo como fallback)
-- La edge function `elevenlabs-tts` queda sin uso y se puede eliminar opcionalmente
+- **Fondo inmersivo**: Gradiente oscuro de pantalla completa con particulas o estrellas sutiles usando CSS, estilo cosmico coherente con la estetica del proyecto.
+- **Orbe mejorado**: Multiples capas de glow con colores mas ricos (violet/indigo/cyan), efecto "glass morphism" interno, y anillos concentricos animados que reaccionan al audio.
+- **Avatar de Sara**: Mostrar la imagen `sara-avatar.png` dentro del orbe cuando esta idle o procesando.
+- **Tipografia premium**: Nombre "Sara" en texto grande con font-weight light, estado en texto mas pequeno con tracking wide.
+- **Controles rediseados**: Botones con fondo glass/blur, iconos mas grandes, separacion visual clara. Boton de colgar rojo brillante con glow.
+- **Indicador de ondas**: Barras de audio animadas (tipo ecualizador) cuando Sara habla, en lugar del simple circulo pulsante.
+- **Transiciones suaves**: AnimatePresence para cada cambio de estado con fade/scale.
 
-## Secuencia del flujo
+### 4. Resumen de secuencia optimizada
 
 ```text
-Usuario habla --> Deepgram STT --> texto --> Sara API --> respuesta texto
-    --> google-tts edge function --> MP3 bytes --> Audio() --> reproducir
-    --> al terminar: volver a escuchar
+ANTES (lento):
+Usuario habla -> STT -> sara-chat [AI + guardar + notificar + CLASIFICAR + PUSH] -> respuesta -> TTS
+
+DESPUES (rapido):
+Usuario habla -> STT -> sara-chat [AI + guardar] -> respuesta -> TTS
+                                                 \-> [notificar + clasificar + push en background]
 ```
 
-## Detalles tecnicos
+Tiempo estimado de mejora: 2-4 segundos menos por turno de conversacion.
 
-- La firma JWT RS256 en Deno se hara importando la clave privada PEM con `crypto.subtle.importKey` y firmando con `crypto.subtle.sign`
-- El token OAuth tiene 1h de validez; se puede cachear en memoria de la edge function
-- El texto se limita a 5000 caracteres por llamada (limite de Google)
-- El audio se reproduce con la Web Audio API estandar (`HTMLAudioElement`)
+## Archivos a modificar
+
+| Archivo | Cambio |
+|---|---|
+| `supabase/functions/sara-chat/index.ts` | Modelo lite, max_tokens 300, historial 6, background tasks, prompt sin markdown |
+| `src/components/VirtualAssistant/SaraVoiceCallMode.tsx` | UI premium completa, limpieza de asteriscos en cleanReply |
 
