@@ -10,7 +10,7 @@ const TTS_URL = "https://texttospeech.googleapis.com/v1/text:synthesize";
 const STYLE_PROMPT = "Juvenil. Acento Valladolid. Castilla y León España.";
 const VOICE_NAME = "Achernar";
 
-// --- Service Account OAuth2 (fallback only) ---
+// --- Service Account OAuth2 (fallback when API key not available) ---
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
@@ -96,12 +96,36 @@ serve(async (req) => {
       audioConfig: { audioEncoding: "MP3" },
     });
 
-    // Use service account OAuth2 (API keys not supported by this API)
+    let ttsRes: Response;
+
+    // Strategy 1: API Key (fastest - zero auth overhead)
+    const apiKey = Deno.env.get("GOOGLE_TTS_API_KEY");
+    if (apiKey) {
+      ttsRes = await fetch(`${TTS_URL}?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: requestBody,
+      });
+
+      if (ttsRes.ok) {
+        const data = await ttsRes.json();
+        if (data.audioContent) {
+          const bytes = Uint8Array.from(atob(data.audioContent), (c) => c.charCodeAt(0));
+          return new Response(bytes, {
+            headers: { ...corsHeaders, "Content-Type": "audio/mpeg" },
+          });
+        }
+      }
+      // API key failed, fall through to OAuth2
+      console.warn("API key auth failed, falling back to OAuth2:", ttsRes.status);
+    }
+
+    // Strategy 2: Service Account OAuth2 (fallback)
     const saJson = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_JSON");
-    if (!saJson) throw new Error("No GOOGLE_SERVICE_ACCOUNT_JSON configured");
+    if (!saJson) throw new Error("No GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_TTS_API_KEY configured");
 
     const accessToken = await getAccessToken(saJson);
-    const ttsRes = await fetch(TTS_URL, {
+    ttsRes = await fetch(TTS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
       body: requestBody,
@@ -116,7 +140,6 @@ serve(async (req) => {
     const data = await ttsRes.json();
     if (!data.audioContent) throw new Error("No audioContent in Google TTS response");
 
-    // Fast base64 decode
     const bytes = Uint8Array.from(atob(data.audioContent), (c) => c.charCodeAt(0));
 
     return new Response(bytes, {
