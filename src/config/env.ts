@@ -1,7 +1,7 @@
 // Environment configuration for deployment
 // These values can be overridden via environment variables
 
-export const SITE_URL = import.meta.env.VITE_SITE_URL ?? window.location.origin;
+export const SITE_URL = import.meta.env.VITE_SITE_URL ?? 'https://solutionsnova.es';
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 

@@ -15,7 +15,7 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 const MAX_EMPTY_RETRIES = 3;
-const LISTEN_DURATION_MS = 5000;
+const LISTEN_DURATION_MS = 1000;
 
 /** Browser TTS fallback */
 const playBrowserTTS = (text: string): Promise<void> =>
@@ -225,7 +225,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
         setCallState('greeting');
         setStatusText('Sara');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
-        if (activeRef.current) { await new Promise(r => setTimeout(r, 400)); startListening(); }
+        if (activeRef.current) startListening();
       } catch (err) {
         console.error('Greeting error:', err);
         if (activeRef.current) { setCallState('idle'); setStatusText('Toca el micrófono para empezar'); }
