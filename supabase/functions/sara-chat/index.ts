@@ -329,14 +329,14 @@ serve(async (req) => {
         content: message.substring(0, 2000)
       });
 
-      // Load only last 6 messages for context (reduced from 20)
+      // Load only last 6 messages for minimal latency
       const { data: history } = await supabase
         .from("sara_anonymous_messages")
         .select("role, content")
         .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true })
-        .limit(10);
-      allMessages = history || [];
+        .order("created_at", { ascending: false })
+        .limit(6);
+      allMessages = (history || []).reverse();
     }
 
     console.log(`Processing chat - ID: ${effectiveAnonId}, Authenticated: ${!!userId}, Remaining: ${rateLimitResult.remaining}`);
@@ -363,7 +363,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
         messages: apiMessages,
-        max_tokens: 300,
+        max_tokens: 200,
       }),
     });
 
