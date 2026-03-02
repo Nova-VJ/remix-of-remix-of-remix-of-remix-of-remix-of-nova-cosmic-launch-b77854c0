@@ -137,17 +137,81 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     }
   }, [playGoogleTTS]);
 
+  /** Split text into sentences for parallel TTS generation */
+  const splitIntoSentences = useCallback((text: string): string[] => {
+    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+    if (!sentences || sentences.length === 0) return [text];
+    // Group very short sentences together (< 40 chars)
+    const grouped: string[] = [];
+    let buffer = '';
+    for (const s of sentences) {
+      buffer += s;
+      if (buffer.trim().length >= 40) {
+        grouped.push(buffer.trim());
+        buffer = '';
+      }
+    }
+    if (buffer.trim()) {
+      if (grouped.length > 0) grouped[grouped.length - 1] += ' ' + buffer.trim();
+      else grouped.push(buffer.trim());
+    }
+    return grouped;
+  }, []);
+
   const processQueue = useCallback(async () => {
     if (isPlayingRef.current || audioQueueRef.current.length === 0 || !activeRef.current) return;
     isPlayingRef.current = true;
     while (audioQueueRef.current.length > 0 && activeRef.current) {
-      const nextText = audioQueueRef.current.shift()!;
+      const fullText = audioQueueRef.current.shift()!;
       setCallState('speaking');
       setStatusText('Sara');
-      try { await playTTS(nextText); } catch { break; }
+
+      // Split into sentences and pre-generate audio in parallel
+      const sentences = splitIntoSentences(fullText);
+      if (sentences.length <= 1) {
+        try { await playTTS(fullText); } catch { break; }
+      } else {
+        // Start generating ALL sentences in parallel immediately
+        const audioPromises = sentences.map(s => playGoogleTTS(s).catch(() => null));
+        // But play them sequentially as they resolve
+        // We use a different approach: generate blobs in parallel, play in order
+        const blobPromises = sentences.map(async (s) => {
+          try {
+            const res = await fetch(
+              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-tts`,
+              { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY }, body: JSON.stringify({ text: s }) }
+            );
+            if (!res.ok) return null;
+            return await res.blob();
+          } catch { return null; }
+        });
+
+        // Play each blob in order as soon as it's ready
+        for (let i = 0; i < blobPromises.length; i++) {
+          if (!activeRef.current) break;
+          const blob = await blobPromises[i];
+          if (!blob) continue;
+          try {
+            const url = URL.createObjectURL(blob);
+            await new Promise<void>((resolve, reject) => {
+              const audio = new Audio(url);
+              audioRef.current = audio;
+              const animateLevel = () => {
+                if (!activeRef.current || audio.paused) { setAudioLevel(0); return; }
+                setAudioLevel(0.2 + Math.random() * 0.5);
+                animFrameRef.current = requestAnimationFrame(animateLevel);
+              };
+              audio.onplay = animateLevel;
+              audio.onended = () => { setAudioLevel(0); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
+              audio.onerror = () => { setAudioLevel(0); URL.revokeObjectURL(url); audioRef.current = null; reject(); };
+              audio.play();
+            });
+          } catch { /* continue to next sentence */ }
+        }
+      }
     }
     isPlayingRef.current = false;
-  }, [playTTS]);
+  }, [playTTS, playGoogleTTS, splitIntoSentences]);
 
   const transcribe = useCallback(async (blob: Blob): Promise<string> => {
     const formData = new FormData();
