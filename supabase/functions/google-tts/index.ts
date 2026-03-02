@@ -7,8 +7,14 @@ const corsHeaders = {
 };
 
 const TTS_URL = "https://texttospeech.googleapis.com/v1/text:synthesize";
-const STYLE_PROMPT = "Juvenil. Acento Valladolid. Castilla y León España.";
-const VOICE_NAME = "Achernar";
+
+// Gemini TTS config (requires OAuth2 - higher quality, slower auth)
+const GEMINI_STYLE_PROMPT = "Juvenil. Acento Valladolid. Castilla y León España.";
+const GEMINI_VOICE_NAME = "Achernar";
+
+// Standard TTS config (supports API key - zero auth overhead)
+const STANDARD_VOICE_NAME = "es-ES-Neural2-A"; // High-quality female Spanish voice
+
 
 // --- Service Account OAuth2 (fallback when API key not available) ---
 
@@ -90,21 +96,22 @@ serve(async (req) => {
       });
     }
 
-    const requestBody = JSON.stringify({
-      input: { text: text.substring(0, 5000), prompt: STYLE_PROMPT },
-      voice: { languageCode: "es-ES", name: VOICE_NAME, model_name: "gemini-2.5-flash-tts" },
-      audioConfig: { audioEncoding: "MP3" },
-    });
-
-    let ttsRes: Response;
-
-    // Strategy 1: API Key (fastest - zero auth overhead)
     const apiKey = Deno.env.get("GOOGLE_TTS_API_KEY");
+    const saJson = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_JSON");
+    const inputText = text.substring(0, 5000);
+
+    // Strategy 1: API Key + Neural2 voice (fastest - zero auth overhead, ~0.5-1s)
     if (apiKey) {
-      ttsRes = await fetch(`${TTS_URL}?key=${apiKey}`, {
+      const standardBody = JSON.stringify({
+        input: { text: inputText },
+        voice: { languageCode: "es-ES", name: STANDARD_VOICE_NAME },
+        audioConfig: { audioEncoding: "MP3", speakingRate: 1.05, pitch: 1.0 },
+      });
+
+      const ttsRes = await fetch(`${TTS_URL}?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: requestBody,
+        body: standardBody,
       });
 
       if (ttsRes.ok) {
@@ -116,19 +123,23 @@ serve(async (req) => {
           });
         }
       }
-      // API key failed, fall through to OAuth2
-      console.warn("API key auth failed, falling back to OAuth2:", ttsRes.status);
+      console.warn("API key auth failed:", ttsRes.status, "- falling back to OAuth2 + Gemini");
     }
 
-    // Strategy 2: Service Account OAuth2 (fallback)
-    const saJson = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_JSON");
+    // Strategy 2: Service Account OAuth2 + Gemini voice (fallback - higher quality but slower auth)
     if (!saJson) throw new Error("No GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_TTS_API_KEY configured");
 
+    const geminiBody = JSON.stringify({
+      input: { text: inputText, prompt: GEMINI_STYLE_PROMPT },
+      voice: { languageCode: "es-ES", name: GEMINI_VOICE_NAME, model_name: "gemini-2.5-flash-tts" },
+      audioConfig: { audioEncoding: "MP3" },
+    });
+
     const accessToken = await getAccessToken(saJson);
-    ttsRes = await fetch(TTS_URL, {
+    const ttsRes = await fetch(TTS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-      body: requestBody,
+      body: geminiBody,
     });
 
     if (!ttsRes.ok) {
