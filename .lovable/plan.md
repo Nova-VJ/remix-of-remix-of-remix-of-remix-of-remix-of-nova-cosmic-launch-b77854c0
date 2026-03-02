@@ -1,75 +1,77 @@
 
 
-# Optimizar velocidad, eliminar asteriscos y UI premium para la llamada de Sara
+# Plan: Optimizar Google TTS para igualar la velocidad de ElevenLabs
 
-## Problema actual
+## Diagnostico
 
-1. **Lentitud**: La edge function `sara-chat` ejecuta la clasificacion IA y las notificaciones push DE FORMA SINCRONA antes de devolver la respuesta. Esto anade 2-5 segundos innecesarios a cada mensaje.
-2. **Asteriscos**: El system prompt no prohibe markdown, asi que el modelo responde con `**negritas**` y `*cursivas*` que el TTS lee como "asterisco".
-3. **UI basica**: La interfaz de llamada es funcional pero simple, sin aspecto premium.
+El Google TTS actual tarda 3-10 segundos, pero NO es culpa del modelo `gemini-2.5-flash-tts`. El problema esta en el codigo de la edge function, que tiene varios fallos graves:
 
-## Cambios
-
-### 1. Acelerar respuesta de sara-chat (edge function)
-
-Archivo: `supabase/functions/sara-chat/index.ts`
-
-- **Mover clasificacion y notificaciones a segundo plano**: Usar `EdgeRuntime` o simplemente NO hacer await en la clasificacion. Devolver la respuesta al usuario inmediatamente despues de guardar el mensaje de Sara, y ejecutar clasificacion/notificacion/push sin bloquear.
-- **Usar modelo mas rapido**: Cambiar de `google/gemini-2.5-flash` a `google/gemini-2.5-flash-lite` para respuestas mas agiles (suficiente para un chatbot de ventas).
-- **Reducir max_tokens**: De 500 a 300, ya que respuestas mas cortas son mejores para voz.
-- **Reducir historial**: Cargar solo los ultimos 6 mensajes en vez de 10 para reducir tokens de entrada.
-
-### 2. Eliminar asteriscos y markdown del prompt
-
-Archivo: `supabase/functions/sara-chat/index.ts`
-
-Anadir al SYSTEM_PROMPT las siguientes instrucciones:
-
+### Bug 1: Doble llamada con API key
+```text
+Linea 141: synthesize(text, {})          <-- Llamada SIN api key (siempre falla)
+Linea 149: fetch(urlWithKey, ...)        <-- Llamada CON api key (la correcta)
 ```
-FORMATO DE RESPUESTA (CRITICO):
-- NUNCA uses asteriscos (*), negritas (**), cursivas, ni ningun formato markdown
-- Escribe texto plano siempre, sin formato especial
-- No uses listas con guiones ni numeradas a menos que sea estrictamente necesario
-- Tus respuestas se leen en voz alta, asi que escribe de forma natural y conversacional
-```
+Se hacen DOS llamadas HTTP a Google, la primera siempre falla. Eso ya son 1-2 segundos perdidos.
 
-Ademas, en el frontend (`SaraVoiceCallMode.tsx`), anadir un regex para limpiar cualquier asterisco residual antes de enviarlo al TTS:
+### Bug 2: Fallback a OAuth2 innecesario
+Si la API key falla (porque el primer intento sin key contamina `ttsRes`), se lanza el flujo OAuth2 completo: generar JWT, firmar con RSA, intercambiar por access token, y luego hacer otra llamada. Eso anade 2-4 segundos.
 
-```typescript
-.replace(/\*+/g, '')
-```
+### Bug 3: Base64 decode en el servidor
+Google TTS devuelve audio en base64 dentro de JSON. La edge function lo decodifica byte a byte en un bucle, lo cual es lento para audios largos.
 
-### 3. Interfaz de llamada premium
+### Resultado: 3 llamadas HTTP + decode lento = 3-10 segundos
 
-Archivo: `src/components/VirtualAssistant/SaraVoiceCallMode.tsx`
+## Solucion: Corregir la edge function
 
-Redisenar la interfaz con:
+Con los bugs arreglados, Google TTS deberia responder en **500ms-1.5s**, comparable a ElevenLabs (~300-800ms).
 
-- **Fondo inmersivo**: Gradiente oscuro de pantalla completa con particulas o estrellas sutiles usando CSS, estilo cosmico coherente con la estetica del proyecto.
-- **Orbe mejorado**: Multiples capas de glow con colores mas ricos (violet/indigo/cyan), efecto "glass morphism" interno, y anillos concentricos animados que reaccionan al audio.
-- **Avatar de Sara**: Mostrar la imagen `sara-avatar.png` dentro del orbe cuando esta idle o procesando.
-- **Tipografia premium**: Nombre "Sara" en texto grande con font-weight light, estado en texto mas pequeno con tracking wide.
-- **Controles rediseados**: Botones con fondo glass/blur, iconos mas grandes, separacion visual clara. Boton de colgar rojo brillante con glow.
-- **Indicador de ondas**: Barras de audio animadas (tipo ecualizador) cuando Sara habla, en lugar del simple circulo pulsante.
-- **Transiciones suaves**: AnimatePresence para cada cambio de estado con fade/scale.
+### Cambios en `supabase/functions/google-tts/index.ts`
 
-### 4. Resumen de secuencia optimizada
+1. **Eliminar la llamada duplicada**: Una sola llamada con API key directamente en la URL
+2. **Simplificar el flujo de auth**: Probar API key primero. Si no hay key, usar service account. Sin llamadas duplicadas
+3. **Decodificacion rapida de base64**: Usar `atob` con `Uint8Array.from()` en una sola linea en vez del bucle manual
+4. **Eliminar la funcion `synthesize` separada**: Inline el fetch para evitar confusion y la llamada fantasma
+
+### Codigo simplificado (estructura)
 
 ```text
-ANTES (lento):
-Usuario habla -> STT -> sara-chat [AI + guardar + notificar + CLASIFICAR + PUSH] -> respuesta -> TTS
-
-DESPUES (rapido):
-Usuario habla -> STT -> sara-chat [AI + guardar] -> respuesta -> TTS
-                                                 \-> [notificar + clasificar + push en background]
+1. Recibir texto
+2. Si hay GOOGLE_TTS_API_KEY:
+   - fetch(TTS_URL + "?key=" + apiKey, body)
+3. Si no hay key o fallo:
+   - getAccessToken() (con cache)
+   - fetch(TTS_URL, body, Authorization: Bearer token)
+4. Decodificar base64 -> bytes (una linea)
+5. Devolver audio/mpeg
 ```
 
-Tiempo estimado de mejora: 2-4 segundos menos por turno de conversacion.
+### Cambios en `SaraVoiceCallMode.tsx`
+
+Ninguno necesario. El frontend ya llama a `google-tts` y reproduce el blob correctamente.
+
+## Resultado esperado
+
+```text
+ANTES (con bugs):
+fetch sin key (1-2s) + fetch con key (falla) + OAuth2 JWT (1-2s) + fetch con token (1-2s) + decode lento = 3-10s
+
+DESPUES (corregido):  
+fetch con key (0.5-1.5s) + decode rapido = 0.5-1.5s
+```
+
+## Comparativa final
+
+| Proveedor | Tiempo estimado |
+|---|---|
+| Google TTS (actual, con bugs) | 3-10s |
+| Google TTS (corregido) | 0.5-1.5s |
+| ElevenLabs TTS | 0.3-0.8s |
+
+La diferencia entre Google corregido y ElevenLabs seria minima (menos de 1 segundo). No merece la pena cambiar de proveedor si se corrige el codigo.
 
 ## Archivos a modificar
 
 | Archivo | Cambio |
 |---|---|
-| `supabase/functions/sara-chat/index.ts` | Modelo lite, max_tokens 300, historial 6, background tasks, prompt sin markdown |
-| `src/components/VirtualAssistant/SaraVoiceCallMode.tsx` | UI premium completa, limpieza de asteriscos en cleanReply |
+| `supabase/functions/google-tts/index.ts` | Eliminar llamada duplicada, simplificar auth flow, decode rapido |
 
