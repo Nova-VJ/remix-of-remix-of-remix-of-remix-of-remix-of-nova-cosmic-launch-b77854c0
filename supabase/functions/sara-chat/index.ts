@@ -18,14 +18,14 @@ SOBRE NOVA MARKETING SOLUTIONS:
 CATÁLOGO DE SERVICIOS Y PRECIOS:
 | ID | Servicio | Precio | Tipo |
 |---|---|---|---|
-| web | Página Web Profesional | 600€ | service |
-| apps | Aplicación Móvil | 1700€ | service |
-| social | Redes Sociales (mensual) | 500€/mes | service |
-| branding | Branding Profesional | 200€ | service |
-| marketing | Marketing Digital | 200€ | service |
-| sem | SEM - Google Ads (mensual) | 150€/mes | service |
-| pkg-pro | Paquete Pro (Web + Social + Marketing gratis) | 800€ | package |
-| pkg-plus | Paquete Plus (Web + Social + Branding + Apps + Marketing + SEM gratis) | 1900€ | package |
+| web | Página Web Profesional | 150€ | service |
+| apps | Aplicación Móvil | 425€ | service |
+| social | Redes Sociales (mensual) | 125€/mes | service |
+| branding | Branding Profesional | 50€ | service |
+| marketing | Marketing Digital | 50€ | service |
+| sem | SEM - Google Ads (mensual) | 38€/mes | service |
+| pkg-pro | Paquete Pro (Web + Social + Marketing gratis) | 200€ | package |
+| pkg-plus | Paquete Plus (Web + Social + Branding + Apps + Marketing + SEM gratis) | 475€ | package |
 
 INSTRUCCIONES:
 1. Responde SOLO con información de Nova Marketing Solutions

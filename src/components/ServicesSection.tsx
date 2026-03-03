@@ -18,8 +18,8 @@ const services = [
     title: "Páginas web que convierten",
     description: "Diseño + velocidad + Posicionamiento en Google",
     includes: ["SEO (Visitas)", "Embudos de venta", "Medición y optimización"],
-    price: 600,
-    priceLabel: "desde 600€",
+    price: 150,
+    priceLabel: "desde 150€",
     hasVirtualAssistant: true,
   },
   {
@@ -29,8 +29,8 @@ const services = [
     title: "Aplicaciones móviles",
     description: "Tu app a medida, lista para publicar.",
     includes: ["Guía en estructura, análisis y mejora", "App Store & Play Store", "Experiencia de usuario optimizada"],
-    price: 1700,
-    priceLabel: "desde 1.700€",
+    price: 425,
+    priceLabel: "desde 425€",
     hasVirtualAssistant: true,
   },
   {
@@ -40,8 +40,8 @@ const services = [
     title: "Contenido para redes sociales",
     description: "Estrategia basada en algoritmo",
     includes: ["Crecimiento real y orgánico, copywriting", "Formato actual y adaptado al nicho"],
-    price: 500,
-    priceLabel: "500€/mes",
+    price: 125,
+    priceLabel: "125€/mes",
     isMonthly: true,
   },
   {
@@ -51,8 +51,8 @@ const services = [
     title: "Branding profesional",
     description: "Creación de identidad visual premium y manual de marca",
     includes: ["Logotipo (variantes)", "Papelería corporativa", "Elementos gráficos"],
-    price: 200,
-    priceLabel: "desde 200€",
+    price: 50,
+    priceLabel: "desde 50€",
   },
   {
     id: 'content',
@@ -81,8 +81,8 @@ const virtualAssistants = [
       "Deriva a humano cuando haga falta"
     ],
     useCase: "Uso típico: peluquerías, clínicas, restaurantes, servicios locales, academias.",
-    price: 100,
-    priceLabel: "100€",
+    price: 25,
+    priceLabel: "25€",
   },
   {
     id: 'assistant-plus',
@@ -96,8 +96,8 @@ const virtualAssistants = [
       "Puede calificar leads y guiar a \"Solicitar presupuesto\" o \"Comprar\""
     ],
     useCase: "Uso típico: empresas con muchos servicios, ventas consultivas, soporte y captación constante.",
-    price: 200,
-    priceLabel: "200€",
+    price: 50,
+    priceLabel: "50€",
   }
 ];
 
@@ -108,8 +108,8 @@ const additionalServices = [
     title: "Marketing Digital",
     subtitle: "Desarrollo de Estrategia",
     description: "Planificación estratégica para maximizar tu presencia digital.",
-    price: 200,
-    priceLabel: "200€",
+    price: 50,
+    priceLabel: "50€",
     badge: "Gratis con 2+ servicios",
   },
   {
@@ -118,8 +118,8 @@ const additionalServices = [
     title: "SEM",
     subtitle: "Creación y seguimiento de campañas en Google/Social Ads",
     description: "Creación y seguimiento de campañas en Google/Social Ads",
-    price: 150,
-    priceLabel: "150€/mes",
+    price: 38,
+    priceLabel: "38€/mes",
     isMonthly: true,
     badge: "Primer mes gratis con 4 servicios",
   }
