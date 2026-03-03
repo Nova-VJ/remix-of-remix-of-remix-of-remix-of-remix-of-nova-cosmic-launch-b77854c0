@@ -15,7 +15,7 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 const MAX_EMPTY_RETRIES = 3;
-const LISTEN_DURATION_MS = 1000;
+const LISTEN_DURATION_MS = 5000;
 
 /** Browser TTS fallback */
 const playBrowserTTS = (text: string): Promise<void> =>
