@@ -29,6 +29,15 @@ serve(async (req) => {
     }
 
     const audioBuffer = await audioFile.arrayBuffer();
+    console.log(`STT: audio size=${audioBuffer.byteLength} bytes, type=${audioFile.type}, name=${audioFile.name}`);
+
+    if (audioBuffer.byteLength < 1000) {
+      console.warn("STT: Audio too small, likely silence or empty recording");
+      return new Response(
+        JSON.stringify({ text: "", warning: "audio_too_small" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const response = await fetch(
       "https://api.deepgram.com/v1/listen?model=nova-2&language=es&smart_format=true",
@@ -49,8 +58,11 @@ serve(async (req) => {
     }
 
     const result = await response.json();
+    console.log("Deepgram response:", JSON.stringify(result?.results?.channels?.[0]?.alternatives?.[0]));
     const transcript =
       result?.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+    const confidence = result?.results?.channels?.[0]?.alternatives?.[0]?.confidence || 0;
+    console.log(`STT result: "${transcript}" (confidence: ${confidence})`);
 
     return new Response(
       JSON.stringify({ text: transcript }),
