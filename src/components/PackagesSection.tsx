@@ -8,8 +8,8 @@ const packages = [
   {
     id: 'pkg-pro',
     name: "Paquete Pro",
-    price: 200,
-    priceLabel: "200€",
+    price: 800,
+    priceLabel: "800€",
     icon: Crown,
     description: "Ideal para emprendedores que quieren presencia web y redes.",
     includes: [
@@ -23,8 +23,8 @@ const packages = [
   {
     id: 'pkg-plus',
     name: "Paquete Plus",
-    price: 475,
-    priceLabel: "475€",
+    price: 1900,
+    priceLabel: "1.900€",
     icon: Gem,
     description: "El pack completo para transformar tu negocio digitalmente.",
     includes: [

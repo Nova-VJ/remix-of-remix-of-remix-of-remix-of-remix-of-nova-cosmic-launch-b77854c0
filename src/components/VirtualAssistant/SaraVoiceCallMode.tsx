@@ -15,7 +15,7 @@ type CallState = 'connecting' | 'greeting' | 'listening' | 'processing' | 'speak
 
 const SARA_SESSION_KEY = 'nova_chat_session_id';
 const MAX_EMPTY_RETRIES = 3;
-const LISTEN_DURATION_MS = 5000;
+const LISTEN_DURATION_MS = 1000;
 
 /** Browser TTS fallback */
 const playBrowserTTS = (text: string): Promise<void> =>
@@ -78,7 +78,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const animFrameRef = useRef<number | null>(null);
   const emptyRetriesRef = useRef(0);
 
-  const { isRecording, startRecording, stopRecording, initMicrophone, releaseMicrophone } = useVoiceRecorder();
+  const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
   const { session } = useAuth();
   const { toast } = useToast();
 
@@ -286,8 +286,6 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   useEffect(() => {
     const init = async () => {
       try {
-        // Pre-acquire microphone so it's ready when greeting ends
-        await initMicrophone();
         setCallState('greeting');
         setStatusText('Sara');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
@@ -300,7 +298,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     init();
   }, []);
 
-  const handleEndCall = () => { activeRef.current = false; stopCurrentAudio(); stopRecording(); releaseMicrophone(); onEnd(); };
+  const handleEndCall = () => { activeRef.current = false; stopCurrentAudio(); stopRecording(); onEnd(); };
 
   const handleMicToggle = async () => {
     if (isRecording) {

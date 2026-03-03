@@ -27,17 +27,17 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 const SERVICES = {
-  web: { id: 'web', name: 'Páginas web que convierten', price: 150, type: 'service' as const },
-  apps: { id: 'apps', name: 'Aplicaciones móviles', price: 425, type: 'service' as const },
-  social: { id: 'social', name: 'Contenido para redes sociales', price: 125, type: 'service' as const, isMonthly: true },
-  branding: { id: 'branding', name: 'Branding profesional', price: 50, type: 'service' as const },
-  marketing: { id: 'marketing', name: 'Marketing Digital - Estrategia', price: 50, type: 'service' as const },
-  sem: { id: 'sem', name: 'SEM - Posicionamiento Google', price: 38, type: 'service' as const, isMonthly: true },
+  web: { id: 'web', name: 'Páginas web que convierten', price: 600, type: 'service' as const },
+  apps: { id: 'apps', name: 'Aplicaciones móviles', price: 1700, type: 'service' as const },
+  social: { id: 'social', name: 'Contenido para redes sociales', price: 500, type: 'service' as const, isMonthly: true },
+  branding: { id: 'branding', name: 'Branding profesional', price: 200, type: 'service' as const },
+  marketing: { id: 'marketing', name: 'Marketing Digital - Estrategia', price: 200, type: 'service' as const },
+  sem: { id: 'sem', name: 'SEM - Posicionamiento Google', price: 150, type: 'service' as const, isMonthly: true },
 };
 
 const PACKAGES = {
-  pro: { id: 'pkg-pro', name: 'Paquete Pro', price: 200, type: 'package' as const, includes: ['web', 'social'], freeItems: ['marketing'] },
-  plus: { id: 'pkg-plus', name: 'Paquete Plus', price: 475, type: 'package' as const, includes: ['web', 'social', 'branding', 'apps'], freeItems: ['marketing', 'sem'], noPromo: true },
+  pro: { id: 'pkg-pro', name: 'Paquete Pro', price: 800, type: 'package' as const, includes: ['web', 'social'], freeItems: ['marketing'] },
+  plus: { id: 'pkg-plus', name: 'Paquete Plus', price: 1900, type: 'package' as const, includes: ['web', 'social', 'branding', 'apps'], freeItems: ['marketing', 'sem'], noPromo: true },
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {

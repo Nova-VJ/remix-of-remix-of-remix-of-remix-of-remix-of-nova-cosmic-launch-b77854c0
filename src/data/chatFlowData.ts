@@ -355,7 +355,7 @@ export const SERVICES_DATA = {
           'Entrega rápida'
         ],
         timeline: '1–2 semanas',
-        price: 'Desde 175 €'
+        price: 'Desde 700 €'
       },
       {
         id: 'web-pro',
@@ -370,7 +370,7 @@ export const SERVICES_DATA = {
           'Medición y analítica'
         ],
         timeline: '3–4 semanas',
-        price: 'Desde 300 €'
+        price: 'Desde 1.200 €'
       },
       {
         id: 'web-premium',
@@ -386,7 +386,7 @@ export const SERVICES_DATA = {
           '100 primeros productos añadidos gratuitos'
         ],
         timeline: '4–8 semanas',
-        price: 'Desde 425 €'
+        price: 'Desde 1.700 €'
       }
     ]
   },
@@ -405,7 +405,7 @@ export const SERVICES_DATA = {
           'Preparada para escalar'
         ],
         timeline: '4–6 semanas',
-        price: 'Desde 425 €'
+        price: 'Desde 1.700 €'
       },
       {
         id: 'app-pro',
@@ -419,7 +419,7 @@ export const SERVICES_DATA = {
           'Panel de administración'
         ],
         timeline: '8–12 semanas',
-        price: 'Desde 750 €'
+        price: 'Desde 3.000 €'
       },
       {
         id: 'app-premium',
@@ -433,7 +433,7 @@ export const SERVICES_DATA = {
           'Soporte post-lanzamiento'
         ],
         timeline: '12–20 semanas',
-        price: 'Desde 1.250 €'
+        price: 'Desde 5.000 €'
       }
     ]
   },
@@ -451,7 +451,7 @@ export const SERVICES_DATA = {
           'Respuestas personalizadas',
           'Informe mensual'
         ],
-        price: 'Desde 63 €/mes'
+        price: 'Desde 250 €/mes'
       },
       {
         id: 'social-plus',
@@ -466,8 +466,8 @@ export const SERVICES_DATA = {
           'Meta Ads / TikTok Ads',
           'Optimización continua'
         ],
-        price: 'Desde 225 €/mes',
-        note: 'Primer mes en solo 125 €. Plan de Branding se vende por separado.'
+        price: 'Desde 900 €/mes',
+        note: 'Primer mes en solo 500 €. Plan de Branding se vende por separado.'
       }
     ]
   },
@@ -484,7 +484,7 @@ export const SERVICES_DATA = {
           'Paleta de colores',
           'Tipografías'
         ],
-        price: 'Desde 25 €'
+        price: 'Desde 100 €'
       },
       {
         id: 'branding-pro',
@@ -497,7 +497,7 @@ export const SERVICES_DATA = {
           'Recursos y plantillas',
           'Papelería corporativa si requiere'
         ],
-        price: 'Desde 48 €'
+        price: 'Desde 190 €'
       }
     ]
   },
@@ -516,7 +516,7 @@ export const SERVICES_DATA = {
           'Informe ejecutivo + técnico'
         ],
         timeline: '3–5 días',
-        price: 'Desde 225 €'
+        price: 'Desde 900 €'
       },
       {
         id: 'ciber-pro',
@@ -531,7 +531,7 @@ export const SERVICES_DATA = {
           'Reunión de entrega de resultados'
         ],
         timeline: '1–2 semanas',
-        price: 'Desde 625 €'
+        price: 'Desde 2.500 €'
       },
       {
         id: 'ciber-premium',
@@ -546,7 +546,7 @@ export const SERVICES_DATA = {
           'Informe final actualizado'
         ],
         timeline: '2–4 semanas',
-        price: 'Desde 1.250 €'
+        price: 'Desde 5.000 €'
       },
       {
         id: 'ciber-monthly',
@@ -558,7 +558,7 @@ export const SERVICES_DATA = {
           'Recomendaciones continuas',
           'Mini-auditorías y control de cambios'
         ],
-        price: 'Desde 200 €/mes'
+        price: 'Desde 300 €/mes'
       }
     ]
   }
