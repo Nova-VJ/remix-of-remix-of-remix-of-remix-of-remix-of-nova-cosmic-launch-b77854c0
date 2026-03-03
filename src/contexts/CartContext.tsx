@@ -143,12 +143,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+const fallbackCart: CartContextType = {
+  items: [],
+  addItem: () => {},
+  removeItem: () => {},
+  clearCart: () => {},
+  promoCode: '',
+  setPromoCode: () => {},
+  isPromoApplied: false,
+  applyPromo: () => false,
+  getTotal: () => 0,
+  getDiscount: () => 0,
+  itemCount: 0,
+  freeItems: [],
+};
+
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+  return context ?? fallbackCart;
 };
 
 export { SERVICES, PACKAGES };
