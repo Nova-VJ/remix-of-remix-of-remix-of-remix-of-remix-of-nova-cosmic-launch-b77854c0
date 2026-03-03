@@ -78,7 +78,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   const animFrameRef = useRef<number | null>(null);
   const emptyRetriesRef = useRef(0);
 
-  const { isRecording, startRecording, stopRecording } = useVoiceRecorder();
+  const { isRecording, startRecording, stopRecording, initMicrophone, releaseMicrophone } = useVoiceRecorder();
   const { session } = useAuth();
   const { toast } = useToast();
 
@@ -286,6 +286,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
   useEffect(() => {
     const init = async () => {
       try {
+        // Pre-acquire microphone so it's ready when greeting ends
+        await initMicrophone();
         setCallState('greeting');
         setStatusText('Sara');
         await playTTS('¡Hola! Soy Sara, tu asistente de Nova. ¿En qué puedo ayudarte?');
@@ -298,7 +300,7 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
     init();
   }, []);
 
-  const handleEndCall = () => { activeRef.current = false; stopCurrentAudio(); stopRecording(); onEnd(); };
+  const handleEndCall = () => { activeRef.current = false; stopCurrentAudio(); stopRecording(); releaseMicrophone(); onEnd(); };
 
   const handleMicToggle = async () => {
     if (isRecording) {
