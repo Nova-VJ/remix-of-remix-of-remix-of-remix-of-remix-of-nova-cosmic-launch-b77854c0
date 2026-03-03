@@ -239,7 +239,7 @@ const VirtualAssistant = () => {
 
   const mainOptions: ChatOption[] = [
     { id: 'ai-chat', label: 'Chat con Sara (IA)', icon: <Bot className="w-4 h-4" /> },
-    { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
+    // { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
     { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'services', label: 'Ver servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
