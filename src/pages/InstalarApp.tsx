@@ -1,3 +1,4 @@
+import SEOHead from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { Smartphone, Monitor, Apple, Download, Bell, CheckCircle, ArrowRight, Chrome, Share, Plus, X, MessageCircleHeart, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
