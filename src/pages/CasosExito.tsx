@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
 import dominosImage from '@/assets/dominos-presentation.jpg';
 import hawkersLogo from '@/assets/hawkers-logo.jpg';
 import ThemeToggle from '@/components/ThemeToggle';
+import SEOHead from '@/components/SEOHead';
 
 const CasosExito = () => {
   const casos = [
