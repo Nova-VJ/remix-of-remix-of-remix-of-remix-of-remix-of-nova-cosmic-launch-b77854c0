@@ -1,9 +1,16 @@
+import SEOHead from '@/components/SEOHead';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const LegalNotice = () => {
   return (
+    <>
+    <SEOHead
+      title="Aviso Legal | NOVA Marketing Solutions"
+      description="Aviso legal y condiciones de uso del sitio web solutionsnova.es. Información legal conforme a la LSSI-CE."
+      path="/aviso-legal"
+    />
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <Link to="/">

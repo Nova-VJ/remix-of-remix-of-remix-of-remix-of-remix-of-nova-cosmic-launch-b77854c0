@@ -546,6 +546,7 @@ const InstalarApp = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 
