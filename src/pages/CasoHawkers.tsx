@@ -1,3 +1,4 @@
+import SEOHead from "@/components/SEOHead";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   motion,
@@ -673,6 +674,12 @@ export default function CasoHawkers() {
   const lineHeight = "leading-relaxed";
 
   return (
+    <>
+    <SEOHead
+      title="Caso Hawkers: De Idea Simple a Marca Global | NOVA Marketing"
+      description="Descubre cómo Hawkers revolucionó el marketing digital y construyó una marca global de gafas de sol. Lecciones prácticas para emprendedores."
+      path="/casos-exito/hawkers"
+    />
     <div className="min-h-screen bg-background text-foreground">
       <ReadingProgress />
       {showSticky && <StickyCTA />}
@@ -1096,5 +1103,6 @@ export default function CasoHawkers() {
         Secciones
       </button>
     </div>
+    </>
   );
 }
