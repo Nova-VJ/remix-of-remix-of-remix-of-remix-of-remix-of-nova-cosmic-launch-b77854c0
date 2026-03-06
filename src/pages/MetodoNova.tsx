@@ -116,7 +116,6 @@ export default function MetodoNova() {
   ];
 
   return (
-  return (
     <>
     <SEOHead
       title="Método NOVA | Estrategia Digital Personalizada para tu Negocio"

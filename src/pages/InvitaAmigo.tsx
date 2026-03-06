@@ -1,3 +1,4 @@
+import SEOHead from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, Mail, Link2, Copy, Check, Share2, Gift, Users, ArrowLeft, Lock } from 'lucide-react';
@@ -148,6 +149,12 @@ Contacto: +34659343822
   };
 
   return (
+    <>
+    <SEOHead
+      title="Invita a un Amigo y Gana Descuentos | NOVA Marketing Solutions"
+      description="Comparte NOVA con tus amigos y ambos ganáis un 10% de descuento en cualquier servicio. Programa de referidos exclusivo."
+      path="/invita-a-un-amigo"
+    />
     <div className="min-h-screen bg-background">
       <Navbar />
       
@@ -351,6 +358,7 @@ Contacto: +34659343822
 
       <Footer />
     </div>
+    </>
   );
 };
 
