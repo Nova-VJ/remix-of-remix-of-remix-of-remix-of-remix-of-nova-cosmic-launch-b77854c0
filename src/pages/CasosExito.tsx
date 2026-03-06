@@ -30,6 +30,12 @@ const CasosExito = () => {
   ];
 
   return (
+    <>
+      <SEOHead
+        title="Casos de Éxito | NOVA Marketing Solutions"
+        description="Descubre cómo ayudamos a marcas a crecer con estrategias de marketing digital. Casos reales de Hawkers, Domino's y más."
+        path="/casos-exito"
+      />
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
