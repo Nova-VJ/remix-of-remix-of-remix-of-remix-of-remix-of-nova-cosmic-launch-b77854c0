@@ -657,5 +657,6 @@ export default function CasoDominos() {
         Secciones
       </button>
     </div>
+    </>
   );
 }
