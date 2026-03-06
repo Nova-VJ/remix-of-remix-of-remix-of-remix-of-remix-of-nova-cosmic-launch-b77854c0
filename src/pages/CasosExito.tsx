@@ -147,6 +147,7 @@ const CasosExito = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 
