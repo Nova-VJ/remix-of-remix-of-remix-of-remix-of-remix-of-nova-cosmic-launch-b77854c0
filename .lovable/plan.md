@@ -1,82 +1,77 @@
 
 
-# Plan: SEO Completo para posicionar solutionsnova.es en Google
+# Plan: Optimizar Google TTS para igualar la velocidad de ElevenLabs
 
-## Problema actual
+## Diagnostico
 
-1. **No existe `sitemap.xml`** - Google Search Console muestra "1 error" porque se envio la URL raiz como sitemap
-2. **`robots.txt` incompleto** - No tiene directiva `Sitemap` ni bloquea rutas privadas
-3. **Meta tags solo en `index.html`** - Al ser SPA, todas las paginas comparten el mismo title/description. Google ve contenido duplicado
-4. **Falta `og:url` y `canonical`** - Google no sabe cual es la URL canonica
-5. **Open Graph images usan ruta relativa** - Debe ser URL absoluta para que funcionen en redes sociales
-6. **No hay datos estructurados (Schema.org)** - Google no puede mostrar rich snippets
+El Google TTS actual tarda 3-10 segundos, pero NO es culpa del modelo `gemini-2.5-flash-tts`. El problema esta en el codigo de la edge function, que tiene varios fallos graves:
 
-## Cambios a implementar
+### Bug 1: Doble llamada con API key
+```text
+Linea 141: synthesize(text, {})          <-- Llamada SIN api key (siempre falla)
+Linea 149: fetch(urlWithKey, ...)        <-- Llamada CON api key (la correcta)
+```
+Se hacen DOS llamadas HTTP a Google, la primera siempre falla. Eso ya son 1-2 segundos perdidos.
 
-### 1. Crear `public/sitemap.xml`
-Archivo XML estatico con las 10 rutas publicas, usando `https://solutionsnova.es` como dominio base, con `lastmod`, `changefreq` y `priority` apropiados.
+### Bug 2: Fallback a OAuth2 innecesario
+Si la API key falla (porque el primer intento sin key contamina `ttsRes`), se lanza el flujo OAuth2 completo: generar JWT, firmar con RSA, intercambiar por access token, y luego hacer otra llamada. Eso anade 2-4 segundos.
 
-### 2. Actualizar `public/robots.txt`
-- Agregar `Sitemap: https://solutionsnova.es/sitemap.xml`
-- Agregar `Disallow` para `/auth`, `/dashboard`, `/profile`, `/admin`, `/forgot-password`, `/reset-password`
+### Bug 3: Base64 decode en el servidor
+Google TTS devuelve audio en base64 dentro de JSON. La edge function lo decodifica byte a byte en un bucle, lo cual es lento para audios largos.
 
-### 3. Crear componente `SEOHead` reutilizable
-Un componente React que use `document.title` y meta tags dinamicos via `useEffect` para que cada pagina tenga:
-- **Title unico** optimizado con keywords
-- **Meta description** unica por pagina
-- **Canonical URL** (`<link rel="canonical">`)
-- **Open Graph** completo con URLs absolutas
-- **Twitter Card** meta tags
+### Resultado: 3 llamadas HTTP + decode lento = 3-10 segundos
 
-### 4. Agregar `SEOHead` a cada pagina publica
+## Solucion: Corregir la edge function
 
-| Pagina | Title | Keywords objetivo |
-|---|---|---|
-| `/` | NOVA Marketing Solutions · Agencia Digital en Valladolid | agencia marketing digital valladolid |
-| `/casos-exito` | Casos de Exito · NOVA Marketing Solutions | casos exito marketing digital |
-| `/casos-exito/hawkers` | Caso Hawkers · NOVA Marketing Solutions | hawkers marketing digital caso estudio |
-| `/casos-exito/dominos` | Caso Domino's Pizza · NOVA Marketing Solutions | dominos pizza marketing digital |
-| `/metodo-nova` | Metodo NOVA · Estrategia Digital Personalizada | metodo marketing digital estrategia |
-| `/invita-a-un-amigo` | Programa de Referidos · NOVA Marketing | referidos descuento marketing |
-| `/instalar-app` | Instalar App · NOVA Marketing Solutions | app nova marketing |
+Con los bugs arreglados, Google TTS deberia responder en **500ms-1.5s**, comparable a ElevenLabs (~300-800ms).
 
-### 5. Agregar datos estructurados JSON-LD en `index.html`
-Schema.org `LocalBusiness` + `Organization` para que Google muestre:
-- Nombre, direccion, telefono
-- Tipo de negocio (agencia de marketing)
-- Logo, redes sociales
-- Zona de servicio (Valladolid, Espana)
+### Cambios en `supabase/functions/google-tts/index.ts`
 
-### 6. Corregir Open Graph images
-Cambiar rutas relativas (`/nova-icon-512.png`) a absolutas (`https://solutionsnova.es/nova-icon-512.png`) en `index.html`.
+1. **Eliminar la llamada duplicada**: Una sola llamada con API key directamente en la URL
+2. **Simplificar el flujo de auth**: Probar API key primero. Si no hay key, usar service account. Sin llamadas duplicadas
+3. **Decodificacion rapida de base64**: Usar `atob` con `Uint8Array.from()` en una sola linea en vez del bucle manual
+4. **Eliminar la funcion `synthesize` separada**: Inline el fetch para evitar confusion y la llamada fantasma
 
-### 7. Agregar `<link rel="canonical">` en `index.html`
-Para la pagina principal: `https://solutionsnova.es/`
+### Codigo simplificado (estructura)
 
-## Archivos a crear/modificar
+```text
+1. Recibir texto
+2. Si hay GOOGLE_TTS_API_KEY:
+   - fetch(TTS_URL + "?key=" + apiKey, body)
+3. Si no hay key o fallo:
+   - getAccessToken() (con cache)
+   - fetch(TTS_URL, body, Authorization: Bearer token)
+4. Decodificar base64 -> bytes (una linea)
+5. Devolver audio/mpeg
+```
 
-| Archivo | Accion |
+### Cambios en `SaraVoiceCallMode.tsx`
+
+Ninguno necesario. El frontend ya llama a `google-tts` y reproduce el blob correctamente.
+
+## Resultado esperado
+
+```text
+ANTES (con bugs):
+fetch sin key (1-2s) + fetch con key (falla) + OAuth2 JWT (1-2s) + fetch con token (1-2s) + decode lento = 3-10s
+
+DESPUES (corregido):  
+fetch con key (0.5-1.5s) + decode rapido = 0.5-1.5s
+```
+
+## Comparativa final
+
+| Proveedor | Tiempo estimado |
 |---|---|
-| `public/sitemap.xml` | Crear |
-| `public/robots.txt` | Actualizar |
-| `src/components/SEOHead.tsx` | Crear (componente reutilizable) |
-| `src/pages/Index.tsx` | Agregar SEOHead |
-| `src/pages/CasosExito.tsx` | Agregar SEOHead |
-| `src/pages/CasoHawkers.tsx` | Agregar SEOHead |
-| `src/pages/CasoDominos.tsx` | Agregar SEOHead |
-| `src/pages/MetodoNova.tsx` | Agregar SEOHead |
-| `src/pages/InvitaAmigo.tsx` | Agregar SEOHead |
-| `src/pages/InstalarApp.tsx` | Agregar SEOHead |
-| `src/pages/PrivacyPolicy.tsx` | Agregar SEOHead |
-| `src/pages/CookiePolicy.tsx` | Agregar SEOHead |
-| `src/pages/LegalNotice.tsx` | Agregar SEOHead |
-| `index.html` | JSON-LD, canonical, OG absolutas |
+| Google TTS (actual, con bugs) | 3-10s |
+| Google TTS (corregido) | 0.5-1.5s |
+| ElevenLabs TTS | 0.3-0.8s |
 
-## Impacto esperado
+La diferencia entre Google corregido y ElevenLabs seria minima (menos de 1 segundo). No merece la pena cambiar de proveedor si se corrige el codigo.
 
-- Google indexara correctamente todas las paginas publicas
-- Cada pagina tendra title y description unicos (elimina contenido duplicado)
-- Rich snippets en resultados de busqueda (nombre, telefono, tipo de negocio)
-- Mejor CTR en redes sociales con Open Graph correcto
-- Bloqueo de paginas privadas para no desperdiciar crawl budget
+## Archivos a modificar
+
+| Archivo | Cambio |
+|---|---|
+| `supabase/functions/google-tts/index.ts` | Eliminar llamada duplicada, simplificar auth flow, decode rapido |
 

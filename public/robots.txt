@@ -12,3 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://solutionsnova.es/sitemap.xml

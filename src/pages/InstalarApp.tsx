@@ -1,3 +1,4 @@
+import SEOHead from '@/components/SEOHead';
 import { useState, useEffect } from 'react';
 import { Smartphone, Monitor, Apple, Download, Bell, CheckCircle, ArrowRight, Chrome, Share, Plus, X, MessageCircleHeart, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -377,6 +378,12 @@ const InstalarApp = () => {
   ];
 
   return (
+    <>
+    <SEOHead
+      title="Instalar App NOVA | Acceso Rápido desde tu Móvil"
+      description="Instala la app de NOVA Marketing Solutions en tu dispositivo. Accede a tu panel de cliente, proyectos y soporte desde cualquier lugar."
+      path="/instalar-app"
+    />
     <div className="min-h-screen bg-background">
       <Navbar />
 
@@ -539,6 +546,7 @@ const InstalarApp = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 
