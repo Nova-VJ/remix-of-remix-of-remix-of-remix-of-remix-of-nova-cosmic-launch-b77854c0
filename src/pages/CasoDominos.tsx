@@ -382,6 +382,12 @@ export default function CasoDominos() {
   const lineHeight = "leading-relaxed";
 
   return (
+    <>
+    <SEOHead
+      title="Caso Domino's Pizza: Estrategia Digital Ganadora | NOVA Marketing"
+      description="Cómo Domino's Pizza transformó su negocio con marketing digital. Estrategias clave y lecciones aplicables a cualquier empresa."
+      path="/casos-exito/dominos"
+    />
     <div className="min-h-screen bg-background text-foreground">
       <ReadingProgress />
       {showSticky && <StickyCTA />}
