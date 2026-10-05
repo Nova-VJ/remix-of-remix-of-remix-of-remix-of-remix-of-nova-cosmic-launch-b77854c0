@@ -44,25 +44,38 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 const normalizeSaraReply = (text: string): string => {
   // Remove all form-related URLs and placeholders - we'll handle them as buttons
   return text
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '$2')
     .replace(/\[LINK_WHATSAPP\]/gi, WHATSAPP_URL)
     .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL)
     // Replace form placeholders with a special marker that won't be a URL
     .replace(/\[LINK_FORMULARIO\]/gi, '##OPEN_FORM##')
     .replace(/\[FORMULARIO\]/gi, '##OPEN_FORM##')
     // Catch any literal formulario URLs Sara might generate and replace with marker
-    .replace(/https?:\/\/[^\s]*(?:formulario|openBriefing)[^\s]*/gi, '##OPEN_FORM##');
+    .replace(/https?:\/\/[^\s]*(?:formulario|openBriefing)[^\s]*/gi, '##OPEN_FORM##')
+    .replace(/\*\*/g, '');
 };
 
 const CATALOG_ITEMS: Record<string, { id: string; name: string; price: number; type: 'service' | 'package' }> = {
-  web: { id: 'web', name: 'Página Web Profesional', price: 600, type: 'service' },
+  'pkg-plus': { id: 'pkg-plus', name: 'Paquete Plus', price: 1900, type: 'package' },
+  'pkg-pro': { id: 'pkg-pro', name: 'Paquete Pro', price: 800, type: 'package' },
   apps: { id: 'apps', name: 'Aplicación Móvil', price: 1700, type: 'service' },
+  web: { id: 'web', name: 'Página Web Profesional', price: 600, type: 'service' },
   social: { id: 'social', name: 'Redes Sociales (mensual)', price: 500, type: 'service' },
   branding: { id: 'branding', name: 'Branding Profesional', price: 200, type: 'service' },
   marketing: { id: 'marketing', name: 'Marketing Digital', price: 200, type: 'service' },
   sem: { id: 'sem', name: 'SEM - Posicionamiento Google', price: 150, type: 'service' },
-  'pkg-pro': { id: 'pkg-pro', name: 'Paquete Pro (Web + Social + Marketing gratis)', price: 800, type: 'package' },
-  'pkg-plus': { id: 'pkg-plus', name: 'Paquete Plus (Web + Social + Branding + Apps + Marketing + SEM gratis)', price: 1900, type: 'package' },
 };
+
+const CATALOG_PATTERNS = [
+  { id: 'pkg-plus', regex: /\b(?:paquete|plan|pack)\s+plus\b/i },
+  { id: 'pkg-pro', regex: /\b(?:paquete|plan|pack)\s+pro\b/i },
+  { id: 'apps', regex: /\b(?:aplicaci[oó]n(?:es)?\s+m[oó]vil(?:es)?|app\s+m[oó]vil|app\s+personalizada|desarrollo\s+de\s+(?:una\s+)?app(?:s)?)\b/i },
+  { id: 'web', regex: /\b(?:p[aá]gina(?:s)?\s+web|diseño\s+web|desarrollo\s+web|sitio\s+web|tienda\s+online|tienda\s+virtual|e-commerce)\b/i },
+  { id: 'social', regex: /\b(?:redes?\s+social(?:es)?|community\s+manager|gesti[oó]n\s+de\s+redes?)\b/i },
+  { id: 'branding', regex: /\b(?:branding(?:\s+profesional)?|identidad\s+visual|diseño\s+de\s+marca)\b/i },
+  { id: 'marketing', regex: /\b(?:marketing\s+digital|estrategia\s+de\s+marketing)\b/i },
+  { id: 'sem', regex: /\b(?:posicionamiento\s+sem|google\s+ads|campa[ñn]as?\s+sem|anuncios?\s+en\s+google)\b/i },
+];
 
 const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
   const items: CartProposal['items'] = [];
@@ -71,12 +84,13 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
   const addItem = (item: { id: string; name?: string; price?: number; type?: string }) => {
     if (!item || !item.id || seenIds.has(item.id)) return;
     const catalog = CATALOG_ITEMS[item.id];
+    if (!catalog) return;
     seenIds.add(item.id);
     items.push({
       id: item.id,
-      name: item.name || (catalog ? catalog.name : item.id),
-      price: typeof item.price === 'number' ? item.price : (catalog ? catalog.price : 0),
-      type: item.type === 'package' || catalog?.type === 'package' ? 'package' : 'service',
+      name: item.name || catalog.name,
+      price: typeof item.price === 'number' ? item.price : catalog.price,
+      type: item.type === 'package' || catalog.type === 'package' ? 'package' : 'service',
     });
   };
 
@@ -127,6 +141,13 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
         price: priceMatch ? parseInt(priceMatch[1], 10) : undefined,
         type: typeMatch ? typeMatch[1] : undefined,
       });
+    }
+  }
+
+  // 2.5. Natural language detection: if Sara mentions/recommends catalog services in text
+  for (const pattern of CATALOG_PATTERNS) {
+    if (pattern.regex.test(text)) {
+      addItem({ id: pattern.id });
     }
   }
 
