@@ -10,4 +10,4 @@ export const SARA_CHAT_ENDPOINT = import.meta.env.VITE_SARA_CHAT_ENDPOINT ?? 'ht
 
 // URLs for Sara chat - these are replaced from placeholders in Sara's responses
 export const FORM_URL = import.meta.env.VITE_FORM_URL ?? `${window.location.origin}/?openBriefing=true`;
-export const WHATSAPP_URL = import.meta.env.VITE_WHATSAPP_URL ?? 'https://wa.me/34611967651';
+export const WHATSAPP_URL = import.meta.env.VITE_WHATSAPP_URL ?? 'https://wa.me/34659343822';

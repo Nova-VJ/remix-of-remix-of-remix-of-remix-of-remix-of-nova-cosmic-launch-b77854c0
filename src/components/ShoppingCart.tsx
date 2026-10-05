@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
 import { ServiceType } from '@/components/BriefingForm/types';
 
-const WHATSAPP_NUMBER = '34604948362';
+const WHATSAPP_NUMBER = '34659343822';
 const EMAIL = 'info@solutionsnova.es';
 
 // Map cart item names to service types

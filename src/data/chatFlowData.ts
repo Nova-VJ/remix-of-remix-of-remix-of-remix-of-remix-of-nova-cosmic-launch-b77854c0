@@ -564,6 +564,6 @@ export const SERVICES_DATA = {
   }
 };
 
-export const WHATSAPP_NUMBER = '34604948362';
+export const WHATSAPP_NUMBER = '34659343822';
 export const CONTACT_EMAIL = 'info@solutionsnova.es';
 export const CALENDLY_LINK = 'https://calendly.com/solutionsnova';

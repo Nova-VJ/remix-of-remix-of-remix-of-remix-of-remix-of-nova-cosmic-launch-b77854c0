@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
             <a href="mailto:info@solutionsnova.es" className="hover:text-primary transition-colors">info@solutionsnova.es</a>
             <span className="hidden sm:block">·</span>
-            <a href="https://wa.me/34604948362" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">+34 604 94 83 62</a>
+            <a href="https://wa.me/34659343822" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">+34 659 34 38 22</a>
             
             
           </div>

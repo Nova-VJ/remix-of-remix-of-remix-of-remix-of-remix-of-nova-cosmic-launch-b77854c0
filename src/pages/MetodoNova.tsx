@@ -22,7 +22,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import InteractiveStars from "@/components/InteractiveStars";
 import metodoNovaIcon from "@/assets/metodo-nova-icon.png";
 
-const WHATSAPP_LINK = "https://wa.me/34604948362?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
+const WHATSAPP_LINK = "https://wa.me/34659343822?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },

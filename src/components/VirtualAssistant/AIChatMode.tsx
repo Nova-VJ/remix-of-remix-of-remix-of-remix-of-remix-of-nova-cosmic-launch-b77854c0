@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText } from 'lucide-react';
+import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText, Sparkles } from 'lucide-react';
 import VoiceRecordButton from './VoiceRecordButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -182,6 +182,25 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
 
 const isWhatsAppLink = (url: string) => url.includes('wa.me') || url.includes('whatsapp');
 
+const QUICK_SUGGESTIONS = [
+  {
+    label: '💼 Paquete Pro (800€)',
+    prompt: '¿Qué incluye el Paquete Pro y qué precio tiene?',
+  },
+  {
+    label: '📱 Presupuesto App móvil',
+    prompt: 'Quiero información y presupuesto para crear una aplicación móvil para mi negocio.',
+  },
+  {
+    label: '🌐 Página web profesional',
+    prompt: 'Necesito una página web profesional para mi negocio, ¿qué opciones y planes tenéis?',
+  },
+  {
+    label: '🎁 Código NOVA20',
+    prompt: '¿Cómo funciona el código de descuento NOVA20?',
+  },
+];
+
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
   const [inputValue, setInputValue] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -291,9 +310,34 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
       {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
         {messages.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            <p>¡Hola! 👋 Soy Sara, tu asistente virtual.</p>
-            <p className="mt-2">Pregúntame sobre nuestros servicios, precios o cualquier duda.</p>
+          <div className="text-center text-muted-foreground text-sm py-6">
+            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center mb-2.5">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <p className="font-semibold text-foreground text-base">¡Hola! 👋 Soy Sara</p>
+            <p className="mt-1 text-xs text-muted-foreground">Tu asistente virtual en Nova Marketing Solutions.</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Pregúntame sobre nuestros servicios, tarifas o presupuestos.</p>
+          </div>
+        )}
+
+        {messages.length <= 1 && (
+          <div className="mb-4 mt-2 space-y-2">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-primary" /> Preguntas frecuentes
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_SUGGESTIONS.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  disabled={isLoading || demoLimitReached}
+                  onClick={() => sendMessage(item.prompt)}
+                  className="text-left text-xs bg-muted/70 hover:bg-primary/10 hover:text-primary hover:border-primary/40 border border-border/60 rounded-full px-3 py-1.5 transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -352,8 +396,13 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
 
         {isLoading && (
           <div className="flex justify-start mb-3">
-            <div className="bg-muted rounded-lg px-3 py-2">
-              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            <div className="bg-muted rounded-lg px-3.5 py-2.5 flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium">Sara está escribiendo</span>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce" />
+              </div>
             </div>
           </div>
         )}
