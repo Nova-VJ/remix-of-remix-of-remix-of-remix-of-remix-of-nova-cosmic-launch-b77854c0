@@ -9,13 +9,15 @@ interface ChatMessageProps {
   timestamp?: Date;
 }
 
-// Normalize placeholders in Sara's responses to actual URLs
 const normalizeSaraReply = (text: string): string => {
   return text
+    .replace(/\[PROPUESTA_CARRITO:[\s\S]*?(?:\]|$)/gi, '')
+    .replace(/\{[\s\S]*?"(?:id|items|description)"[\s\S]*?\}/gi, '')
     .replace(/\[LINK_FORMULARIO\]/gi, FORM_URL)
     .replace(/\[FORMULARIO\]/gi, FORM_URL)
     .replace(/\[LINK_WHATSAPP\]/gi, WHATSAPP_URL)
-    .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL);
+    .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL)
+    .trim();
 };
 
 // Check if URL is a WhatsApp link

@@ -237,7 +237,8 @@ const SaraVoiceCallMode = ({ onEnd }: SaraVoiceCallModeProps) => {
       const { reply } = await sendToSara(text, accessToken, sid);
       if (!activeRef.current) return;
       const cleanReply = reply
-        .replace(/\[PROPUESTA_CARRITO:[^\]]*\]/g, '')
+        .replace(/\[PROPUESTA_CARRITO:[\s\S]*?(?:\]|$)/gi, '')
+        .replace(/\{[\s\S]*?"(?:id|items|description)"[\s\S]*?\}/gi, '')
         .replace(/\[LINK_WHATSAPP\]/gi, '')
         .replace(/\[LINK_FORMULARIO\]/gi, '')
         .replace(/##OPEN_FORM##/g, '')

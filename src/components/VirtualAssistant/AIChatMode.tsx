@@ -53,33 +53,110 @@ const normalizeSaraReply = (text: string): string => {
     .replace(/https?:\/\/[^\s]*(?:formulario|openBriefing)[^\s]*/gi, '##OPEN_FORM##');
 };
 
-const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
-  const startTag = '[PROPUESTA_CARRITO:';
-  const startIdx = text.indexOf(startTag);
-  if (startIdx === -1) return { cleanText: text, proposal: null };
+const CATALOG_ITEMS: Record<string, { id: string; name: string; price: number; type: 'service' | 'package' }> = {
+  web: { id: 'web', name: 'Página Web Profesional', price: 600, type: 'service' },
+  apps: { id: 'apps', name: 'Aplicación Móvil', price: 1700, type: 'service' },
+  social: { id: 'social', name: 'Redes Sociales (mensual)', price: 500, type: 'service' },
+  branding: { id: 'branding', name: 'Branding Profesional', price: 200, type: 'service' },
+  marketing: { id: 'marketing', name: 'Marketing Digital', price: 200, type: 'service' },
+  sem: { id: 'sem', name: 'SEM - Posicionamiento Google', price: 150, type: 'service' },
+  'pkg-pro': { id: 'pkg-pro', name: 'Paquete Pro (Web + Social + Marketing gratis)', price: 800, type: 'package' },
+  'pkg-plus': { id: 'pkg-plus', name: 'Paquete Plus (Web + Social + Branding + Apps + Marketing + SEM gratis)', price: 1900, type: 'package' },
+};
 
-  let depth = 0;
-  let endIdx = -1;
-  for (let i = startIdx + startTag.length; i < text.length; i++) {
-    if (text[i] === '{' || text[i] === '[') depth++;
-    else if (text[i] === '}' || text[i] === ']') {
-      depth--;
-      if (depth === 0) {
-        endIdx = i;
-        break;
+const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
+  const items: CartProposal['items'] = [];
+  const seenIds = new Set<string>();
+
+  const addItem = (item: { id: string; name?: string; price?: number; type?: string }) => {
+    if (!item || !item.id || seenIds.has(item.id)) return;
+    const catalog = CATALOG_ITEMS[item.id];
+    seenIds.add(item.id);
+    items.push({
+      id: item.id,
+      name: item.name || (catalog ? catalog.name : item.id),
+      price: typeof item.price === 'number' ? item.price : (catalog ? catalog.price : 0),
+      type: item.type === 'package' || catalog?.type === 'package' ? 'package' : 'service',
+    });
+  };
+
+  // 1. Try standard parse on [PROPUESTA_CARRITO: ...] blocks
+  const startTag = '[PROPUESTA_CARRITO:';
+  let tagIdx = text.indexOf(startTag);
+  while (tagIdx !== -1) {
+    const after = text.substring(tagIdx + startTag.length);
+    let depth = 0;
+    let endIdx = -1;
+    for (let i = 0; i < after.length; i++) {
+      if (after[i] === '{' || after[i] === '[') depth++;
+      else if (after[i] === '}' || after[i] === ']') {
+        depth--;
+        if (depth === 0) {
+          endIdx = i;
+          break;
+        }
       }
     }
+    if (endIdx !== -1) {
+      try {
+        const jsonStr = after.substring(0, endIdx + 1);
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.items && Array.isArray(parsed.items)) {
+          parsed.items.forEach(addItem);
+        } else if (parsed.id) {
+          addItem(parsed);
+        }
+      } catch (_) {}
+    }
+    tagIdx = text.indexOf(startTag, tagIdx + startTag.length);
   }
-  if (endIdx === -1) return { cleanText: text, proposal: null };
 
-  const jsonStr = text.substring(startIdx + startTag.length, endIdx + 1);
-  try {
-    const proposal: CartProposal = JSON.parse(jsonStr);
-    const cleanText = (text.substring(0, startIdx) + text.substring(endIdx + 2)).trim();
-    return { cleanText, proposal };
-  } catch {
-    return { cleanText: text, proposal: null };
+  // 2. Fallback: extract any catalog items mentioned via JSON structure anywhere in text
+  const itemJsonRegex = /"id"\s*:\s*"([a-zA-Z0-9_-]+)"/g;
+  let match: RegExpExecArray | null;
+  while ((match = itemJsonRegex.exec(text)) !== null) {
+    const id = match[1];
+    if (CATALOG_ITEMS[id]) {
+      const surrounding = text.substring(Math.max(0, match.index - 50), Math.min(text.length, match.index + 200));
+      const nameMatch = surrounding.match(/"name"\s*:\s*"([^"]+)"/);
+      const priceMatch = surrounding.match(/"price"\s*:\s*(\d+)/);
+      const typeMatch = surrounding.match(/"type"\s*:\s*"(service|package)"/);
+      addItem({
+        id,
+        name: nameMatch ? nameMatch[1] : undefined,
+        price: priceMatch ? parseInt(priceMatch[1], 10) : undefined,
+        type: typeMatch ? typeMatch[1] : undefined,
+      });
+    }
   }
+
+  // 3. Clean the text completely: NEVER allow raw JSON, tags, or unclosed braces to appear in chat
+  let cleanText = text;
+  const firstTagIdx = cleanText.indexOf(startTag);
+  if (firstTagIdx !== -1) {
+    cleanText = cleanText.substring(0, firstTagIdx);
+  }
+
+  cleanText = cleanText
+    .replace(/\[PROPUESTA_CARRITO:[\s\S]*?(?:\]|$)/gi, '')
+    .replace(/\{[\s\S]*?"(?:id|items|description)"[\s\S]*?\}/gi, '')
+    .split('\n')
+    .filter(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return true;
+      if (trimmed.startsWith('{') || trimmed.startsWith('}') || trimmed.startsWith('[') || trimmed.startsWith(']')) return false;
+      if (/["'](?:id|items|price|type)["']\s*:/i.test(trimmed)) return false;
+      return true;
+    })
+    .join('\n')
+    .replace(/,?\s*\{[\s\S]*$/g, '')
+    .replace(/,?\s*\[[\s\S]*$/g, '')
+    .replace(/[\}\]]\s*,?\s*$/g, '')
+    .replace(/[,\s]+$/, '')
+    .trim();
+
+  const proposal = items.length > 0 ? { items, description: 'Servicios recomendados' } : null;
+  return { cleanText, proposal };
 };
 
 const isWhatsAppLink = (url: string) => url.includes('wa.me') || url.includes('whatsapp');
