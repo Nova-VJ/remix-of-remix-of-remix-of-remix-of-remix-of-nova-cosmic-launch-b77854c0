@@ -26,8 +26,6 @@ const PrivacyPolicy = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Responsable del Tratamiento</h2>
             <ul className="list-none space-y-1 text-muted-foreground">
-              <li><strong>NIF:</strong> 71164077F</li>
-              <li><strong>Dirección:</strong> Calle Recondo 7</li>
               <li><strong>Email:</strong> info@solutionsnova.es</li>
               <li><strong>Nombre comercial:</strong> Nova Marketing Solutions</li>
             </ul>
