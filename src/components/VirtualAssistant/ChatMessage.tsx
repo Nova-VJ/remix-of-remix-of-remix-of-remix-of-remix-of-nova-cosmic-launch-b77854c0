@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import Linkify from 'linkify-react';
 import { ExternalLink, MessageCircle } from 'lucide-react';
 import { FORM_URL, WHATSAPP_URL } from '@/config/env';
+import saraAvatar from '@/assets/sara-avatar.webp';
 
 interface ChatMessageProps {
   message: string;
@@ -90,15 +91,21 @@ const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => {
 
   return (
     <div className={cn(
-      "flex w-full mb-3",
+      "flex w-full mb-3 gap-2",
       isBot ? "justify-start" : "justify-end"
     )}>
-      <div className={cn(
-        "max-w-[85%] rounded-2xl px-4 py-3 text-sm",
-        isBot 
-          ? "bg-muted text-foreground rounded-bl-sm" 
-          : "bg-primary text-primary-foreground rounded-br-sm"
-      )}>
+      {isBot && (
+        <img src={saraAvatar} alt="" className="mt-0.5 h-7 w-7 shrink-0 rounded-full object-cover" />
+      )}
+      <div
+        className={cn(
+          "max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed",
+          isBot
+            ? "bg-muted/70 text-foreground rounded-tl-md border border-border/40"
+            : "text-white rounded-tr-md shadow-md shadow-primary/20"
+        )}
+        style={isBot ? undefined : { backgroundImage: 'var(--gradient-purple)' }}
+      >
         <div className="whitespace-pre-wrap">
           {isBot ? (
             <Linkify options={linkifyOptions}>{normalizedMessage}</Linkify>
@@ -107,7 +114,7 @@ const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => {
           )}
         </div>
         {timestamp && (
-          <span className="text-xs opacity-60 mt-1 block">
+          <span className={cn("mt-1 block text-[10px] opacity-60", !isBot && "text-right")}>
             {timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}

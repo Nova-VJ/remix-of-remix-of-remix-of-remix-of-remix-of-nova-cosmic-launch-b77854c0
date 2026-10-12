@@ -97,9 +97,22 @@ Devuelve un JSON con esta estructura exacta (sin markdown, solo JSON puro):
 }`;
 
 // Simple in-memory rate limiting
-// Google Gemini through its OpenAI-compatible endpoint (same request/response shape as before)
-const AI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-const AI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite";
+// AI provider. Both speak the OpenAI chat-completions format.
+// - GEMINI_API_KEY set: call Google Gemini directly (no Lovable dependency).
+// - Otherwise: fall back to Lovable's AI gateway, so nothing breaks while the
+//   Gemini key hasn't been configured yet.
+const GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
+const AI = GEMINI_KEY
+  ? {
+      url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      model: Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite",
+      key: GEMINI_KEY,
+    }
+  : {
+      url: "https://ai.gateway.lovable.dev/v1/chat/completions",
+      model: "google/gemini-2.5-flash-lite",
+      key: Deno.env.get("LOVABLE_API_KEY"),
+    };
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000;
@@ -164,14 +177,14 @@ async function classifyAndNotify(
       .map((m: any) => `${m.role === 'user' ? 'Usuario' : 'Sara'}: ${m.content}`)
       .join('\n');
 
-    const response = await fetch(AI_URL, {
+    const response = await fetch(AI.url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: AI_MODEL,
+        model: AI.model,
         messages: [
           { role: "system", content: CLASSIFICATION_PROMPT },
           { role: "user", content: `Conversación:\n${conversationText}` }
@@ -278,11 +291,10 @@ serve(async (req) => {
       );
     }
     
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+    if (!AI.key) throw new Error("GEMINI_API_KEY is not configured");
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
@@ -358,14 +370,14 @@ serve(async (req) => {
       apiMessages.push({ role: "user", content: message });
     }
 
-    const response = await fetch(AI_URL, {
+    const response = await fetch(AI.url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${GEMINI_API_KEY}`,
+        Authorization: `Bearer ${AI.key}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: AI_MODEL,
+        model: AI.model,
         messages: apiMessages,
         max_tokens: 200,
       }),
@@ -385,7 +397,7 @@ serve(async (req) => {
         );
       }
       const errorText = await response.text();
-      console.error("Gemini API error:", response.status, errorText);
+      console.error("AI API error:", response.status, errorText);
       throw new Error("Error al procesar la solicitud");
     }
 
@@ -427,7 +439,7 @@ serve(async (req) => {
         });
 
         // AI classification
-        await classifyAndNotify(convId, supabase, GEMINI_API_KEY!);
+        await classifyAndNotify(convId, supabase, AI.key!);
       });
     }
 

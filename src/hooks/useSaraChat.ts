@@ -21,7 +21,7 @@ interface UseSaraChatReturn {
   conversationId: string | null;
 }
 
-const DEMO_LIMIT = 3;
+export const DEMO_LIMIT = 3;
 const DEMO_MESSAGES_KEY = 'sara_demo_messages';
 const DEMO_COUNT_KEY = 'sara_demo_count';
 const SARA_SESSION_KEY = 'nova_chat_session_id';

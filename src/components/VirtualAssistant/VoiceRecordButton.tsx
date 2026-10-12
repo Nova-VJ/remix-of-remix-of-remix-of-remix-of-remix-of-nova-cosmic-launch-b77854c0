@@ -89,7 +89,7 @@ const VoiceRecordButton = ({ onTranscription, disabled }: VoiceRecordButtonProps
       onClick={handleToggle}
       disabled={disabled || isTranscribing}
       title={isRecording ? 'Detener grabación' : 'Grabar nota de voz'}
-      className="relative"
+      className="relative h-9 w-9 shrink-0 rounded-full"
     >
       {isTranscribing ? (
         <Loader2 className="w-4 h-4 animate-spin" />

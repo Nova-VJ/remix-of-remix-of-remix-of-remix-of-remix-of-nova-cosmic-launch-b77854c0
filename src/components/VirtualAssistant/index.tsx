@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, ArrowLeft, User, MessageSquare } from 'lucide-react';
+import { X, ArrowLeft, User, MessageSquare, Sparkles, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,7 +30,6 @@ import {
   Smartphone,
   Share2,
   Palette,
-  Bot,
   Download,
   PhoneCall
 } from 'lucide-react';
@@ -80,7 +79,9 @@ const VirtualAssistant = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // On the opening menu keep Sara's greeting in view; elsewhere follow the newest message
+      const atStart = flowState === 'welcome' && messages.length <= 1;
+      scrollRef.current.scrollTop = atStart ? 0 : scrollRef.current.scrollHeight;
     }
   }, [messages, flowState]);
 
@@ -237,21 +238,24 @@ const VirtualAssistant = () => {
     setFlowState('welcome');
   };
 
-  const mainOptions: ChatOption[] = [
-    { id: 'ai-chat', label: 'Chat con Sara (IA)', icon: <Bot className="w-4 h-4" /> },
-    // { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
+  // 'ai-chat' is rendered as the highlighted card above these
+  const quickOptions: ChatOption[] = [
+    { id: 'services', label: 'Servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
     { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
-    { id: 'services', label: 'Ver servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
-    { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
     { id: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle className="w-4 h-4" /> },
-    { id: 'email', label: 'Enviar correo', icon: <Mail className="w-4 h-4" /> },
     { id: 'agent', label: 'Hablar con un agente', icon: <Phone className="w-4 h-4" /> },
+  ];
+
+  const moreOptions: ChatOption[] = [
+    // { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
+    { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
+    { id: 'email', label: 'Enviar correo', icon: <Mail className="w-4 h-4" /> },
     { id: 'cybersecurity', label: 'Ciberseguridad / Pentesting', icon: <Shield className="w-4 h-4" /> },
     { id: 'install-app', label: 'Instalar App', icon: <Download className="w-4 h-4" /> },
   ];
 
   if (user) {
-    mainOptions.push({ id: 'client-portal', label: 'Mi Portal', icon: <User className="w-4 h-4" /> });
+    moreOptions.unshift({ id: 'client-portal', label: 'Mi Portal', icon: <User className="w-4 h-4" /> });
   }
 
   const serviceOptions: ChatOption[] = [
@@ -277,10 +281,30 @@ const VirtualAssistant = () => {
     switch (flowState) {
       case 'welcome':
         return (
-          <ChatOptions 
-            options={mainOptions} 
-            onSelect={handleMainOption}
-          />
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={() => handleMainOption('ai-chat')}
+              className="group flex w-full items-center gap-3 rounded-2xl p-3.5 text-left text-white shadow-lg shadow-primary/25 transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              style={{ backgroundImage: 'var(--gradient-purple)' }}
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold">Habla con Sara</span>
+                <span className="block text-xs text-white/80">Resuelve tus dudas y recibe un presupuesto orientativo al momento</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 opacity-80 transition-transform group-hover:translate-x-0.5" />
+            </button>
+
+            <ChatOptions options={quickOptions} onSelect={handleMainOption} columns={2} />
+
+            <div>
+              <p className="mb-1 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Más opciones</p>
+              <ChatOptions options={moreOptions} onSelect={handleMainOption} />
+            </div>
+          </div>
         );
 
       case 'faq':
@@ -475,29 +499,35 @@ const VirtualAssistant = () => {
       <ChatButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 
       {isOpen && (
-        <div className="fixed bottom-36 sm:bottom-20 right-4 z-50 w-[380px] sm:w-[420px] max-w-[calc(100vw-2rem)] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300 flex flex-col" style={{ maxHeight: 'min(600px, calc(100vh - 10rem))' }}>
+        <div
+          role="dialog"
+          aria-label="Chat con Sara, asistente virtual de NOVA"
+          className="fixed bottom-40 sm:bottom-24 right-4 z-50 w-[380px] sm:w-[400px] max-w-[calc(100vw-2rem)] bg-background/95 backdrop-blur-xl border border-border/60 rounded-3xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.55)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col"
+          style={{ maxHeight: 'min(620px, calc(100dvh - 10rem))' }}
+        >
           {/* Header with Sara avatar */}
-          <div className="bg-primary text-primary-foreground p-3 shrink-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <img 
-                  src={saraAvatar} 
-                  alt="Sara" 
-                  className="w-12 h-12 rounded-full object-cover border-2 border-primary-foreground/30"
+          <div className="relative shrink-0 px-4 py-3 text-white" style={{ backgroundImage: 'var(--gradient-purple)' }}>
+            <div className="flex items-center gap-3">
+              <div className="relative shrink-0">
+                <img
+                  src={saraAvatar}
+                  alt="Sara"
+                  className="h-10 w-10 rounded-full object-cover ring-2 ring-white/30"
                 />
-                <div>
-                  <h3 className="font-semibold text-sm">Sara</h3>
-                  <p className="text-xs opacity-80">Asistente Virtual Nova</p>
-                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-[hsl(275_75%_55%)]" />
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <div className="min-w-0 flex-1">
+                <h3 className="text-[15px] font-semibold leading-tight">Sara</h3>
+                <p className="text-xs text-white/80">Asistente de NOVA · En línea</p>
+              </div>
+              <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-primary-foreground hover:bg-primary-foreground/20"
+                aria-label="Cerrar chat"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
-                <X className="w-5 h-5" />
-              </Button>
+                <X className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
@@ -510,7 +540,7 @@ const VirtualAssistant = () => {
               <AIChatMode onBack={handleBack} />
             </div>
           ) : (
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ maxHeight: '400px', WebkitOverflowScrolling: 'touch' as any, touchAction: 'pan-y' }}>
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ maxHeight: '460px', WebkitOverflowScrolling: 'touch' as any, touchAction: 'pan-y' }}>
               {messages.map((msg) => (
                 <ChatMessage
                   key={msg.id}

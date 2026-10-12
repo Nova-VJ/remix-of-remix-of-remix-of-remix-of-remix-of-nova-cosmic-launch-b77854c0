@@ -1,17 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, ArrowLeft, Loader2, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText, Sparkles } from 'lucide-react';
+import { Send, ArrowLeft, LogIn, MessageCircle, ShoppingCart, Check, ChevronUp, Globe, Smartphone, Share2, Palette, TrendingUp, BarChart3, Briefcase, Gem, FileText, Tag } from 'lucide-react';
 import VoiceRecordButton from './VoiceRecordButton';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 import { useNavigate } from 'react-router-dom';
-import { useSaraChat } from '@/hooks/useSaraChat';
-import { Badge } from '@/components/ui/badge';
+import { useSaraChat, DEMO_LIMIT } from '@/hooks/useSaraChat';
 import Linkify from 'linkify-react';
 import { WHATSAPP_URL } from '@/config/env';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
+import saraAvatar from '@/assets/sara-avatar.webp';
 import {
   Dialog,
   DialogContent,
@@ -184,22 +183,30 @@ const isWhatsAppLink = (url: string) => url.includes('wa.me') || url.includes('w
 
 const QUICK_SUGGESTIONS = [
   {
-    label: '💼 Paquete Pro (800€)',
-    prompt: '¿Qué incluye el Paquete Pro y qué precio tiene?',
-  },
-  {
-    label: '📱 Presupuesto App móvil',
-    prompt: 'Quiero información y presupuesto para crear una aplicación móvil para mi negocio.',
-  },
-  {
-    label: '🌐 Página web profesional',
+    icon: <Globe className="w-3.5 h-3.5" />,
+    label: 'Página web profesional',
     prompt: 'Necesito una página web profesional para mi negocio, ¿qué opciones y planes tenéis?',
   },
   {
-    label: '🎁 Código NOVA20',
+    icon: <Smartphone className="w-3.5 h-3.5" />,
+    label: 'Presupuesto app móvil',
+    prompt: 'Quiero información y presupuesto para crear una aplicación móvil para mi negocio.',
+  },
+  {
+    icon: <Briefcase className="w-3.5 h-3.5" />,
+    label: 'Paquete Pro (800€)',
+    prompt: '¿Qué incluye el Paquete Pro y qué precio tiene?',
+  },
+  {
+    icon: <Tag className="w-3.5 h-3.5" />,
+    label: 'Código NOVA20',
     prompt: '¿Cómo funciona el código de descuento NOVA20?',
   },
 ];
+
+const SaraBubbleAvatar = () => (
+  <img src={saraAvatar} alt="" className="mt-0.5 h-7 w-7 shrink-0 rounded-full object-cover" />
+);
 
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
   const [inputValue, setInputValue] = useState('');
@@ -295,46 +302,55 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 p-2 border-b border-border">
-        <Button variant="ghost" size="sm" onClick={onBack} className="h-8 px-2">
+      <div className="flex items-center gap-2 border-b border-border/60 bg-muted/20 px-2 py-1.5">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Volver al menú"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
           <ArrowLeft className="w-4 h-4" />
-        </Button>
+        </button>
         <span className="text-sm font-medium">Chat con Sara</span>
         {isDemo && (
-          <Badge variant="secondary" className="ml-auto text-xs">
-            Demo: {3 - demoCount} mensajes
-          </Badge>
+          <span className="ml-auto pr-2 text-[11px] text-muted-foreground">
+            Te quedan {Math.max(0, DEMO_LIMIT - demoCount)} mensajes de prueba
+          </span>
         )}
       </div>
 
       {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4" ref={scrollRef} style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}>
         {messages.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-6">
-            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center mb-2.5">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <p className="font-semibold text-foreground text-base">¡Hola! 👋 Soy Sara</p>
-            <p className="mt-1 text-xs text-muted-foreground">Tu asistente virtual en Nova Marketing Solutions.</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Pregúntame sobre nuestros servicios, tarifas o presupuestos.</p>
+          <div className="py-5 text-center">
+            <img
+              src={saraAvatar}
+              alt=""
+              className="mx-auto mb-3 h-16 w-16 rounded-full object-cover ring-4 ring-primary/15 shadow-lg shadow-primary/20"
+            />
+            <p className="text-base font-semibold text-foreground">Hola, soy Sara</p>
+            <p className="mx-auto mt-1 max-w-[260px] text-xs leading-relaxed text-muted-foreground">
+              Te ayudo con servicios, precios orientativos y presupuestos de NOVA Marketing Solutions.
+            </p>
           </div>
         )}
 
         {messages.length <= 1 && (
           <div className="mb-4 mt-2 space-y-2">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-primary" /> Preguntas frecuentes
+            <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Puedes empezar por
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
               {QUICK_SUGGESTIONS.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
                   disabled={isLoading || demoLimitReached}
                   onClick={() => sendMessage(item.prompt)}
-                  className="text-left text-xs bg-muted/70 hover:bg-primary/10 hover:text-primary hover:border-primary/40 border border-border/60 rounded-full px-3 py-1.5 transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+                  className="flex items-center gap-2 rounded-xl border border-border/60 bg-card/50 px-2.5 py-2 text-left text-xs text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:pointer-events-none disabled:opacity-50"
                 >
-                  {item.label}
+                  <span className="shrink-0 text-primary">{item.icon}</span>
+                  <span className="leading-snug">{item.label}</span>
                 </button>
               ))}
             </div>
@@ -348,14 +364,20 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
 
           return (
             <div key={msg.id} className="mb-3">
-              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm ${
-                  msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
-                }`}>
+              <div className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {isBot && <SaraBubbleAvatar />}
+                <div
+                  className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'text-white rounded-tr-md shadow-md shadow-primary/20'
+                      : 'bg-muted/70 text-foreground rounded-tl-md border border-border/40'
+                  }`}
+                  style={msg.role === 'user' ? { backgroundImage: 'var(--gradient-purple)' } : undefined}
+                >
                   <div className="whitespace-pre-wrap break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                     {isBot ? renderMessageContent(cleanText) : <p>{cleanText}</p>}
                   </div>
-                  <span className="text-[10px] opacity-60 mt-1 block">
+                  <span className={`text-[10px] opacity-60 mt-1 block ${msg.role === 'user' ? 'text-right' : ''}`}>
                     {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -363,11 +385,11 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
 
               {/* Inline product items */}
               {proposal && (
-                <div className="mt-2 space-y-1.5 max-w-[90%]">
+                <div className="mt-2 ml-9 space-y-1.5 max-w-[82%]">
                   {proposal.items.map((item, i) => {
                     const isAdded = addedItems.has(item.id);
                     return (
-                      <div key={i} className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-lg px-2.5 py-1.5">
+                      <div key={i} className="flex items-center gap-2 bg-card/60 border border-border/60 rounded-xl px-2.5 py-2">
                         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary shrink-0">
                           {SERVICE_ICONS[item.id] || <ShoppingCart className="w-3 h-3" />}
                         </div>
@@ -395,8 +417,9 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         })}
 
         {isLoading && (
-          <div className="flex justify-start mb-3">
-            <div className="bg-muted rounded-lg px-3.5 py-2.5 flex items-center gap-2">
+          <div className="flex justify-start gap-2 mb-3">
+            <SaraBubbleAvatar />
+            <div className="bg-muted/70 border border-border/40 rounded-2xl rounded-tl-md px-3.5 py-2.5 flex items-center gap-2">
               <span className="text-xs text-muted-foreground font-medium">Sara está escribiendo</span>
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.3s]" />
@@ -421,15 +444,16 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
       )}
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-3 border-t border-border">
-        <div className="flex gap-2">
-          <Input
+      <form onSubmit={handleSubmit} className="border-t border-border/60 px-3 pt-3 pb-2">
+        <div className="flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 py-1 pl-4 pr-1 transition focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/15">
+          <input
             ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={demoLimitReached ? "Inicia sesión para continuar" : "Escribe tu mensaje..."}
             disabled={isLoading || demoLimitReached}
-            className="flex-1 text-sm"
+            aria-label="Mensaje para Sara"
+            className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60"
           />
           <VoiceRecordButton
             onTranscription={async (text) => {
@@ -438,10 +462,19 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
             }}
             disabled={isLoading || demoLimitReached}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim() || demoLimitReached}>
+          <Button
+            type="submit"
+            size="icon"
+            aria-label="Enviar mensaje"
+            className="h-9 w-9 shrink-0 rounded-full"
+            disabled={isLoading || !inputValue.trim() || demoLimitReached}
+          >
             <Send className="w-4 h-4" />
           </Button>
         </div>
+        <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
+          Sara es una IA y puede equivocarse. El presupuesto final te lo confirma nuestro equipo.
+        </p>
       </form>
 
       {/* Login Dialog */}
@@ -453,7 +486,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
               Límite de demo alcanzado
             </DialogTitle>
             <DialogDescription>
-              Has usado los 3 mensajes gratuitos del modo demo.
+              Has usado los {DEMO_LIMIT} mensajes gratuitos del modo demo.
               Inicia sesión o crea una cuenta para continuar chateando con Sara sin límites.
               <br /><br />
               <span className="text-xs text-muted-foreground">

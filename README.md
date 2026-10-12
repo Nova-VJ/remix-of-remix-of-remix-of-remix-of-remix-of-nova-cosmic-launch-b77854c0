@@ -48,7 +48,7 @@ Secretos que necesitan las funciones (*Supabase → Edge Functions → Secrets*)
 
 | Secreto | Lo usa |
 | --- | --- |
-| `GEMINI_API_KEY` | `sara-chat` (Google AI Studio) |
+| `GEMINI_API_KEY` | `sara-chat` (Google AI Studio). Mientras no exista, Sara usa la pasarela de Lovable (`LOVABLE_API_KEY`) |
 | `GEMINI_MODEL` | opcional, por defecto `gemini-2.5-flash-lite` |
 | `ELEVENLABS_API_KEY` | `elevenlabs-tts` |
 | `DEEPGRAM_API_KEY` | `elevenlabs-stt` |
