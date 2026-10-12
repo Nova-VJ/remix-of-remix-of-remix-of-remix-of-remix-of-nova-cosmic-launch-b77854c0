@@ -22,7 +22,9 @@ Los títulos y descripciones de cada página están en [`src/config/seoPages.jso
 
 ## Publicar (Cloudflare Pages)
 
-Cada push a `main` se publica solo. Configuración del proyecto en Cloudflare Pages:
+Proyecto de Pages: **`77851234`** (dominio `solutionsnova.es`). Cada push a `main` se publica solo en la web. Cualquier otra rama genera una URL de prueba, por ejemplo `https://mejoras-rendimiento-seo.77851234.pages.dev`, para revisar los cambios antes de publicarlos.
+
+Configuración del proyecto:
 
 | Ajuste | Valor |
 | --- | --- |
