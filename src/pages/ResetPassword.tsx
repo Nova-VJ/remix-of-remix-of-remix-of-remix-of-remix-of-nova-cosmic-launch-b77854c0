@@ -118,7 +118,7 @@ const ResetPassword = () => {
         <div className="flex-1 flex items-center justify-center px-6 pb-12">
           <div className="w-full max-w-md">
             <div className="text-center mb-8">
-              <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/lovable-uploads/17c987fe-5397-4a68-b9b0-ad2444852c78.png" />
+              <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
             </div>
 
             <div className="glass-card p-8 text-center">
@@ -154,7 +154,7 @@ const ResetPassword = () => {
       <div className="flex-1 flex items-center justify-center px-6 pb-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/lovable-uploads/17c987fe-5397-4a68-b9b0-ad2444852c78.png" />
+            <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
             <h1 className="text-2xl font-bold text-foreground">
               Nueva contraseña
             </h1>

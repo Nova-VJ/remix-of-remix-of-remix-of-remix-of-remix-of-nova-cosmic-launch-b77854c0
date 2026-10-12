@@ -97,6 +97,10 @@ Devuelve un JSON con esta estructura exacta (sin markdown, solo JSON puro):
 }`;
 
 // Simple in-memory rate limiting
+// Google Gemini through its OpenAI-compatible endpoint (same request/response shape as before)
+const AI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+const AI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash-lite";
+
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const MAX_REQUESTS_PER_WINDOW = 10;
@@ -160,14 +164,14 @@ async function classifyAndNotify(
       .map((m: any) => `${m.role === 'user' ? 'Usuario' : 'Sara'}: ${m.content}`)
       .join('\n');
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: AI_MODEL,
         messages: [
           { role: "system", content: CLASSIFICATION_PROMPT },
           { role: "user", content: `Conversación:\n${conversationText}` }
@@ -274,11 +278,11 @@ serve(async (req) => {
       );
     }
     
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
@@ -354,14 +358,14 @@ serve(async (req) => {
       apiMessages.push({ role: "user", content: message });
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GEMINI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: AI_MODEL,
         messages: apiMessages,
         max_tokens: 200,
       }),
@@ -381,7 +385,7 @@ serve(async (req) => {
         );
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("Gemini API error:", response.status, errorText);
       throw new Error("Error al procesar la solicitud");
     }
 
@@ -423,7 +427,7 @@ serve(async (req) => {
         });
 
         // AI classification
-        await classifyAndNotify(convId, supabase, LOVABLE_API_KEY!);
+        await classifyAndNotify(convId, supabase, GEMINI_API_KEY!);
       });
     }
 

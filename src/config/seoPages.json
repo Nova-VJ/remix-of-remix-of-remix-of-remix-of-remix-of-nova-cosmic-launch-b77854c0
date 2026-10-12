@@ -1,0 +1,42 @@
+{
+  "/": {
+    "title": "NOVA Marketing Solutions | Agencia de Marketing Digital en Valladolid",
+    "description": "Impulsamos tu negocio hacia el éxito. Diseño web, apps móviles, branding y contenido para redes sociales. Pide presupuesto gratis en Valladolid, España."
+  },
+  "/aviso-legal": {
+    "title": "Aviso Legal | NOVA Marketing Solutions",
+    "description": "Aviso legal y condiciones de uso del sitio web solutionsnova.es. Información legal conforme a la LSSI-CE."
+  },
+  "/casos-exito": {
+    "title": "Casos de Éxito | NOVA Marketing Solutions",
+    "description": "Descubre cómo ayudamos a marcas a crecer con estrategias de marketing digital. Casos reales de Hawkers, Domino's y más."
+  },
+  "/casos-exito/dominos": {
+    "title": "Caso Domino's Pizza: Estrategia Digital Ganadora | NOVA Marketing",
+    "description": "Cómo Domino's Pizza transformó su negocio con marketing digital. Estrategias clave y lecciones aplicables a cualquier empresa."
+  },
+  "/casos-exito/hawkers": {
+    "title": "Caso Hawkers: De Idea Simple a Marca Global | NOVA Marketing",
+    "description": "Descubre cómo Hawkers revolucionó el marketing digital y construyó una marca global de gafas de sol. Lecciones prácticas para emprendedores."
+  },
+  "/instalar-app": {
+    "title": "Instalar App NOVA | Acceso Rápido desde tu Móvil",
+    "description": "Instala la app de NOVA Marketing Solutions en tu dispositivo. Accede a tu panel de cliente, proyectos y soporte desde cualquier lugar."
+  },
+  "/invita-a-un-amigo": {
+    "title": "Invita a un Amigo y Gana Descuentos | NOVA Marketing Solutions",
+    "description": "Comparte NOVA con tus amigos y ambos ganáis un 10% de descuento en cualquier servicio. Programa de referidos exclusivo."
+  },
+  "/metodo-nova": {
+    "title": "Método NOVA | Estrategia Digital Personalizada para tu Negocio",
+    "description": "Nuestro método exclusivo: diagnóstico, arquitectura digital, diseño que convierte, activación de ventas y optimización constante. Resultados reales."
+  },
+  "/politica-de-cookies": {
+    "title": "Política de Cookies | NOVA Marketing Solutions",
+    "description": "Información sobre el uso de cookies en solutionsnova.es. Tipos de cookies, finalidad y cómo gestionarlas."
+  },
+  "/politica-de-privacidad": {
+    "title": "Política de Privacidad | NOVA Marketing Solutions",
+    "description": "Consulta cómo tratamos tus datos personales. Política de privacidad conforme al RGPD de NOVA Marketing Solutions."
+  }
+}

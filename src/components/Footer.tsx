@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col items-center gap-6">
           {/* Logo */}
-          <img alt="NOVA Marketing Solutions" loading="lazy" decoding="async" src="/lovable-uploads/e3229bd0-0856-4bcb-8a85-66feaafa1f92.png" className="w-32 opacity-95 rounded-full shadow-none" />
+          <img alt="NOVA Marketing Solutions" loading="lazy" decoding="async" src="/images/logo-nova-footer.png" className="w-32 opacity-95 rounded-full shadow-none" />
 
           {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">

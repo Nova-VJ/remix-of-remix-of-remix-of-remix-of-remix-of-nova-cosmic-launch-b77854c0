@@ -466,7 +466,7 @@ const Dashboard = () => {
           {/* Desktop Header */}
           <div className="hidden md:flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <img alt="Nova" className="h-8" src="/lovable-uploads/88c38dcf-6220-422a-8e76-722a26d10429.png" />
+              <img alt="Nova" className="h-8" src="/images/logo-nova.png" />
               <span className="font-bold text-foreground">Mi Panel</span>
             </Link>
             <div className="flex items-center gap-4">
@@ -499,7 +499,7 @@ const Dashboard = () => {
           <div className="md:hidden">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-2">
-                <img alt="Nova" className="h-7" src="/lovable-uploads/88c38dcf-6220-422a-8e76-722a26d10429.png" />
+                <img alt="Nova" className="h-7" src="/images/logo-nova.png" />
               </Link>
               <div className="flex items-center gap-2">
                 {user?.email === ADMIN_EMAIL && <Link to="/admin">

@@ -1,4 +1,5 @@
 import SEOHead from "@/components/SEOHead";
+import { SEO_PAGES } from "@/config/seo";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   motion,
@@ -383,11 +384,7 @@ export default function CasoDominos() {
 
   return (
     <>
-    <SEOHead
-      title="Caso Domino's Pizza: Estrategia Digital Ganadora | NOVA Marketing"
-      description="Cómo Domino's Pizza transformó su negocio con marketing digital. Estrategias clave y lecciones aplicables a cualquier empresa."
-      path="/casos-exito/dominos"
-    />
+    <SEOHead {...SEO_PAGES["/casos-exito/dominos"]} />
     <div className="min-h-screen bg-background text-foreground">
       <ReadingProgress />
       {showSticky && <StickyCTA />}

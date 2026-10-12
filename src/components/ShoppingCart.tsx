@@ -276,9 +276,12 @@ const ShoppingCart = () => {
                     </div>
                   )}
                   <div className="flex justify-between text-lg font-bold">
-                    <span className="text-foreground">Total</span>
-                    <span className="text-primary">{getTotal().toFixed(0)}€</span>
+                    <span className="text-foreground">Total estimado</span>
+                    <span className="text-primary">desde {getTotal().toFixed(0)}€</span>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    Precio mínimo orientativo. Analizamos tu proyecto y te enviamos el presupuesto final, sin compromiso.
+                  </p>
                 </div>
 
                 {/* Account prompt */}

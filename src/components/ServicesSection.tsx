@@ -82,7 +82,7 @@ const virtualAssistants = [
     ],
     useCase: "Uso típico: peluquerías, clínicas, restaurantes, servicios locales, academias.",
     price: 100,
-    priceLabel: "100€",
+    priceLabel: "100€ · pago único",
   },
   {
     id: 'assistant-plus',
@@ -97,7 +97,7 @@ const virtualAssistants = [
     ],
     useCase: "Uso típico: empresas con muchos servicios, ventas consultivas, soporte y captación constante.",
     price: 200,
-    priceLabel: "200€",
+    priceLabel: "200€ · pago único",
   }
 ];
 

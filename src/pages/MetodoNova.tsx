@@ -1,4 +1,5 @@
 import SEOHead from "@/components/SEOHead";
+import { SEO_PAGES } from "@/config/seo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -117,11 +118,7 @@ export default function MetodoNova() {
 
   return (
     <>
-    <SEOHead
-      title="Método NOVA | Estrategia Digital Personalizada para tu Negocio"
-      description="Nuestro método exclusivo: diagnóstico, arquitectura digital, diseño que convierte, activación de ventas y optimización constante. Resultados reales."
-      path="/metodo-nova"
-    />
+    <SEOHead {...SEO_PAGES["/metodo-nova"]} />
     <div className="min-h-screen bg-background text-foreground relative">
       {/* Interactive Stars - behind everything */}
       <InteractiveStars />

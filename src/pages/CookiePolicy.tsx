@@ -1,4 +1,5 @@
 import SEOHead from '@/components/SEOHead';
+import { SEO_PAGES } from "@/config/seo";
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,7 @@ const CookiePolicy = () => {
 
   return (
     <>
-    <SEOHead
-      title="Política de Cookies | NOVA Marketing Solutions"
-      description="Información sobre el uso de cookies en solutionsnova.es. Tipos de cookies, finalidad y cómo gestionarlas."
-      path="/politica-de-cookies"
-    />
+    <SEOHead {...SEO_PAGES["/politica-de-cookies"]} />
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <Link to="/">

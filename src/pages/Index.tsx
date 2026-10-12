@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
+import { SEO_PAGES } from "@/config/seo";
 import IntroSection from '@/components/IntroSection';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
@@ -58,11 +59,7 @@ const Index = () => {
 
   return (
     <>
-      <SEOHead
-        title="NOVA Marketing Solutions | Agencia de Marketing Digital en Valladolid"
-        description="Impulsamos tu negocio hacia el éxito. Diseño web, apps móviles, branding y contenido para redes sociales. Pide presupuesto gratis en Valladolid, España."
-        path="/"
-      />
+      <SEOHead {...SEO_PAGES["/"]} />
       {showIntro && <IntroSection onIntroEnd={handleIntroEnd} />}
 
       <main className={`relative pb-20 md:pb-0 transition-opacity duration-500 ${showIntro ? 'opacity-0' : 'opacity-100'}`}>

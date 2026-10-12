@@ -1,4 +1,5 @@
 import SEOHead from "@/components/SEOHead";
+import { SEO_PAGES } from "@/config/seo";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   motion,
@@ -675,11 +676,7 @@ export default function CasoHawkers() {
 
   return (
     <>
-    <SEOHead
-      title="Caso Hawkers: De Idea Simple a Marca Global | NOVA Marketing"
-      description="Descubre cómo Hawkers revolucionó el marketing digital y construyó una marca global de gafas de sol. Lecciones prácticas para emprendedores."
-      path="/casos-exito/hawkers"
-    />
+    <SEOHead {...SEO_PAGES["/casos-exito/hawkers"]} />
     <div className="min-h-screen bg-background text-foreground">
       <ReadingProgress />
       {showSticky && <StickyCTA />}

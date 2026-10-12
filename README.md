@@ -1,73 +1,56 @@
-# Welcome to your Lovable project
+# NOVA Marketing Solutions — solutionsnova.es
 
-## Project info
+Web de la agencia: React + Vite + TypeScript + Tailwind (shadcn/ui), con Supabase como backend (login, panel, admin, chat de Sara) y publicada en **Cloudflare Pages**.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Trabajar en local
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requiere Node.js 20 o superior.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev        # servidor de desarrollo en http://localhost:8080
+npm run build      # build de producción en dist/
+npm run preview    # sirve dist/ para probarlo
 ```
 
-**Edit a file directly in GitHub**
+`npm run build` hace dos cosas:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. `vite build` genera la web en `dist/`.
+2. `scripts/prerender-seo.mjs` escribe un HTML por página (`dist/casos-exito.html`, `dist/metodo-nova.html`…) con su título, descripción y etiquetas Open Graph, y un `dist/404.html`. Así Google y las previsualizaciones de WhatsApp/LinkedIn ven los datos correctos de cada página, y las URLs que no existen devuelven un 404 de verdad.
 
-**Use GitHub Codespaces**
+Los títulos y descripciones de cada página están en [`src/config/seoPages.json`](src/config/seoPages.json). Si añades una página pública nueva, añádela ahí y en `public/sitemap.xml`.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Publicar (Cloudflare Pages)
 
-## What technologies are used for this project?
+Cada push a `main` se publica solo. Configuración del proyecto en Cloudflare Pages:
 
-This project is built with:
+| Ajuste | Valor |
+| --- | --- |
+| Framework preset | None / Vite |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Node | se toma de `.nvmrc` |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Las variables `VITE_*` se leen de `.env` (solo contiene claves públicas). Para cambiarlas sin tocar el repo, defínelas en *Settings → Environment variables* de Pages.
 
-## How can I deploy this project?
+Las cabeceras (caché de `/assets`, service worker, seguridad) están en [`public/_headers`](public/_headers).
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Backend (Supabase)
 
-## Can I connect a custom domain to my Lovable project?
+Proyecto `dnnqeydtybmzriyjqqyt`. Las migraciones están en `supabase/migrations` y las funciones en `supabase/functions`. Para desplegar una función:
 
-Yes, you can!
+```sh
+npx supabase login
+npx supabase functions deploy sara-chat --project-ref dnnqeydtybmzriyjqqyt
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Secretos que necesitan las funciones (*Supabase → Edge Functions → Secrets*):
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+| Secreto | Lo usa |
+| --- | --- |
+| `GEMINI_API_KEY` | `sara-chat` (Google AI Studio) |
+| `GEMINI_MODEL` | opcional, por defecto `gemini-2.5-flash-lite` |
+| `ELEVENLABS_API_KEY` | `elevenlabs-tts` |
+| `DEEPGRAM_API_KEY` | `elevenlabs-stt` |
+| `GOOGLE_TTS_API_KEY` / `GOOGLE_SERVICE_ACCOUNT_JSON` | `google-tts` |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | `send-push-notification` |

@@ -1,4 +1,5 @@
 import SEOHead from '@/components/SEOHead';
+import { SEO_PAGES } from "@/config/seo";
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,7 @@ import { Button } from '@/components/ui/button';
 const PrivacyPolicy = () => {
   return (
     <>
-    <SEOHead
-      title="Política de Privacidad | NOVA Marketing Solutions"
-      description="Consulta cómo tratamos tus datos personales. Política de privacidad conforme al RGPD de NOVA Marketing Solutions."
-      path="/politica-de-privacidad"
-    />
+    <SEOHead {...SEO_PAGES["/politica-de-privacidad"]} />
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <Link to="/">

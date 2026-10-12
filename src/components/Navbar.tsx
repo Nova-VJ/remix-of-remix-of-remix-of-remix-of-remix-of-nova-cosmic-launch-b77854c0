@@ -72,7 +72,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img alt="SolutionsNova" className="h-8 w-auto" src="/lovable-uploads/23cbcec3-61dc-4e89-aebc-d743d8b36be1.png" />
+            <img alt="SolutionsNova" className="h-8 w-auto" src="/images/logo-nova.png" />
           </Link>
 
           {/* Desktop menu */}
