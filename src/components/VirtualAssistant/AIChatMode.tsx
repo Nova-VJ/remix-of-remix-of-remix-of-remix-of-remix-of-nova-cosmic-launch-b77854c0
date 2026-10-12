@@ -314,7 +314,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         <span className="text-sm font-medium">Chat con Sara</span>
         {isDemo && (
           <span className="ml-auto pr-2 text-[11px] text-muted-foreground">
-            Te quedan {Math.max(0, DEMO_LIMIT - demoCount)} mensajes de prueba
+            Te quedan {Math.max(0, DEMO_LIMIT - demoCount)} mensajes hoy
           </span>
         )}
       </div>
@@ -483,11 +483,11 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <LogIn className="w-5 h-5" />
-              Límite de demo alcanzado
+              Has llegado al límite de hoy
             </DialogTitle>
             <DialogDescription>
-              Has usado los {DEMO_LIMIT} mensajes gratuitos del modo demo.
-              Inicia sesión o crea una cuenta para continuar chateando con Sara sin límites.
+              Has usado los {DEMO_LIMIT} mensajes gratuitos de hoy.
+              Inicia sesión o crea una cuenta para seguir chateando con Sara, o vuelve mañana.
               <br /><br />
               <span className="text-xs text-muted-foreground">
                 Tu conversación anterior se guardará automáticamente en tu cuenta.

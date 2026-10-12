@@ -14,6 +14,17 @@ function getOrCreateAnonId() {
   return id;
 }
 
+export class SaraApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(status: number, data: any) {
+    super(typeof data === "string" ? data : JSON.stringify(data, null, 2));
+    this.status = status;
+    this.data = data;
+  }
+}
+
 // ✅ Ahora acepta sessionId y devuelve también session_id
 export async function sendToSara(
   message: string,
@@ -48,9 +59,7 @@ export async function sendToSara(
   }
 
   if (!res.ok) {
-    throw new Error(
-      typeof data === "string" ? data : JSON.stringify(data, null, 2)
-    );
+    throw new SaraApiError(res.status, data);
   }
 
   return {

@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { sendToSara } from '@/lib/saraApi';
+import { sendToSara, SaraApiError } from '@/lib/saraApi';
 
 interface Message {
   id: string;
@@ -21,10 +21,25 @@ interface UseSaraChatReturn {
   conversationId: string | null;
 }
 
-export const DEMO_LIMIT = 3;
+// Visitors without an account get DEMO_LIMIT messages per rolling 24h.
+// The sara-chat edge function enforces the same number (ANON_DAILY_LIMIT).
+export const DEMO_LIMIT = 10;
+const DEMO_WINDOW_MS = 24 * 60 * 60 * 1000;
 const DEMO_MESSAGES_KEY = 'sara_demo_messages';
-const DEMO_COUNT_KEY = 'sara_demo_count';
+const DEMO_SENT_KEY = 'sara_demo_sent_at';
+const LEGACY_DEMO_COUNT_KEY = 'sara_demo_count';
 const SARA_SESSION_KEY = 'nova_chat_session_id';
+
+// Timestamps of the visitor's messages within the last 24h
+const getRecentDemoSends = (): number[] => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DEMO_SENT_KEY) || '[]');
+    const cutoff = Date.now() - DEMO_WINDOW_MS;
+    return Array.isArray(parsed) ? parsed.filter((t) => typeof t === 'number' && t > cutoff) : [];
+  } catch {
+    return [];
+  }
+};
 
 export const useSaraChat = (): UseSaraChatReturn => {
   const { user, session } = useAuth();
@@ -133,7 +148,8 @@ export const useSaraChat = (): UseSaraChatReturn => {
 
       // Clear demo data from localStorage
       localStorage.removeItem(DEMO_MESSAGES_KEY);
-      localStorage.removeItem(DEMO_COUNT_KEY);
+      localStorage.removeItem(DEMO_SENT_KEY);
+      localStorage.removeItem(LEGACY_DEMO_COUNT_KEY);
     } catch (e) {
       console.error('Error migrating demo messages:', e);
     }
@@ -143,7 +159,6 @@ export const useSaraChat = (): UseSaraChatReturn => {
   useEffect(() => {
     if (isDemo) {
       const storedMessages = localStorage.getItem(DEMO_MESSAGES_KEY);
-      const storedCount = localStorage.getItem(DEMO_COUNT_KEY);
 
       if (storedMessages) {
         try {
@@ -157,9 +172,9 @@ export const useSaraChat = (): UseSaraChatReturn => {
         }
       }
 
-      if (storedCount) {
-        setDemoCount(parseInt(storedCount, 10));
-      }
+      // The old lifetime counter (3 messages, never reset) is replaced by the 24h window
+      localStorage.removeItem(LEGACY_DEMO_COUNT_KEY);
+      setDemoCount(getRecentDemoSends().length);
     } else if (user && !migrationDoneRef.current) {
       migrationDoneRef.current = true;
       // Check if there are demo messages to migrate
@@ -173,9 +188,11 @@ export const useSaraChat = (): UseSaraChatReturn => {
     }
   }, [user]);
 
-  const saveDemoMessage = (newMessages: Message[], newCount: number) => {
+  const saveDemoMessage = (newMessages: Message[]) => {
     localStorage.setItem(DEMO_MESSAGES_KEY, JSON.stringify(newMessages));
-    localStorage.setItem(DEMO_COUNT_KEY, newCount.toString());
+    const sends = [...getRecentDemoSends(), Date.now()];
+    localStorage.setItem(DEMO_SENT_KEY, JSON.stringify(sends));
+    return sends.length;
   };
 
   const sendMessage = useCallback(async (content: string) => {
@@ -217,11 +234,9 @@ export const useSaraChat = (): UseSaraChatReturn => {
       };
 
       if (isDemo) {
-        const newCount = demoCount + 1;
-        setDemoCount(newCount);
         const newMessages = [...messages, userMessage, assistantMessage];
         setMessages(newMessages);
-        saveDemoMessage(newMessages, newCount);
+        setDemoCount(saveDemoMessage(newMessages));
       } else {
         if (conversationId && user) {
           await supabase.from('chat_messages').insert({
@@ -249,10 +264,16 @@ export const useSaraChat = (): UseSaraChatReturn => {
     } catch (e) {
       console.error('Error sending message:', e);
 
+      // The server's daily limit wins over the browser counter (e.g. after clearing storage)
+      if (isDemo && e instanceof SaraApiError && e.data?.limit_reached) {
+        setDemoCount(DEMO_LIMIT);
+      }
+      const serverText = e instanceof SaraApiError && typeof e.data?.error === 'string' ? e.data.error : null;
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Ahora mismo no puedo responder. Intenta de nuevo.',
+        content: serverText || 'Ahora mismo no puedo responder. Intenta de nuevo.',
         createdAt: new Date()
       };
 

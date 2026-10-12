@@ -118,6 +118,13 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const MAX_REQUESTS_PER_WINDOW = 10;
 
+// Visitors without an account: messages per rolling 24h. Must match DEMO_LIMIT
+// in src/hooks/useSaraChat.ts (the browser counter can be reset, this one can't).
+const ANON_DAILY_LIMIT = 10;
+// Safety net for the AI bill: total user messages per rolling 24h across the site.
+const SITE_DAILY_CAP = parseInt(Deno.env.get("SARA_DAILY_CAP") || "1000", 10);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 function checkRateLimit(identifier: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
   const record = rateLimitMap.get(identifier);
@@ -144,6 +151,21 @@ function cleanupRateLimitMap() {
 }
 
 // Background task runner - fire and forget
+// The website logs users in against its main Supabase project, not this one, so
+// getUser() can't validate their token here. For the visitor limit only, treat
+// a JWT whose role is "authenticated" as a signed-in user (SITE_DAILY_CAP still
+// applies to everyone).
+function looksSignedIn(token: string): boolean {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return false;
+    const json = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    return json.role === "authenticated" && (!json.exp || json.exp * 1000 > Date.now());
+  } catch {
+    return false;
+  }
+}
+
 function runInBackground(fn: () => Promise<void>) {
   fn().catch(err => console.error("Background task error:", err));
 }
@@ -301,13 +323,55 @@ serve(async (req) => {
     // Check auth
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
+    let signedIn = false;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.replace("Bearer ", "");
       const { data: { user } } = await supabase.auth.getUser(token);
       userId = user?.id || null;
+      signedIn = !!userId || looksSignedIn(token);
     }
 
     const effectiveAnonId = userId || anon_id || "unknown";
+
+    // Daily limits. If a count query fails we let the message through rather
+    // than break the chat.
+    const since = new Date(Date.now() - DAY_MS).toISOString();
+
+    if (!signedIn) {
+      const { count: anonCount, error: anonCountError } = await supabase
+        .from("sara_anonymous_messages")
+        .select("id, sara_anonymous_conversations!inner(anon_id)", { count: "exact", head: true })
+        .eq("role", "user")
+        .eq("sara_anonymous_conversations.anon_id", effectiveAnonId)
+        .gte("created_at", since);
+      if (anonCountError) console.error("Anon daily count error:", anonCountError);
+      if ((anonCount ?? 0) >= ANON_DAILY_LIMIT) {
+        return new Response(
+          JSON.stringify({
+            error: `Has usado los ${ANON_DAILY_LIMIT} mensajes gratuitos de hoy. Inicia sesión o crea una cuenta para seguir hablando con Sara, o escríbenos por WhatsApp.`,
+            limit_reached: true,
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    const { count: siteCount, error: siteCountError } = await supabase
+      .from("sara_anonymous_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "user")
+      .gte("created_at", since);
+    if (siteCountError) console.error("Site daily count error:", siteCountError);
+    if ((siteCount ?? 0) >= SITE_DAILY_CAP) {
+      console.warn(`Sara daily cap reached (${SITE_DAILY_CAP})`);
+      return new Response(
+        JSON.stringify({
+          error: "Sara está atendiendo muchas consultas ahora mismo. Escríbenos por WhatsApp y te respondemos enseguida.",
+          daily_cap: true,
+        }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     let conversationId: string | null = null;
     let allMessages: { role: string; content: string }[] = [];

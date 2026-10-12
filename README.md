@@ -37,12 +37,27 @@ Las cabeceras (caché de `/assets`, service worker, seguridad) están en [`publi
 
 ## Backend (Supabase)
 
-Proyecto `dnnqeydtybmzriyjqqyt`. Las migraciones están en `supabase/migrations` y las funciones en `supabase/functions`. Para desplegar una función:
+Hay **dos proyectos** de Supabase:
+
+| Proyecto | Para qué | Dónde se configura |
+| --- | --- | --- |
+| `rpqldtlvdzdwspxpccuh` | Web principal: login, panel de cliente, admin, formularios | `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY` en `.env` |
+| `dnnqeydtybmzriyjqqyt` ("Nova Solutions Chatbot") | Solo Sara (función `sara-chat` y sus conversaciones) | `VITE_SARA_CHAT_ENDPOINT` en `.env` |
+
+La URL y la clave de `.env` tienen que ser **del mismo proyecto**; si no, Supabase responde "Invalid API key" y fallan el login y el panel.
+
+Las migraciones están en `supabase/migrations` y las funciones en `supabase/functions`. Para desplegar Sara:
 
 ```sh
 npx supabase login
 npx supabase functions deploy sara-chat --project-ref dnnqeydtybmzriyjqqyt
 ```
+
+### Límites de Sara
+
+- Visitantes sin cuenta: 10 mensajes cada 24 h (`DEMO_LIMIT` en `src/hooks/useSaraChat.ts` y `ANON_DAILY_LIMIT` en la función; tienen que coincidir).
+- Toda la web: tope de seguridad de 1000 mensajes cada 24 h (secreto opcional `SARA_DAILY_CAP`). Al llegar, Sara deriva a WhatsApp.
+- Por persona: máximo 10 mensajes por minuto (antispam).
 
 Secretos que necesitan las funciones (*Supabase → Edge Functions → Secrets*):
 
@@ -50,6 +65,7 @@ Secretos que necesitan las funciones (*Supabase → Edge Functions → Secrets*)
 | --- | --- |
 | `GEMINI_API_KEY` | `sara-chat` (Google AI Studio). Mientras no exista, Sara usa la pasarela de Lovable (`LOVABLE_API_KEY`) |
 | `GEMINI_MODEL` | opcional, por defecto `gemini-2.5-flash-lite` |
+| `SARA_DAILY_CAP` | opcional, tope diario de mensajes de toda la web (por defecto 1000) |
 | `ELEVENLABS_API_KEY` | `elevenlabs-tts` |
 | `DEEPGRAM_API_KEY` | `elevenlabs-stt` |
 | `GOOGLE_TTS_API_KEY` / `GOOGLE_SERVICE_ACCOUNT_JSON` | `google-tts` |
