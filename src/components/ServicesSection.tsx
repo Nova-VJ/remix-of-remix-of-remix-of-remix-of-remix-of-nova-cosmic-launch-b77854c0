@@ -5,7 +5,7 @@ import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
 import serviceSocialIcon from '@/assets/service-social-icon.webp';
 import serviceContentIcon from '@/assets/service-content-icon.webp';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight } from 'lucide-react';
+import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
@@ -212,16 +212,18 @@ const ServicesSection = () => {
           {services.map((service, index) => (
             <article
               key={service.id}
-              className={cn('glass-card hover-lift p-6 flex flex-col', reveal(index * 80 + 100).className)}
+              className={cn('group glass-card hover-lift p-6 flex flex-col hover:border-primary/30', reveal(index * 80 + 100).className)}
               style={reveal(index * 80 + 100).style}
             >
-              <img
-                src={service.image}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="w-14 h-14 object-contain mb-5"
-              />
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-background ring-1 ring-primary/10">
+                <img
+                  src={service.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+                />
+              </div>
               <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
 
@@ -257,6 +259,9 @@ const ServicesSection = () => {
             className={cn('flex flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-accent/50 p-6', reveal(services.length * 80 + 100).className)}
             style={reveal(services.length * 80 + 100).style}
           >
+            <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-primary/15">
+              <Sparkles className="h-7 w-7" />
+            </span>
             <h3 className="text-lg font-bold text-foreground">¿Necesitas algo a medida?</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Tiendas online, reservas, automatizaciones, integraciones… Cuéntanos tu idea y te proponemos la mejor solución.

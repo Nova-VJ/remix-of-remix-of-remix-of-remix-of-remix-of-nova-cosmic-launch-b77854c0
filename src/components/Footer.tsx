@@ -22,7 +22,7 @@ const Footer = () => {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Brand */}
           <div>
-            <img alt="NOVA Marketing Solutions" loading="lazy" decoding="async" src="/images/logo-nova.png" className="h-10 w-auto" />
+            <img alt="NOVA Marketing Solutions" loading="lazy" decoding="async" width={103} height={48} src="/images/logo-nova-light.webp" className="h-12 w-auto" />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               Agencia de marketing digital en Valladolid. Webs, apps, branding y redes sociales para negocios que quieren crecer.
             </p>

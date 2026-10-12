@@ -4,19 +4,20 @@ import { Menu, X, User, Shield, Bell, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 
 type NavItem =
   | { label: string; section: string }
-  | { label: string; to: string };
+  | { label: string; to: string; novaIcon?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Servicios', section: 'servicios' },
   { label: 'Precios', section: 'paquetes' },
   { label: 'Proceso', section: 'proceso' },
   { label: 'Casos de éxito', to: '/casos-exito' },
-  { label: 'Método NOVA', to: '/metodo-nova' },
+  { label: 'Método NOVA', to: '/metodo-nova', novaIcon: true },
   { label: 'Contacto', section: 'contacto' },
 ];
 
@@ -98,7 +99,21 @@ const Navbar = () => {
     const className = cn(linkClass, mobile && "block w-full py-2.5 text-left text-base");
     if ('to' in item) {
       return (
-        <Link key={item.label} to={item.to} onClick={() => setIsOpen(false)} className={className}>
+        <Link
+          key={item.label}
+          to={item.to}
+          onClick={() => setIsOpen(false)}
+          className={cn(className, item.novaIcon && "group inline-flex items-center gap-1.5")}
+        >
+          {item.novaIcon && (
+            <img
+              src={metodoNovaIcon}
+              alt=""
+              width={28}
+              height={28}
+              className="h-7 w-7 -my-2 object-contain motion-safe:animate-nova-float transition-transform duration-500 group-hover:rotate-[24deg] group-hover:scale-110"
+            />
+          )}
           {item.label}
         </Link>
       );
@@ -123,7 +138,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2" aria-label="NOVA Marketing Solutions, inicio">
-            <img alt="NOVA Marketing Solutions" className="h-9 w-auto" src="/images/logo-nova.png" />
+            <img alt="NOVA Marketing Solutions" width={86} height={40} className="h-10 w-auto" src="/images/logo-nova-light.webp" />
           </Link>
 
           {/* Desktop menu */}

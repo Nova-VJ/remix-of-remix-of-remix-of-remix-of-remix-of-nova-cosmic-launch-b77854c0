@@ -88,6 +88,10 @@ export default {
           "0%, 100%": { boxShadow: "0 0 20px hsl(270 80% 60% / 0.4)" },
           "50%": { boxShadow: "0 0 40px hsl(270 80% 60% / 0.6)" },
         },
+        "nova-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-3px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -96,6 +100,7 @@ export default {
         "fade-in-up": "fade-in-up 0.8s ease-out forwards",
         "fade-out": "fade-out 0.5s ease-out forwards",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "nova-float": "nova-float 3s ease-in-out infinite",
       },
     },
   },

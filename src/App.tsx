@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MotionConfig } from "framer-motion";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import Index from "./pages/Index";
@@ -36,6 +37,8 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          {/* Skip motion animations for visitors who ask for reduced motion */}
+          <MotionConfig reducedMotion="user">
           <BrowserRouter>
             <Suspense fallback={<div className="min-h-screen bg-background" />}>
               <Routes>
@@ -61,6 +64,7 @@ const App = () => (
             </Suspense>
             <CookieConsent />
           </BrowserRouter>
+          </MotionConfig>
         </TooltipProvider>
       </CartProvider>
     </AuthProvider>

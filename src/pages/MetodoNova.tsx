@@ -3,7 +3,6 @@ import { SEO_PAGES } from "@/config/seo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft,
   ArrowRight,
   Smartphone,
   TrendingUp,
@@ -19,9 +18,10 @@ import {
   Repeat,
   MessageCircle,
 } from "lucide-react";
-import ThemeToggle from "@/components/ThemeToggle";
-import InteractiveStars from "@/components/InteractiveStars";
-import metodoNovaIcon from "@/assets/metodo-nova-icon.webp";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SectionHeader from "@/components/SectionHeader";
+import NovaMethodIcon from "@/components/NovaMethodIcon";
 
 const WHATSAPP_LINK = "https://wa.me/34659343822?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
 
@@ -35,268 +35,232 @@ const stagger = {
   show: { transition: { staggerChildren: 0.08 } },
 };
 
-function cn(...classes: (string | false | null | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
-}
+const inView = { initial: "hidden", whileInView: "show", viewport: { once: true, amount: 0.15 } } as const;
+
+const benefits = [
+  { icon: Smartphone, title: "Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
+  { icon: TrendingUp, title: "Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
+  { icon: Brain, title: "Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
+  { icon: Globe, title: "Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
+  { icon: BarChart3, title: "Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
+  { icon: DollarSign, title: "Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
+];
+
+const competitiveEdge = { icon: Trophy, title: "Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." };
+
+const methodSteps = [
+  { number: "1", title: "Diagnóstico Estratégico", description: "Analizamos tu negocio, tu mercado y tus clientes.", items: ["Oportunidades ocultas", "Puntos de fuga de ventas", "Ventajas competitivas"], icon: Target },
+  { number: "2", title: "Arquitectura Digital", description: "Diseñamos tu ecosistema digital.", items: ["Web optimizada", "Embudos de venta", "Automatizaciones", "Canales de contacto", "Integraciones clave"], icon: Layers },
+  { number: "3", title: "Experiencia que convierte", description: "Creamos una experiencia clara, rápida y persuasiva. Menos pasos. Más conversiones.", items: [], icon: Zap },
+  { number: "4", title: "Activación de ventas", description: "Ponemos el sistema a trabajar.", items: ["Captación de tráfico", "Estrategia de contenidos", "Publicidad optimizada", "Seguimiento de leads"], icon: TrendingUp },
+  { number: "5", title: "Optimización constante", description: "Medimos resultados y mejoramos cada fase. Más rendimiento. Más beneficios. Más crecimiento.", items: [], icon: Repeat },
+];
+
+const outcomes = ["Vende más", "Crece más rápido", "Funciona mejor", "Se ve más profesional", "Está preparado para el futuro"];
+
+const results = [
+  { icon: Zap, text: "Un sistema escalable" },
+  { icon: DollarSign, text: "Una máquina de ventas" },
+  { icon: Globe, text: "Una marca profesional" },
+  { icon: TrendingUp, text: "Un proyecto preparado para el futuro" },
+];
 
 function BenefitCard({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
-    <motion.div
-      variants={fadeUp}
-      whileHover={{ y: -3 }}
-      className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur"
-    >
-      <div className="flex items-start gap-4">
-        <div className="rounded-xl border border-border/50 bg-primary/10 p-3">
-          <Icon className="h-5 w-5 text-primary" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-          <p className="mt-2 text-sm text-foreground/70">{description}</p>
-        </div>
-      </div>
+    <motion.div variants={fadeUp} className="glass-card hover-lift p-6">
+      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
+        <Icon className="h-5 w-5" />
+      </span>
+      <h3 className="mt-4 text-lg font-bold text-foreground">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
     </motion.div>
   );
 }
 
-function MethodStep({ number, title, description, items, icon: Icon }: { number: string; title: string; description: string; items: string[]; icon: React.ElementType }) {
+function MethodStep({ number, title, description, items, icon: Icon, last }: (typeof methodSteps)[number] & { last: boolean }) {
   return (
-    <motion.div variants={fadeUp} className="relative pl-12">
-      <div className="absolute left-2 top-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
-        {number}
+    <motion.li variants={fadeUp} className="relative grid grid-cols-[3rem_1fr] gap-4 sm:gap-6">
+      <div className="relative flex justify-center">
+        <span className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground shadow-[var(--shadow-glow)]">
+          {number}
+        </span>
+        {!last && <span className="absolute bottom-[-1.5rem] top-12 w-px bg-gradient-to-b from-primary/50 to-border" aria-hidden="true" />}
       </div>
-      <div className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-        <div className="flex items-start gap-3">
-          <div className="rounded-xl border border-border/50 bg-muted/50 p-2">
-            <Icon className="h-5 w-5 text-foreground/85" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-            <p className="mt-2 text-sm text-foreground/70">{description}</p>
-            {items.length > 0 && (
-              <ul className="mt-3 space-y-1.5">
-                {items.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-foreground/70">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+      <div className="glass-card mb-6 p-5 sm:p-6">
+        <div className="flex items-center gap-3">
+          <Icon className="h-5 w-5 text-primary" />
+          <h3 className="text-lg font-bold text-foreground">{title}</h3>
         </div>
+        <p className="mt-2 text-muted-foreground">{description}</p>
+        {items.length > 0 && (
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {items.map((item) => (
+              <li key={item} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1 text-sm text-foreground/80">
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </motion.div>
+    </motion.li>
   );
 }
 
 export default function MetodoNova() {
-  const benefits = [
-    { icon: Smartphone, title: "Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
-    { icon: TrendingUp, title: "Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
-    { icon: Brain, title: "Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
-    { icon: Globe, title: "Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
-    { icon: BarChart3, title: "Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
-    { icon: DollarSign, title: "Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
-    { icon: Trophy, title: "Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." },
-  ];
-
-  const methodSteps = [
-    { number: "1", title: "Diagnóstico Estratégico", description: "Analizamos tu negocio, tu mercado y tus clientes.", items: ["Oportunidades ocultas", "Puntos de fuga de ventas", "Ventajas competitivas"], icon: Target },
-    { number: "2", title: "Arquitectura Digital", description: "Diseñamos tu ecosistema digital.", items: ["Web optimizada", "Embudos de venta", "Automatizaciones", "Canales de contacto", "Integraciones clave"], icon: Layers },
-    { number: "3", title: "Experiencia que convierte", description: "Creamos una experiencia clara, rápida y persuasiva. Menos pasos. Más conversiones.", items: [], icon: Zap },
-    { number: "4", title: "Activación de ventas", description: "Ponemos el sistema a trabajar.", items: ["Captación de tráfico", "Estrategia de contenidos", "Publicidad optimizada", "Seguimiento de leads"], icon: TrendingUp },
-    { number: "5", title: "Optimización constante", description: "Medimos resultados y mejoramos cada fase. Más rendimiento. Más beneficios. Más crecimiento.", items: [], icon: Repeat },
-  ];
-
-  const results = [
-    { icon: Zap, text: "Un sistema escalable" },
-    { icon: DollarSign, text: "Una máquina de ventas" },
-    { icon: Globe, text: "Una marca profesional" },
-    { icon: TrendingUp, text: "Un proyecto preparado para el futuro" },
-  ];
-
   return (
     <>
-    <SEOHead {...SEO_PAGES["/metodo-nova"]} />
-    <div className="min-h-screen bg-background text-foreground relative">
-      {/* Interactive Stars - behind everything */}
-      <InteractiveStars />
+      <SEOHead {...SEO_PAGES["/metodo-nova"]} />
+      <Navbar />
 
-      {/* Background gradient */}
-      <div className="pointer-events-none fixed inset-0" style={{ zIndex: 1 }}>
-        <div className="absolute inset-0 opacity-50" style={{ background: "radial-gradient(circle_at_20%_20%,hsl(var(--primary)/0.1),transparent_45%),radial-gradient(circle_at_80%_30%,hsl(var(--primary)/0.08),transparent_45%),radial-gradient(circle_at_50%_85%,hsl(var(--primary)/0.05),transparent_50%)" }} />
-      </div>
+      <main className="bg-background text-foreground">
+        {/* Hero */}
+        <section className="relative overflow-hidden px-4 pb-20 pt-28 sm:px-6 md:pb-24 md:pt-36">
+          <div className="absolute inset-0 bg-grid opacity-70 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" aria-hidden="true" />
+          <div className="absolute left-1/2 top-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Volver</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Método Nova</span>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+          <motion.div variants={stagger} initial="hidden" animate="show" className="relative mx-auto max-w-3xl text-center">
+            <div className="flex justify-center">
+              <NovaMethodIcon size={104} />
+            </div>
 
-      <main className="relative mx-auto max-w-3xl px-4 pb-20 pt-24" style={{ zIndex: 10 }}>
-        {/* HERO */}
-        <motion.header variants={stagger} initial="hidden" animate="show" className="space-y-6 text-center">
-          <motion.div 
-            variants={fadeUp} 
-            className="flex justify-center"
-            initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", type: "spring", stiffness: 100 }}
-          >
-            <motion.img 
-              src={metodoNovaIcon} 
-              alt="Método Nova" 
-              className="w-28 h-28 object-contain"
-              animate={{ 
-                y: [0, -8, 0],
-              }}
-              transition={{ 
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
+            <motion.p variants={fadeUp} className="eyebrow mt-8">Método NOVA</motion.p>
+            <motion.h1 variants={fadeUp} className="mt-3 text-4xl font-extrabold leading-[1.1] text-foreground sm:text-5xl md:text-6xl">
+              La ventaja <span className="text-primary">NOVA</span>
+            </motion.h1>
+            <motion.p variants={fadeUp} className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground md:text-xl">
+              Convierte tu negocio en un sistema digital que vende, escala y crece contigo.
+            </motion.p>
+
+            <motion.figure variants={fadeUp} className="glass-card mx-auto mt-10 max-w-2xl p-6 text-left sm:p-8">
+              <div className="absolute inset-y-0 left-0 w-1 bg-primary" aria-hidden="true" />
+              <p className="text-lg text-foreground/80">
+                Hoy no gana quien tiene el mejor producto.{" "}
+                <span className="font-semibold text-foreground">Gana quien hace más fácil comprar.</span>
+              </p>
+              <p className="mt-3 text-muted-foreground">
+                La digitalización ya no es una opción. Es la diferencia entre crecer o quedarse atrás.
+              </p>
+            </motion.figure>
           </motion.div>
-
-          <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl font-bold text-foreground">
-            LA VENTAJA NOVA
-          </motion.h1>
-
-          <motion.p variants={fadeUp} className="text-xl text-foreground/80">
-            Convierte tu negocio en un sistema digital que vende, escala y crece contigo.
-          </motion.p>
-
-          <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-6 backdrop-blur text-left">
-            <p className="text-foreground/80">
-              Hoy no gana quien tiene el mejor producto.<br />
-              <span className="font-semibold text-foreground">Gana quien hace más fácil comprar.</span>
-            </p>
-            <p className="mt-4 text-foreground/70">
-              La digitalización ya no es una opción.<br />
-              Es la diferencia entre crecer o quedarse atrás.
-            </p>
-          </motion.div>
-        </motion.header>
+        </section>
 
         {/* Benefits */}
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
-          <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            ¿Qué consigue tu negocio al digitalizarse con NOVA?
-          </motion.h2>
-
-          <div className="grid gap-4">
-            {benefits.map((b, i) => (
-              <BenefitCard key={i} icon={b.icon} title={b.title} description={b.description} />
-            ))}
-          </div>
-        </motion.section>
-
-        {/* Results Preview */}
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
-          <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            El resultado
-          </motion.h2>
-
-          <motion.div variants={fadeUp} className="rounded-2xl border border-primary/30 bg-primary/5 p-6 backdrop-blur">
-            <p className="text-foreground/80 mb-4">Un negocio que:</p>
-            <div className="grid gap-2">
-              {["✔ Vende más", "✔ Crece más rápido", "✔ Funciona mejor", "✔ Se ve más profesional", "✔ Está preparado para el futuro"].map((item, i) => (
-                <p key={i} className="text-foreground font-semibold">{item}</p>
+        <section className="px-4 py-20 sm:px-6 md:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader eyebrow="Beneficios" title="¿Qué consigue tu negocio al digitalizarse con NOVA?" />
+            <motion.div variants={stagger} {...inView} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {benefits.map((b) => (
+                <BenefitCard key={b.title} {...b} />
               ))}
-            </div>
-          </motion.div>
-        </motion.section>
+              <motion.div
+                variants={fadeUp}
+                className="relative flex flex-col items-start gap-4 overflow-hidden rounded-2xl p-6 text-white sm:col-span-2 sm:flex-row sm:items-center lg:col-span-3"
+                style={{ backgroundImage: "var(--gradient-purple)" }}
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                  <competitiveEdge.icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-bold">{competitiveEdge.title}</h3>
+                  <p className="mt-1 text-white/85">{competitiveEdge.description}</p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
 
         {/* Method */}
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
-          <motion.div variants={fadeUp} className="text-center space-y-4">
-            <div className="flex justify-center">
-              <img src={metodoNovaIcon} alt="Método Nova" className="w-16 h-16 object-contain" />
+        <section className="border-y border-border bg-muted/40 px-4 py-20 sm:px-6 md:py-28">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-12 flex flex-col items-center text-center">
+              <NovaMethodIcon size={68} onView />
+              <h2 className="mt-6 text-3xl font-bold leading-tight text-foreground md:text-4xl">El Método NOVA</h2>
+              <p className="mt-3 text-lg text-muted-foreground">Nuestro sistema para hacer crecer tu negocio</p>
+              <p className="mt-6 max-w-xl text-foreground/80">
+                No trabajamos al azar. Seguimos un proceso probado que convierte negocios tradicionales en{" "}
+                <span className="font-semibold text-foreground">máquinas digitales de ventas</span>.
+              </p>
             </div>
-            <h2 className="text-2xl font-bold text-foreground">El Método NOVA</h2>
-            <p className="text-foreground/70">Nuestro sistema para hacer crecer tu negocio</p>
-          </motion.div>
 
-          <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 text-center">
-            <p className="text-foreground/80">
-              No trabajamos al azar.<br />
-              Seguimos un proceso probado que convierte negocios tradicionales en <span className="font-semibold text-foreground">máquinas digitales de ventas</span>.
-            </p>
-          </motion.div>
-
-          {/* Timeline */}
-          <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
-            <div className="space-y-4">
-              {methodSteps.map((step) => (
-                <MethodStep key={step.number} {...step} />
+            <motion.ol variants={stagger} {...inView}>
+              {methodSteps.map((step, i) => (
+                <MethodStep key={step.number} {...step} last={i === methodSteps.length - 1} />
               ))}
-            </div>
+            </motion.ol>
           </div>
-        </motion.section>
+        </section>
 
-        {/* Summary */}
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16 space-y-6">
-          <motion.h2 variants={fadeUp} className="text-2xl font-bold text-foreground text-center">
-            En resumen
-          </motion.h2>
+        {/* Result + summary */}
+        <section className="px-4 py-20 sm:px-6 md:py-24">
+          <motion.div variants={stagger} {...inView} className="mx-auto grid max-w-5xl gap-5 md:grid-cols-2">
+            <motion.div variants={fadeUp} className="glass-card p-6 sm:p-8">
+              <p className="eyebrow">El resultado</p>
+              <h2 className="mt-2 text-2xl font-bold text-foreground">Un negocio que…</h2>
+              <ul className="mt-5 space-y-3">
+                {outcomes.map((item) => (
+                  <li key={item} className="flex items-center gap-3 font-semibold text-foreground">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
 
-          <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-6 backdrop-blur">
-            <p className="text-foreground/80 mb-4">El Método NOVA convierte tu negocio en:</p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {results.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 text-foreground font-semibold">
-                  <r.icon className="h-4 w-4 text-primary" />
-                  <span>{r.text}</span>
-                </div>
-              ))}
-            </div>
+            <motion.div variants={fadeUp} className="glass-card p-6 sm:p-8">
+              <p className="eyebrow">En resumen</p>
+              <h2 className="mt-2 text-2xl font-bold text-foreground">El Método NOVA convierte tu negocio en:</h2>
+              <ul className="mt-5 space-y-3">
+                {results.map((r) => (
+                  <li key={r.text} className="flex items-center gap-3 font-semibold text-foreground">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+                      <r.icon className="h-4 w-4" />
+                    </span>
+                    {r.text}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </motion.div>
-        </motion.section>
+        </section>
 
         {/* CTA */}
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-16">
-          <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-primary/30 bg-primary/5 p-8 backdrop-blur text-center">
-            <h2 className="text-2xl font-bold text-foreground">
-              ⚡ Tu negocio puede crecer más
-            </h2>
-            <p className="mt-2 text-foreground/80">Nosotros te mostramos cómo</p>
-
-            <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
-              >
-                <MessageCircle className="h-5 w-5" />
-                Cuéntanos tu proyecto
-              </a>
-              <Link
-                to="/#servicios"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-muted/50 px-6 py-3 text-foreground font-semibold hover:bg-muted transition-colors"
-              >
-                <ArrowRight className="h-5 w-5" />
-                Haz crecer tu negocio hoy
-              </Link>
+        <section className="px-4 pb-20 sm:px-6 md:pb-28">
+          <motion.div
+            variants={fadeUp}
+            {...inView}
+            className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12 md:py-20"
+            style={{ backgroundImage: "var(--gradient-cosmic)" }}
+          >
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" aria-hidden="true" />
+            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
+            <div className="relative mx-auto max-w-2xl">
+              <h2 className="text-3xl font-bold text-white md:text-5xl">Tu negocio puede crecer más</h2>
+              <p className="mt-4 text-lg text-white/75 md:text-xl">Nosotros te mostramos cómo.</p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <a
+                  href={WHATSAPP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-[hsl(var(--nova-ink))] shadow-lg transition-transform hover:-translate-y-0.5"
+                >
+                  <MessageCircle className="h-5 w-5 text-[#25D366]" />
+                  Cuéntanos tu proyecto
+                </a>
+                <Link
+                  to="/#servicios"
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-7 py-3.5 font-semibold text-white transition-colors hover:bg-white/10"
+                >
+                  Haz crecer tu negocio hoy
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
             </div>
-
-            <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
           </motion.div>
-        </motion.section>
+        </section>
       </main>
 
-      <ThemeToggle variant="floating" />
-    </div>
+      <Footer />
     </>
   );
 }

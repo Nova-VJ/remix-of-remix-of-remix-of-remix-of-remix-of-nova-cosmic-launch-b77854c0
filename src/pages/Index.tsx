@@ -12,13 +12,11 @@ import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
 import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
-import FinalCTASection from '@/components/FinalCTASection';
 import StickyMobileCTA from '@/components/StickyMobileCTA';
 import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
 import VirtualAssistant from '@/components/VirtualAssistant';
 import AuditPopup from '@/components/AuditPopup';
-import BriefingCTASection from '@/components/BriefingCTASection';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,9 +44,7 @@ const Index = () => {
         <ComparisonSection />
         <ResultsSection />
         <FAQSection />
-        <BriefingCTASection autoOpen={shouldOpenBriefing} />
-        <ContactSection />
-        <FinalCTASection />
+        <ContactSection autoOpenBriefing={shouldOpenBriefing} />
         <Footer />
         <StickyMobileCTA />
         <ShoppingCart />
