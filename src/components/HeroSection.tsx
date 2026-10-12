@@ -42,8 +42,8 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center max-w-3xl mx-auto px-0 mb-0 my-[170px] mt-[270px]">
-        {/* Main headline */}
-        
+        {/* Main headline: the visible title is part of the background video, so keep a real H1 for SEO and screen readers */}
+        <h1 className="sr-only">NOVA Marketing Solutions: agencia de marketing digital en Valladolid. Impulsamos tu negocio hacia el éxito.</h1>
 
         {/* Subheadline */}
         

@@ -10,8 +10,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import referralHeroBg from '@/assets/invita-hero-bg.png';
-import invitaBottomBg from '@/assets/invita-bottom-bg.png';
+import referralHeroBg from '@/assets/invita-hero-bg.webp';
+import invitaBottomBg from '@/assets/invita-bottom-bg.webp';
 
 // Configuración centralizada
 const referralConfig = {

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import saraIcon from '@/assets/sara-icon.png';
+import saraIcon from '@/assets/sara-icon.webp';
 
 interface ChatButtonProps {
   isOpen: boolean;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { X, ArrowRight, ArrowLeft, Folder, Ticket, Gift, Shield, CreditCard, Bell, MessageCircleHeart } from 'lucide-react';
-import saraAvatar from '@/assets/sara-avatar.png';
+import saraAvatar from '@/assets/sara-avatar.webp';
 
 interface TutorialStep {
   title: string;

@@ -20,8 +20,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: '/nova-icon.svg',
-    badge: '/nova-icon.svg',
+    icon: '/nova-icon-192.png',
+    badge: '/nova-icon-192.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/' },
     tag: data.tag || 'nova-notification',

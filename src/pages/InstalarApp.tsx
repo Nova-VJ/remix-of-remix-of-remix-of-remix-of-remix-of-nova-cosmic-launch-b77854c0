@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import saraAvatar from '@/assets/sara-avatar.png';
+import saraAvatar from '@/assets/sara-avatar.webp';
 
 // ─── Step definitions per platform ───────────────────────────────────────────
 

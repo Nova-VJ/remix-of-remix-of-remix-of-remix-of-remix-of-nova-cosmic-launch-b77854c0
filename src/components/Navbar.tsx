@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Trophy, Gift, Shield, Download, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import metodoNovaIcon from '@/assets/metodo-nova-icon.png';
+import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 

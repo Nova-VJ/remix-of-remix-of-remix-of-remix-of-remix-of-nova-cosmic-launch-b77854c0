@@ -17,7 +17,7 @@ import FAQViewer from './FAQViewer';
 import AIChatMode from './AIChatMode';
 import SaraVoiceCallMode from './SaraVoiceCallMode';
 import { FAQ_CATEGORIES, SERVICES_DATA, WHATSAPP_NUMBER } from '@/data/chatFlowData';
-import saraAvatar from '@/assets/sara-avatar.png';
+import saraAvatar from '@/assets/sara-avatar.webp';
 import { 
   HelpCircle, 
   Briefcase, 

@@ -20,7 +20,9 @@ export default defineConfig(({ mode }) => ({
       filename: "sw.ts",
       manifest: false,
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2}"],
+        // Staff-only page: don't make every visitor download it in the background
+        globIgnores: ["**/Admin-*.js"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
     }),

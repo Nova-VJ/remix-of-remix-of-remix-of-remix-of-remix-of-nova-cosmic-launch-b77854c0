@@ -2,7 +2,7 @@ import { TrendingUp, Rocket, Smartphone, Target, ArrowRight } from 'lucide-react
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import casosExitoBanner from '@/assets/casos-exito-banner.png';
+import casosExitoBanner from '@/assets/casos-exito-banner.webp';
 
 const results = [
   {
@@ -66,7 +66,9 @@ const ResultsSection = () => {
             <div className="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl mx-auto max-w-[280px] sm:max-w-sm md:max-w-full">
               <img 
                 src={casosExitoBanner} 
-                alt="Casos de éxito - Aprende con nosotros" 
+                alt="Casos de éxito - Aprende con nosotros"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />

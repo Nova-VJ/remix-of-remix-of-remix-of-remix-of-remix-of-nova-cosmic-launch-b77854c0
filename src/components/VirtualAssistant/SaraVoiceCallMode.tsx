@@ -5,7 +5,7 @@ import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useAuth } from '@/contexts/AuthContext';
 import { sendToSara } from '@/lib/saraApi';
 import { useToast } from '@/hooks/use-toast';
-import saraAvatar from '@/assets/sara-avatar.png';
+import saraAvatar from '@/assets/sara-avatar.webp';
 
 interface SaraVoiceCallModeProps {
   onEnd: () => void;

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import serviceWebIcon from '@/assets/service-web-icon.svg';
-import serviceAppsIcon from '@/assets/service-apps-icon.svg';
-import serviceBrandingIcon from '@/assets/service-branding-icon.svg';
-import serviceSocialIcon from '@/assets/service-social-icon.svg';
-import serviceContentIcon from '@/assets/service-content-icon.png';
+import serviceWebIcon from '@/assets/service-web-icon.webp';
+import serviceAppsIcon from '@/assets/service-apps-icon.webp';
+import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
+import serviceSocialIcon from '@/assets/service-social-icon.webp';
+import serviceContentIcon from '@/assets/service-content-icon.webp';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { Check, ShoppingCart, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, ChevronUp, FileEdit } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
@@ -212,6 +212,8 @@ const ServicesSection = () => {
                 <img
                   src={service.image}
                   alt={service.alt}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-contain"
                 />
               </div>
