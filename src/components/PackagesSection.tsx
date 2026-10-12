@@ -1,8 +1,9 @@
-import { Check, ShoppingCart, Crown, Gem, Gift } from 'lucide-react';
+import { Check, Plus, Crown, Gem, Gift } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import SectionHeader from '@/components/SectionHeader';
 
 const packages = [
   {
@@ -46,13 +47,13 @@ const PackagesSection = () => {
   const handleAddPackage = (pkg: typeof packages[0]) => {
     // Check if already has items
     if (items.length > 0) {
-      toast.error('Vacía tu carrito antes de añadir un paquete');
+      toast.error('Vacía tu presupuesto antes de añadir un paquete');
       return;
     }
     
     // Check if Paquete Plus and NOVA30 applied
     if (pkg.id === 'pkg-plus' && isPromoApplied) {
-      toast.error('Paquete Plus no es compatible con el código NOVA30');
+      toast.error('Paquete Plus no es compatible con el código NOVA20');
       return;
     }
 
@@ -63,23 +64,22 @@ const PackagesSection = () => {
       type: 'package' as const,
     };
     addItem(cartItem);
-    toast.success(`${pkg.name} añadido al carrito`);
+    toast.success(`${pkg.name} añadido a tu presupuesto`);
   };
 
   const isInCart = (id: string) => items.some(item => item.id === id);
   const hasPackage = items.some(item => item.type === 'package');
 
   return (
-    <section id="paquetes" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
+    <section id="paquetes" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Section header */}
-        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-            Paquetes especiales
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Combina servicios y ahorra. Incluyen beneficios exclusivos.
-          </p>
+        <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <SectionHeader
+            eyebrow="Precios"
+            title="Paquetes para empezar con todo"
+            subtitle="Combina servicios y ahorra. Incluyen bonificaciones que no tendrías comprándolos por separado."
+          />
         </div>
 
         {/* Packages grid */}
@@ -87,12 +87,12 @@ const PackagesSection = () => {
           {packages.map((pkg, index) => (
             <div
               key={pkg.id}
-              className={`relative glass-card p-6 flex flex-col transition-all duration-700 hover-lift overflow-visible ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? 'border-primary/50 ring-2 ring-primary/20' : ''}`}
+              className={`relative glass-card p-7 flex flex-col transition-all duration-700 hover-lift overflow-visible ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? '!border-primary ring-1 ring-primary' : ''}`}
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {pkg.highlight && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-full whitespace-nowrap shadow-lg shadow-primary/30 z-20">
-                  ⭐ MEJOR VALOR
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full whitespace-nowrap z-20">
+                  Recomendado
                 </div>
               )}
 
@@ -144,18 +144,18 @@ const PackagesSection = () => {
                 onClick={() => handleAddPackage(pkg)}
                 disabled={isInCart(pkg.id) || (hasPackage && !isInCart(pkg.id))}
                 variant={pkg.highlight ? "default" : "outline"}
-                className={`w-full mt-auto ${pkg.highlight ? 'shadow-lg shadow-primary/40 hover:shadow-primary/60 hover:scale-[1.02] transition-all' : ''}`}
+                className="w-full mt-auto"
                 size="lg"
               >
                 {isInCart(pkg.id) ? (
                   <>
                     <Check className="w-4 h-4 mr-2" />
-                    En tu carrito
+                    En tu presupuesto
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Seleccionar paquete
+                    <Plus className="w-4 h-4 mr-2" />
+                    Elegir este paquete
                   </>
                 )}
               </Button>
@@ -165,7 +165,7 @@ const PackagesSection = () => {
 
         {/* Individual services note */}
         <p className="text-center text-muted-foreground text-sm mt-8">
-          ¿Prefieres servicios individuales? Selecciónalos arriba en "Nuestros servicios"
+          ¿Prefieres servicios sueltos? Añádelos desde la sección de servicios.
         </p>
       </div>
     </section>

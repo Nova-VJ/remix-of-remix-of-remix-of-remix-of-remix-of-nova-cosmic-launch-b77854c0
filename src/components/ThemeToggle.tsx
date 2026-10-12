@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const THEME_KEY = 'nova-theme';
+
 interface ThemeToggleProps {
   className?: string;
   variant?: 'navbar' | 'floating';
@@ -9,12 +11,12 @@ interface ThemeToggleProps {
 
 const ThemeToggle = ({ className, variant = 'navbar' }: ThemeToggleProps) => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // New key: the old one stored 'dark' for every past visitor, and the site is now light by default
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme');
+      const stored = localStorage.getItem(THEME_KEY);
       if (stored === 'light' || stored === 'dark') return stored;
-      return 'dark';
     }
-    return 'dark';
+    return 'light';
   });
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const ThemeToggle = ({ className, variant = 'navbar' }: ThemeToggleProps) => {
       root.classList.remove('light');
       root.classList.add('dark');
     }
-    localStorage.setItem('theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
   const toggleTheme = () => {

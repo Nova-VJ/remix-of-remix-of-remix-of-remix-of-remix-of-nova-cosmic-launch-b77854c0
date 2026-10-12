@@ -3,6 +3,7 @@ import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import casosExitoBanner from '@/assets/casos-exito-banner.webp';
+import SectionHeader from '@/components/SectionHeader';
 
 const results = [
   {
@@ -31,16 +32,12 @@ const ResultsSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   return (
-    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6 overflow-hidden">
-      {/* Glow effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6 overflow-hidden bg-muted/40 border-y border-border">
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Section header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-            Resultados reales
-          </h2>
+          <SectionHeader eyebrow="Resultados" title="Lo que conseguimos para nuestros clientes" className="mb-0" />
         </div>
 
         {/* Stats grid */}
@@ -51,7 +48,9 @@ const ResultsSection = () => {
               className={`glass-card p-6 text-center transition-all duration-700 hover-lift ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
-              <result.icon className="w-8 h-8 text-primary mx-auto mb-3" />
+              <span className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
+                <result.icon className="h-5 w-5" />
+              </span>
               <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                 {result.stat}
               </div>
@@ -61,9 +60,9 @@ const ResultsSection = () => {
         </div>
 
         {/* Casos de éxito CTA - Image and Text */}
-        <div className={`mt-16 pt-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
-          <Link to="/casos-exito" className="block mb-4 md:mb-6">
-            <div className="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl mx-auto max-w-[280px] sm:max-w-sm md:max-w-full">
+        <div className={`mt-16 glass-card grid items-center gap-8 p-6 md:grid-cols-2 md:p-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '400ms' }}>
+          <Link to="/casos-exito" className="block">
+            <div className="relative group cursor-pointer overflow-hidden rounded-xl border border-border">
               <img 
                 src={casosExitoBanner} 
                 alt="Casos de éxito - Aprende con nosotros"
@@ -71,20 +70,18 @@ const ResultsSection = () => {
                 decoding="async"
                 className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
             </div>
           </Link>
 
-          <div className="text-center px-4 md:px-0">
-            <p className="text-sm sm:text-base md:text-lg text-foreground/80 mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed font-medium">
-              Aprende con nosotros, utilizamos <span className="text-primary font-semibold">historias reales</span> de ejemplo y te explicamos las estrategias que aplicaron estos comercios, para surgir de la nada, pero muchas veces también <span className="text-primary font-semibold">¡Para levantarse con más fuerza!</span>
+          <div>
+            <p className="eyebrow mb-3">Casos de éxito</p>
+            <h3 className="text-2xl font-bold text-foreground">Aprende de marcas que lo hicieron bien</h3>
+            <p className="mt-3 text-muted-foreground leading-relaxed">
+              Analizamos historias reales de negocios que crecieron con estrategia digital y te contamos qué hicieron y cómo aplicarlo al tuyo.
             </p>
-            <Link to="/casos-exito">
-              <Button 
-                size="lg"
-                className="rounded-full px-8 md:px-10 text-base md:text-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/25 border-0 font-semibold"
-              >
-                Ver Casos de Éxito
+            <Link to="/casos-exito" className="mt-6 inline-block">
+              <Button size="lg" className="font-semibold">
+                Ver casos de éxito
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>

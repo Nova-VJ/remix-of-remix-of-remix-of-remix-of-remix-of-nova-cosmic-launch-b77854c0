@@ -5,11 +5,14 @@ import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
 import serviceSocialIcon from '@/assets/service-social-icon.webp';
 import serviceContentIcon from '@/assets/service-content-icon.webp';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, ShoppingCart, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, ChevronUp, FileEdit } from 'lucide-react';
+import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import ContentFormModal from '@/components/ContentFormModal';
+import SectionHeader from '@/components/SectionHeader';
+import { cn } from '@/lib/utils';
 const services = [
   {
     id: 'web',
@@ -128,103 +131,107 @@ const additionalServices = [
 const ServicesSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const { addItem, items } = useCart();
-  const [expandedAssistants, setExpandedAssistants] = useState<Record<string, boolean>>({});
+  const [expandedAssistant, setExpandedAssistant] = useState<string | null>(null);
   const [showContentForm, setShowContentForm] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddToCart = (service: typeof services[0]) => {
-    const cartItem = {
+    addItem({
       id: service.id,
       name: service.title,
       price: service.price,
       type: 'service' as const,
       isMonthly: service.isMonthly,
-    };
-    addItem(cartItem);
-    toast.success(`${service.title} añadido al carrito`);
-    
-    // Auto-expand virtual assistant options when adding web or apps to cart
-    if (service.hasVirtualAssistant) {
-      virtualAssistants.forEach(assistant => {
-        const key = `${service.id}-${assistant.id}`;
-        setExpandedAssistants(prev => ({ ...prev, [key]: true }));
-      });
-    }
+    });
+    toast.success(`${service.title} añadido a tu presupuesto`);
   };
 
   const handleAddVirtualAssistant = (assistant: typeof virtualAssistants[0]) => {
-    const cartItem = {
+    addItem({
       id: assistant.id,
       name: assistant.title,
       price: assistant.price,
       type: 'service' as const,
-    };
-    addItem(cartItem);
-    toast.success(`${assistant.title} añadido al carrito`);
+    });
+    toast.success(`${assistant.title} añadido a tu presupuesto`);
   };
 
   const handleAddAdditionalService = (service: typeof additionalServices[0]) => {
-    const cartItem = {
+    addItem({
       id: service.id,
       name: service.title,
       price: service.price,
       type: 'service' as const,
       isMonthly: service.isMonthly,
-    };
-    addItem(cartItem);
-    toast.success(`${service.title} añadido al carrito`);
+    });
+    toast.success(`${service.title} añadido a tu presupuesto`);
   };
 
   const isInCart = (id: string) => items.some(item => item.id === id);
 
-  const toggleAssistantExpand = (serviceId: string, assistantId: string) => {
-    const key = `${serviceId}-${assistantId}`;
-    setExpandedAssistants(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  const reveal = (delay = 0) => ({
+    className: cn('transition-all duration-700', isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'),
+    style: { transitionDelay: `${delay}ms` },
+  });
 
-  const isAssistantExpanded = (serviceId: string, assistantId: string) => {
-    const key = `${serviceId}-${assistantId}`;
-    return expandedAssistants[key] || false;
-  };
+  const AddButton = ({ id, onAdd, label = 'Añadir al presupuesto', small = false }: { id: string; onAdd: () => void; label?: string; small?: boolean }) => (
+    <Button
+      onClick={onAdd}
+      disabled={isInCart(id)}
+      variant={isInCart(id) ? 'secondary' : 'outline'}
+      size={small ? 'sm' : 'default'}
+      className={cn(!small && 'w-full')}
+    >
+      {isInCart(id) ? (
+        <>
+          <Check className="w-4 h-4 mr-1.5" />
+          {small ? 'Añadido' : 'En tu presupuesto'}
+        </>
+      ) : (
+        <>
+          <Plus className="w-4 h-4 mr-1.5" />
+          {label}
+        </>
+      )}
+    </Button>
+  );
 
   return (
-    <section id="servicios" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6 pt-24">
+    <section id="servicios" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6 bg-muted/40 border-y border-border">
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Section header */}
-        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-            Nuestros servicios
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Soluciones digitales adaptadas a cada tipo de negocio.
-          </p>
+        <div {...reveal()}>
+          <SectionHeader
+            eyebrow="Servicios"
+            title="Todo lo que tu negocio necesita para crecer online"
+            subtitle="Elige un servicio o combínalos. Los precios son orientativos: analizamos tu proyecto y te enviamos el presupuesto final sin compromiso."
+          />
         </div>
 
-        {/* Main services grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-start">
+        {/* Main services */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((service, index) => (
-            <div
-              key={index}
-              className={`glass-card p-6 flex flex-col transition-all duration-700 hover-lift ${(service as any).isFullWidth ? 'md:col-span-2 max-w-xl mx-auto w-full' : ''} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-              style={{ transitionDelay: `${index * 100 + 200}ms` }}
+            <article
+              key={service.id}
+              className={cn('glass-card hover-lift p-6 flex flex-col', reveal(index * 80 + 100).className)}
+              style={reveal(index * 80 + 100).style}
             >
-              {/* Service image */}
-              <div className={`${(service as any).isFullWidth ? 'w-48 h-48' : 'w-20 h-20'} mx-auto mb-4 rounded-xl overflow-hidden`}>
-                <img
-                  src={service.image}
-                  alt={service.alt}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-contain"
-                />
-              </div>
+              <img
+                src={service.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="w-14 h-14 object-contain mb-5"
+              />
+              <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
 
-              {/* Title and description */}
-              <h3 className="text-xl font-bold text-foreground text-center mb-1">{service.title}</h3>
-              <p className="text-primary font-bold text-center mb-2">{service.priceLabel}</p>
-              <p className="text-muted-foreground text-center mb-4">{service.description}</p>
+              {service.price > 0 ? (
+                <p className="mt-4 text-xl font-bold text-foreground">{service.priceLabel}</p>
+              ) : (
+                <p className="mt-4 text-sm font-semibold text-foreground">Precio a medida, tras analizar tu proyecto</p>
+              )}
 
-              {/* Includes list */}
-              <ul className="space-y-2 mb-6 flex-1">
+              <ul className="mt-4 mb-6 space-y-2 flex-1">
                 {service.includes.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
                     <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -233,154 +240,108 @@ const ServicesSection = () => {
                 ))}
               </ul>
 
-              {/* Add to cart button */}
-              <Button
-                onClick={() => handleAddToCart(service)}
-                disabled={isInCart(service.id)}
-                variant={isInCart(service.id) ? "secondary" : "default"}
-                className="w-full mb-4"
-              >
-                {isInCart(service.id) ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    En tu carrito
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Añadir al carrito
-                  </>
+              <div className="space-y-2">
+                <AddButton id={service.id} onAdd={() => handleAddToCart(service)} />
+                {(service as any).hasContentForm && (
+                  <Button onClick={() => setShowContentForm(true)} variant="ghost" className="w-full text-primary hover:text-primary">
+                    <FileEdit className="w-4 h-4 mr-1.5" />
+                    Pedir propuesta de contenido
+                  </Button>
                 )}
-              </Button>
-
-              {/* Content Form button for content service */}
-              {(service as any).hasContentForm && (
-                <Button
-                  onClick={() => setShowContentForm(true)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <FileEdit className="w-4 h-4 mr-2" />
-                  Rellenar formulario
-                </Button>
-              )}
-
-              {/* Virtual Assistant sub-categories for web and apps */}
-              {service.hasVirtualAssistant && (
-                <div className="border-t border-border/50 pt-4 mt-auto space-y-3">
-                  <p className="text-xs text-muted-foreground text-center font-medium uppercase tracking-wide">
-                    Potencia tu {service.id === 'web' ? 'web' : 'app'} con IA
-                  </p>
-                  {virtualAssistants.map((assistant) => {
-                    const isExpanded = isAssistantExpanded(service.id, assistant.id);
-                    return (
-                      <div
-                        key={assistant.id}
-                        className="bg-background/50 rounded-lg p-3 border border-border/30 transition-all duration-300"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => toggleAssistantExpand(service.id, assistant.id)}
-                          className="w-full text-left"
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <assistant.icon className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-bold text-foreground">{assistant.title}</h4>
-                              <p className="text-primary font-bold text-xs">{assistant.priceLabel}</p>
-                            </div>
-                            <div className="flex-shrink-0">
-                              {isExpanded ? (
-                                <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                        
-                        <p className="text-xs text-muted-foreground mb-2">{assistant.subtitle}</p>
-                        
-                        <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                          <ul className="space-y-1.5 mb-3">
-                            {assistant.features.map((feature, i) => (
-                              <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/80">
-                                <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                                <span>{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-                          <p className="text-[11px] text-muted-foreground italic mb-3 bg-muted/30 p-2 rounded">
-                            {assistant.useCase}
-                          </p>
-                        </div>
-                        
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAddVirtualAssistant(assistant);
-                          }}
-                          disabled={isInCart(assistant.id)}
-                          variant="outline"
-                          size="sm"
-                          className="w-full h-7 text-xs"
-                        >
-                          {isInCart(assistant.id) ? (
-                            <>
-                              <Check className="w-3 h-3 mr-1" />
-                              Añadido
-                            </>
-                          ) : (
-                            <>
-                              <ShoppingCart className="w-3 h-3 mr-1" />
-                              Añadir
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+              </div>
+            </article>
           ))}
+
+          {/* Custom project card: fills the grid and leads to the briefing form */}
+          <article
+            className={cn('flex flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-accent/50 p-6', reveal(services.length * 80 + 100).className)}
+            style={reveal(services.length * 80 + 100).style}
+          >
+            <h3 className="text-lg font-bold text-foreground">¿Necesitas algo a medida?</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Tiendas online, reservas, automatizaciones, integraciones… Cuéntanos tu idea y te proponemos la mejor solución.
+            </p>
+            <Button onClick={() => navigate('/?openBriefing=true')} className="mt-5 w-full">
+              Pide presupuesto
+              <ArrowRight className="w-4 h-4 ml-1.5" />
+            </Button>
+          </article>
         </div>
 
-        {/* Additional services */}
-        <div className={`mt-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '600ms' }}>
-          <h3 className="text-xl font-bold text-foreground text-center mb-6">Servicios adicionales</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {additionalServices.map((service, index) => (
-              <div
-                key={service.id}
-                className="glass-card p-4 flex items-center gap-3"
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <service.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                    <h4 className="font-bold text-foreground text-sm">{service.title}</h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary text-primary-foreground font-medium whitespace-nowrap">
+        {/* Add-ons */}
+        <div className={cn('mt-14 grid gap-5 lg:grid-cols-2', reveal(500).className)} style={reveal(500).style}>
+          {/* AI assistant for the client's web or app */}
+          <div className="glass-card p-6">
+            <p className="eyebrow mb-2">Complemento</p>
+            <h3 className="text-lg font-bold text-foreground">Asistente virtual con IA para tu web o app</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">Atiende a tus clientes, responde dudas y agenda citas por ti. Pago único.</p>
+
+            <div className="mt-5 divide-y divide-border rounded-xl border border-border">
+              {virtualAssistants.map((assistant) => {
+                const isExpanded = expandedAssistant === assistant.id;
+                return (
+                  <div key={assistant.id} className="p-4">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+                        <assistant.icon className="h-5 w-5" />
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedAssistant(isExpanded ? null : assistant.id)}
+                        className="min-w-0 flex-1 text-left"
+                        aria-expanded={isExpanded}
+                      >
+                        <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                          {assistant.title}
+                          <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', isExpanded && 'rotate-180')} />
+                        </span>
+                        <span className="block text-xs text-muted-foreground">{assistant.priceLabel}</span>
+                      </button>
+                      <AddButton id={assistant.id} onAdd={() => handleAddVirtualAssistant(assistant)} label="Añadir" small />
+                    </div>
+                    <div className={cn('grid transition-all duration-300', isExpanded ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0')}>
+                      <div className="overflow-hidden">
+                        <p className="text-sm text-muted-foreground">{assistant.subtitle}</p>
+                        <ul className="mt-2 space-y-1.5">
+                          {assistant.features.map((feature, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-sm text-foreground/80">
+                              <Check className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-2 text-xs text-muted-foreground">{assistant.useCase}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Marketing add-ons */}
+          <div className="glass-card p-6">
+            <p className="eyebrow mb-2">Complemento</p>
+            <h3 className="text-lg font-bold text-foreground">Marketing y publicidad</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">Estrategia y campañas para atraer clientes desde el primer día.</p>
+
+            <div className="mt-5 divide-y divide-border rounded-xl border border-border">
+              {additionalServices.map((service) => (
+                <div key={service.id} className="flex items-center gap-3 p-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+                    <service.icon className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-foreground">{service.title} · <span className="font-normal text-muted-foreground">{service.priceLabel}</span></p>
+                    <p className="text-xs text-muted-foreground">{service.subtitle}</p>
+                    <span className="mt-1 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                       {service.badge}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">{service.subtitle}</p>
-                  <p className="text-primary font-bold text-sm">{service.priceLabel}</p>
+                  <AddButton id={service.id} onAdd={() => handleAddAdditionalService(service)} label="Añadir" small />
                 </div>
-                <Button
-                  onClick={() => handleAddAdditionalService(service)}
-                  disabled={isInCart(service.id)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-shrink-0"
-                >
-                  {isInCart(service.id) ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
-                </Button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

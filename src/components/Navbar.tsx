@@ -1,20 +1,41 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, Trophy, Gift, Shield, Download, Bell } from 'lucide-react';
+import { Menu, X, User, Shield, Bell, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
+import { cn } from '@/lib/utils';
 
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 
+type NavItem =
+  | { label: string; section: string }
+  | { label: string; to: string };
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Servicios', section: 'servicios' },
+  { label: 'Precios', section: 'paquetes' },
+  { label: 'Proceso', section: 'proceso' },
+  { label: 'Casos de éxito', to: '/casos-exito' },
+  { label: 'Método NOVA', to: '/metodo-nova' },
+  { label: 'Contacto', section: 'contacto' },
+];
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const isAdmin = user?.email === ADMIN_EMAIL;
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Fetch unread admin notifications count
   useEffect(() => {
@@ -49,104 +70,117 @@ const Navbar = () => {
   }, [isAdmin]);
 
   const scrollToSection = (id: string) => {
+    setIsOpen(false);
     if (!isHome) {
       window.location.href = `/#${id}`;
       return;
     }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const openBriefing = () => {
     setIsOpen(false);
+    navigate('/?openBriefing=true');
   };
 
   const NotificationBadge = () => {
     if (!isAdmin || unreadCount === 0) return null;
     return (
-      <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1 animate-pulse">
+      <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
         {unreadCount > 99 ? '99+' : unreadCount}
       </span>
     );
   };
 
+  const linkClass = "text-sm font-medium text-foreground/70 hover:text-foreground transition-colors";
+
+  const renderItem = (item: NavItem, mobile = false) => {
+    const className = cn(linkClass, mobile && "block w-full py-2.5 text-left text-base");
+    if ('to' in item) {
+      return (
+        <Link key={item.label} to={item.to} onClick={() => setIsOpen(false)} className={className}>
+          {item.label}
+        </Link>
+      );
+    }
+    return (
+      <button key={item.label} type="button" onClick={() => scrollToSection(item.section)} className={className}>
+        {item.label}
+      </button>
+    );
+  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-200",
+        scrolled || isOpen
+          ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-[0_1px_0_hsl(var(--border))]"
+          : "bg-transparent border-b border-transparent"
+      )}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <img alt="SolutionsNova" className="h-8 w-auto" src="/images/logo-nova.png" />
+          <Link to="/" className="flex items-center gap-2" aria-label="NOVA Marketing Solutions, inicio">
+            <img alt="NOVA Marketing Solutions" className="h-9 w-auto" src="/images/logo-nova.png" />
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden md:flex items-center gap-4">
-            <button onClick={() => scrollToSection('servicios')} className="text-foreground/80 hover:text-primary transition-colors text-sm">
-              Servicios
-            </button>
-            <button onClick={() => scrollToSection('paquetes')} className="text-foreground/80 hover:text-primary transition-colors text-sm">
-              Paquetes
-            </button>
-            <Link to="/casos-exito" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
-              <Trophy className="w-4 h-4" />
-              Casos de éxito
-            </Link>
-            <Link to="/metodo-nova" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
-              <img src={metodoNovaIcon} alt="" className="w-10 h-10 object-contain" />
-              Método Nova
-            </Link>
-            <Link to="/invita-a-un-amigo" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
-              <Gift className="w-4 h-4" />
-              Invita a un amigo
-            </Link>
-            <Link to="/instalar-app" className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-sm">
-              <Download className="w-4 h-4" />
-              Instalar App
-            </Link>
-            <button onClick={() => scrollToSection('contacto')} className="text-foreground/80 hover:text-primary transition-colors text-sm">
-              Contacto
-            </button>
+          <div className="hidden lg:flex items-center gap-7">
+            {NAV_ITEMS.map((item) => renderItem(item))}
+          </div>
 
+          <div className="hidden lg:flex items-center gap-3">
             {isAdmin && (
-              <Link to="/admin" className="relative flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
+              <Link to="/admin" className="relative flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 <Shield className="w-4 h-4" />
                 Admin
                 <NotificationBadge />
               </Link>
             )}
 
-            {isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="relative p-2 text-foreground/80 hover:text-primary transition-colors"
-                title="Notificaciones"
-              >
-                <Bell className="w-5 h-5" />
-                <NotificationBadge />
-              </button>
-            )}
-            
             {user ? (
-              <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all text-sm">
+              <Link to="/dashboard" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
                 <User className="w-4 h-4" />
                 Mi cuenta
               </Link>
             ) : (
-              <Link to="/auth" className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all text-sm">
-                <User className="w-4 h-4" />
+              <Link to="/auth" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
                 Acceder
               </Link>
             )}
+
+            <button
+              type="button"
+              onClick={openBriefing}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-[hsl(var(--nova-purple-dark))]"
+            >
+              Pide presupuesto
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
             {isAdmin && (
               <button
+                type="button"
                 onClick={() => navigate('/admin')}
                 className="relative p-2 text-foreground/80 hover:text-primary transition-colors"
+                aria-label="Notificaciones"
               >
                 <Bell className="w-5 h-5" />
                 <NotificationBadge />
               </button>
             )}
-            <button onClick={() => setIsOpen(!isOpen)} className="p-2 text-foreground">
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-foreground"
+              aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={isOpen}
+            >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -154,36 +188,12 @@ const Navbar = () => {
 
         {/* Mobile menu */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <div className="flex flex-col gap-3">
-              <button onClick={() => scrollToSection('servicios')} className="text-foreground/80 hover:text-primary transition-colors py-2 text-left">
-                Servicios
-              </button>
-              <button onClick={() => scrollToSection('paquetes')} className="text-foreground/80 hover:text-primary transition-colors py-2 text-left">
-                Paquetes
-              </button>
-              <Link to="/casos-exito" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
-                <Trophy className="w-4 h-4" />
-                Casos de éxito
-              </Link>
-              <Link to="/metodo-nova" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
-                <img src={metodoNovaIcon} alt="" className="w-10 h-10 object-contain" />
-                Método Nova
-              </Link>
-              <Link to="/invita-a-un-amigo" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
-                <Gift className="w-4 h-4" />
-                Invita a un amigo
-              </Link>
-              <Link to="/instalar-app" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors py-2">
-                <Download className="w-4 h-4" />
-                Instalar App
-              </Link>
-              <button onClick={() => scrollToSection('contacto')} className="text-foreground/80 hover:text-primary transition-colors py-2 text-left">
-                Contacto
-              </button>
+          <div className="lg:hidden border-t border-border pb-5 pt-2">
+            <div className="flex flex-col">
+              {NAV_ITEMS.map((item) => renderItem(item, true))}
 
               {isAdmin && (
-                <Link to="/admin" onClick={() => setIsOpen(false)} className="relative flex items-center gap-2 text-primary hover:text-primary/80 transition-colors py-2 font-medium">
+                <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-2 py-2.5 text-base font-medium text-primary">
                   <Shield className="w-4 h-4" />
                   Admin
                   {unreadCount > 0 && (
@@ -193,18 +203,24 @@ const Navbar = () => {
                   )}
                 </Link>
               )}
-              
-              {user ? (
-                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all w-fit">
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Link
+                  to={user ? '/dashboard' : '/auth'}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground"
+                >
                   <User className="w-4 h-4" />
-                  Mi cuenta
+                  {user ? 'Mi cuenta' : 'Acceder'}
                 </Link>
-              ) : (
-                <Link to="/auth" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all w-fit">
-                  <User className="w-4 h-4" />
-                  Acceder
-                </Link>
-              )}
+                <button
+                  type="button"
+                  onClick={openBriefing}
+                  className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+                >
+                  Pide presupuesto
+                </button>
+              </div>
             </div>
           </div>
         )}

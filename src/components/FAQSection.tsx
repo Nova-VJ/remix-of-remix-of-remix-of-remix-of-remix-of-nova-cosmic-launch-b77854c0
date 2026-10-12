@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import SectionHeader from '@/components/SectionHeader';
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
 const faqs = [{
   question: "¿Cuánto tiempo tarda cada servicio?",
@@ -32,29 +33,26 @@ const FAQSection = () => {
     threshold: 0.1
   });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  return <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
+  return <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
 
       <div className="relative z-10 max-w-3xl mx-auto">
         {/* Section header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-            Preguntas frecuentes
-          </h2>
+          <SectionHeader eyebrow="FAQ" title="Preguntas frecuentes" className="mb-0" />
         </div>
 
         {/* FAQ items */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, index) => <div key={index} className={`glass-card overflow-hidden transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{
           transitionDelay: `${index * 50 + 200}ms`
         }}>
-              <button onClick={() => setOpenIndex(openIndex === index ? null : index)} className="w-full p-4 flex items-center justify-between text-left hover:bg-background/20 transition-colors">
-                <span className="font-medium text-foreground pr-4">{faq.question}</span>
+              <button onClick={() => setOpenIndex(openIndex === index ? null : index)} className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors" aria-expanded={openIndex === index}>
+                <span className="font-semibold text-foreground pr-4">{faq.question}</span>
                 <ChevronDown className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`} />
               </button>
               
               <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}>
-                <div className="p-4 pt-0 text-muted-foreground whitespace-pre-line">
+                <div className="px-5 pb-5 text-muted-foreground leading-relaxed whitespace-pre-line">
                   {faq.answer}
                 </div>
               </div>

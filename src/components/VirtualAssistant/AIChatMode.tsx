@@ -250,7 +250,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
     addItem(item);
     setAddedItems(prev => new Set(prev).add(item.id));
     toast({
-      title: '🛒 Añadido al carrito',
+      title: 'Añadido a tu presupuesto',
       description: `${item.name} — ${item.price.toLocaleString('es-ES')}€`,
     });
   };
@@ -403,7 +403,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                               ? 'text-primary bg-primary/10' 
                               : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
                           }`}
-                          title={isAdded ? 'Añadido' : 'Añadir al carrito'}
+                          title={isAdded ? 'Añadido' : 'Añadir a tu presupuesto'}
                         >
                           {isAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingCart className="w-3.5 h-3.5" />}
                         </button>

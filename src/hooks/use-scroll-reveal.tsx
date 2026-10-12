@@ -7,9 +7,16 @@ interface UseScrollRevealOptions {
 }
 
 export const useScrollReveal = (options: UseScrollRevealOptions = {}) => {
-  const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options;
+  const { triggerOnce = true } = options;
   const ref = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  // Respect "reduce motion" by showing content straight away
+  const [isVisible, setIsVisible] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
+  // Reveal as soon as the section edge enters the viewport. A percentage threshold
+  // left tall sections blank on phones until a large part of them was on screen.
+  const threshold = 0;
+  const rootMargin = options.rootMargin ?? '0px 0px -60px 0px';
 
   useEffect(() => {
     const element = ref.current;

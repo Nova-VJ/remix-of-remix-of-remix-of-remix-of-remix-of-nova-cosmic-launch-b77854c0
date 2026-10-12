@@ -2,95 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NOVA Marketing Solutions - Cosmic Purple Design System */
+/* NOVA Marketing Solutions - Light corporate design system (dark kept for the client area) */
 
 @layer base {
   :root {
-    /* Deep cosmic background */
-    --background: 235 50% 8%;
-    --foreground: 0 0% 98%;
+    /* Clean white canvas, slate text */
+    --background: 0 0% 100%;
+    --foreground: 224 40% 12%;
 
-    --card: 235 45% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 40% 12%;
 
-    --popover: 235 45% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 40% 12%;
 
-    /* Neon purple primary */
-    --primary: 270 80% 60%;
+    /* NOVA violet as the single accent */
+    --primary: 262 78% 54%;
     --primary-foreground: 0 0% 100%;
 
-    /* Muted cosmic blue */
-    --secondary: 235 40% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 220 20% 96%;
+    --secondary-foreground: 224 40% 12%;
 
-    --muted: 235 30% 18%;
-    --muted-foreground: 240 10% 70%;
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 10% 40%;
 
-    /* Purple accent with glow */
-    --accent: 275 70% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 262 80% 96%;
+    --accent-foreground: 262 60% 40%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 270 30% 25%;
-    --input: 270 30% 25%;
-    --ring: 270 80% 60%;
+    --border: 220 16% 90%;
+    --input: 220 16% 88%;
+    --ring: 262 78% 54%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     /* Custom NOVA tokens */
-    --nova-purple: 270 80% 60%;
-    --nova-purple-light: 275 90% 75%;
-    --nova-purple-dark: 265 70% 45%;
-    --nova-blue: 235 80% 55%;
-    --nova-cosmic: 235 50% 8%;
+    --nova-purple: 262 78% 54%;
+    --nova-purple-light: 262 85% 72%;
+    --nova-purple-dark: 262 70% 42%;
+    --nova-blue: 230 75% 55%;
+    --nova-cosmic: 240 33% 10%;
     --nova-star: 45 100% 85%;
-    
-    /* Glassmorphism */
-    --glass-bg: 235 45% 15% / 0.6;
-    --glass-border: 270 50% 50% / 0.3;
-    --glass-glow: 270 80% 60% / 0.4;
-    
+    /* Dark band used by the closing call to action */
+    --nova-ink: 245 40% 11%;
+
+    /* Former glass surfaces: now plain cards */
+    --glass-bg: 0 0% 100%;
+    --glass-border: 220 16% 90%;
+    --glass-glow: 262 78% 54% / 0.15;
+
     /* Gradients */
-    --gradient-cosmic: linear-gradient(135deg, hsl(235 50% 8%) 0%, hsl(265 40% 15%) 50%, hsl(235 50% 8%) 100%);
-    --gradient-purple: linear-gradient(135deg, hsl(270 80% 60%) 0%, hsl(280 70% 50%) 100%);
-    --gradient-glow: linear-gradient(180deg, hsl(270 80% 60% / 0.2) 0%, transparent 100%);
-    
+    --gradient-cosmic: linear-gradient(135deg, hsl(245 40% 11%) 0%, hsl(262 45% 20%) 100%);
+    --gradient-purple: linear-gradient(135deg, hsl(262 78% 56%) 0%, hsl(270 70% 46%) 100%);
+    --gradient-glow: linear-gradient(180deg, hsl(262 78% 54% / 0.08) 0%, transparent 100%);
+
     /* Shadows */
-    --shadow-glow: 0 0 30px hsl(270 80% 60% / 0.4);
-    --shadow-glow-strong: 0 0 50px hsl(270 80% 60% / 0.6);
-    --shadow-card: 0 8px 32px hsl(235 50% 5% / 0.5);
+    --shadow-glow: 0 10px 30px -12px hsl(262 78% 40% / 0.35);
+    --shadow-glow-strong: 0 16px 40px -12px hsl(262 78% 40% / 0.45);
+    --shadow-card: 0 1px 2px hsl(224 40% 12% / 0.04), 0 8px 24px -8px hsl(224 40% 12% / 0.08);
   }
 
+  /* Kept so pages that still toggle .light get the same palette */
   .light {
-    --background: 0 0% 98%;
-    --foreground: 235 50% 8%;
-    --card: 0 0% 96%;
-    --card-foreground: 235 50% 8%;
-    --popover: 0 0% 98%;
-    --popover-foreground: 235 50% 8%;
-    --primary: 270 80% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 235 20% 92%;
-    --secondary-foreground: 235 50% 15%;
-    --muted: 235 15% 92%;
-    --muted-foreground: 235 30% 40%;
-    --accent: 275 70% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 235 20% 85%;
-    --input: 235 20% 85%;
-    --ring: 270 80% 50%;
-    --glass-bg: 0 0% 100% / 0.8;
-    --glass-border: 235 20% 80% / 0.5;
+    --background: 0 0% 100%;
+    --foreground: 224 40% 12%;
   }
 
   .dark {
     --background: 235 50% 8%;
     --foreground: 0 0% 98%;
+    --card: 235 45% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 235 45% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 270 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 40% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 235 30% 18%;
+    --muted-foreground: 240 10% 70%;
+    --accent: 275 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 270 30% 25%;
+    --input: 270 30% 25%;
+    --ring: 270 80% 60%;
+    --glass-bg: 235 45% 15% / 0.6;
+    --glass-border: 270 50% 50% / 0.3;
+    --shadow-card: 0 8px 32px hsl(235 50% 5% / 0.5);
   }
 }
 
@@ -108,6 +110,14 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
   /* iOS Safari zooms into any focused field under 16px now that pinch-zoom is allowed */
   @media (max-width: 640px) {
     input,
@@ -119,69 +129,66 @@
 }
 
 @layer components {
-  /* Glassmorphism card */
+  /* Card surface (name kept from the old glass style so every section picks it up) */
   .glass-card {
     @apply relative overflow-hidden rounded-2xl;
     background: hsl(var(--glass-bg));
     border: 1px solid hsl(var(--glass-border));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-card);
   }
 
-  .glass-card::before {
-    content: '';
-    @apply absolute inset-0 pointer-events-none;
-    background: linear-gradient(135deg, hsl(270 80% 60% / 0.1) 0%, transparent 50%);
-  }
-
-  /* Glow button */
+  /* Primary button */
   .btn-glow {
-    @apply relative px-8 py-4 font-semibold text-lg rounded-2xl transition-all duration-300;
-    background: linear-gradient(135deg, hsl(var(--nova-purple)) 0%, hsl(var(--nova-purple-dark)) 100%);
-    box-shadow: 0 0 30px hsl(var(--nova-purple) / 0.4), 0 4px 20px hsl(235 50% 5% / 0.4);
+    @apply relative px-7 py-3.5 font-semibold text-base rounded-xl transition-all duration-200;
+    background: hsl(var(--primary));
+    box-shadow: var(--shadow-glow);
   }
 
   .btn-glow:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 50px hsl(var(--nova-purple) / 0.6), 0 8px 30px hsl(235 50% 5% / 0.5);
+    background: hsl(var(--nova-purple-dark));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow-strong);
   }
 
   .btn-glow:active {
     transform: translateY(0);
   }
 
-  /* Small glow button */
+  /* Small primary button */
   .btn-glow-sm {
-    @apply relative px-6 py-3 font-medium text-base rounded-xl transition-all duration-300;
-    background: linear-gradient(135deg, hsl(var(--nova-purple)) 0%, hsl(var(--nova-purple-dark)) 100%);
-    box-shadow: 0 0 20px hsl(var(--nova-purple) / 0.3);
+    @apply relative px-6 py-3 font-medium text-base rounded-xl transition-all duration-200;
+    background: hsl(var(--primary));
+    box-shadow: var(--shadow-glow);
   }
 
   .btn-glow-sm:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 30px hsl(var(--nova-purple) / 0.5);
+    background: hsl(var(--nova-purple-dark));
   }
 
   /* Service icon container */
   .service-icon {
-    @apply w-16 h-16 rounded-2xl flex items-center justify-center;
-    background: linear-gradient(135deg, hsl(var(--nova-purple) / 0.3) 0%, hsl(var(--nova-blue) / 0.2) 100%);
-    border: 1px solid hsl(var(--nova-purple) / 0.4);
-    box-shadow: 0 0 20px hsl(var(--nova-purple) / 0.2);
+    @apply w-14 h-14 rounded-xl flex items-center justify-center;
+    background: hsl(var(--accent));
+    color: hsl(var(--primary));
   }
 
   /* Sticky mobile bar */
   .sticky-bar {
     @apply fixed bottom-0 left-0 right-0 z-50 p-4;
-    background: hsl(var(--glass-bg));
-    border-top: 1px solid hsl(var(--glass-border));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: hsl(var(--background) / 0.9);
+    border-top: 1px solid hsl(var(--border));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
-  /* Text glow */
+  /* Former neon text effect: no-op in the corporate design */
   .text-glow {
-    text-shadow: 0 0 20px hsl(var(--nova-purple) / 0.6);
+    text-shadow: none;
+  }
+
+  /* Small label above section titles */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary;
   }
 
   /* Video overlay */
@@ -216,12 +223,12 @@
   }
 
   @keyframes fadeInUp {
-    from { 
-      opacity: 0; 
+    from {
+      opacity: 0;
       transform: translateY(20px);
     }
-    to { 
-      opacity: 1; 
+    to {
+      opacity: 1;
       transform: translateY(0);
     }
   }
@@ -237,7 +244,13 @@
   }
 
   .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0 40px hsl(var(--nova-purple) / 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px hsl(224 40% 12% / 0.04), 0 16px 32px -12px hsl(224 40% 12% / 0.14);
+  }
+
+  /* Subtle dotted backdrop for the hero */
+  .bg-grid {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
 }

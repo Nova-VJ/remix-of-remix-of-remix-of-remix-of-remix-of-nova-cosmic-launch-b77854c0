@@ -1,5 +1,6 @@
 import { X, Check } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import SectionHeader from '@/components/SectionHeader';
 const comparisons = [{
   others: "Diseño genérico",
   nova: "Estrategia personalizada"
@@ -20,13 +21,12 @@ const ComparisonSection = () => {
   } = useScrollReveal({
     threshold: 0.1
   });
-  return <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary/20 via-background to-background" />
+  return <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
 
       <div className="relative z-10 max-w-3xl mx-auto">
         {/* Section header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">¿Por qué Nova Marketing Solutions?</h2>
+          <SectionHeader eyebrow="Por qué NOVA" title="Una agencia que mide resultados, no solo entrega" className="mb-0" />
         </div>
 
         {/* Comparison table */}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingCart as CartIcon, X, Trash2, Tag, Check, Mail, MessageCircle, ChevronRight, Gift, FileText } from 'lucide-react';
+import { Trash2, Tag, Check, Mail, MessageCircle, ChevronRight, Gift, FileText } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -107,16 +107,20 @@ const ShoppingCart = () => {
   if (isSent) {
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
-        <SheetTrigger asChild>
-          <button className="fixed bottom-44 sm:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
-            <CartIcon className="w-5 h-5" />
-            {itemCount > 0 && (
+        {itemCount > 0 && (
+          <SheetTrigger asChild>
+            <button
+              aria-label={`Ver tu presupuesto (${itemCount})`}
+              className="fixed bottom-44 md:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-card text-foreground shadow-lg hover:bg-muted transition-all border border-border"
+            >
+              <FileText className="w-5 h-5 text-primary" />
+              <span className="hidden sm:inline text-sm font-medium">Tu presupuesto</span>
               <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
                 {itemCount}
               </span>
-            )}
-          </button>
-        </SheetTrigger>
+            </button>
+          </SheetTrigger>
+        )}
         <SheetContent className="w-full sm:max-w-md bg-background/95 backdrop-blur-xl border-border">
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-6">
@@ -141,21 +145,25 @@ const ShoppingCart = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <button className="fixed bottom-44 sm:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-secondary text-secondary-foreground shadow-lg hover:bg-secondary/90 transition-all border border-border">
-          <CartIcon className="w-5 h-5" />
-          {itemCount > 0 && (
+      {itemCount > 0 && (
+        <SheetTrigger asChild>
+          <button
+            aria-label={`Ver tu presupuesto (${itemCount})`}
+            className="fixed bottom-44 md:bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 rounded-full bg-card text-foreground shadow-lg hover:bg-muted transition-all border border-border"
+          >
+            <FileText className="w-5 h-5 text-primary" />
+            <span className="hidden sm:inline text-sm font-medium">Tu presupuesto</span>
             <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
               {itemCount}
             </span>
-          )}
-        </button>
-      </SheetTrigger>
+          </button>
+        </SheetTrigger>
+      )}
       <SheetContent className="w-full sm:max-w-md bg-background/95 backdrop-blur-xl border-border flex flex-col">
         <SheetHeader>
           <SheetTitle className="text-foreground flex items-center gap-2">
-            <CartIcon className="w-5 h-5" />
-            Tu carrito
+            <FileText className="w-5 h-5 text-primary" />
+            Tu presupuesto
           </SheetTitle>
         </SheetHeader>
 
@@ -164,9 +172,9 @@ const ShoppingCart = () => {
             <div className="flex-1 overflow-y-auto py-4">
               {items.length === 0 && freeItems.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <CartIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Tu carrito está vacío</p>
-                  <p className="text-sm mt-2">Añade servicios para comenzar</p>
+                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Tu presupuesto está vacío</p>
+                  <p className="text-sm mt-2">Añade servicios para ver un precio orientativo</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -344,7 +352,7 @@ const ShoppingCart = () => {
               variant="ghost"
               className="mt-6"
             >
-              Volver al carrito
+              Volver al presupuesto
             </Button>
           </div>
         )}

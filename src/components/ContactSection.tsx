@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
+import SectionHeader from '@/components/SectionHeader';
 
 const WHATSAPP_NUMBER = '34659343822';
 const EMAIL = 'info@solutionsnova.es';
@@ -78,19 +79,12 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contacto" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 px-6">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
+    <section id="contacto" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
 
       <div className="relative z-10 max-w-2xl mx-auto">
         {/* Section header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-            Contacto
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Elige cómo prefieres contactarnos
-          </p>
+          <SectionHeader eyebrow="Contacto" title="Hablemos de tu proyecto" subtitle="Elige cómo prefieres contactarnos." className="mb-0" />
         </div>
 
         {/* Contact options */}

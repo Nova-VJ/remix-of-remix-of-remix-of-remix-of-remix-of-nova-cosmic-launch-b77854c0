@@ -502,7 +502,7 @@ const VirtualAssistant = () => {
         <div
           role="dialog"
           aria-label="Chat con Sara, asistente virtual de NOVA"
-          className="fixed bottom-40 sm:bottom-24 right-4 z-50 w-[380px] sm:w-[400px] max-w-[calc(100vw-2rem)] bg-background/95 backdrop-blur-xl border border-border/60 rounded-3xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.55)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col"
+          className="fixed bottom-40 md:bottom-24 right-4 z-50 w-[380px] sm:w-[400px] max-w-[calc(100vw-2rem)] bg-background/95 backdrop-blur-xl border border-border/60 rounded-3xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.55)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col"
           style={{ maxHeight: 'min(620px, calc(100dvh - 10rem))' }}
         >
           {/* Header with Sara avatar */}
