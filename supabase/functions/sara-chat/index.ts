@@ -26,6 +26,29 @@ const json = (data: unknown, status = 200, origin = "*") =>
     },
   });
 
+// Visitantes sin cuenta: mensajes por sesión en 24 h. Debe coincidir con
+// DEMO_LIMIT en src/hooks/useSaraChat.ts (el contador del navegador se puede
+// borrar; este no).
+const ANON_DAILY_LIMIT = 10;
+// Red de seguridad para la factura de IA: mensajes de toda la web en 24 h.
+const SITE_DAILY_CAP = parseInt(Deno.env.get("SARA_DAILY_CAP") ?? "1000", 10);
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// La web inicia sesión contra su proyecto principal de Supabase, no contra este,
+// así que aquí no se puede validar el token. Solo para el límite de visitantes,
+// un JWT con role "authenticated" y sin caducar cuenta como usuario con cuenta.
+const looksSignedIn = (authHeader: string) => {
+  const token = authHeader.replace(/^Bearer\s+/i, "");
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return false;
+    const data = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    return data.role === "authenticated" && (!data.exp || data.exp * 1000 > Date.now());
+  } catch {
+    return false;
+  }
+};
+
 const isAllowedOrigin = (origin: string) => {
   if (!origin) return false;
   if (origin === "http://localhost:5173") return true;
@@ -112,6 +135,50 @@ Reglas:
 
   const hasMemory = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && MEMORY_TABLE);
   const supabase = hasMemory ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null;
+
+  // Límites diarios. Si un recuento falla se deja pasar el mensaje en vez de
+  // romper el chat.
+  if (supabase) {
+    const since = new Date(Date.now() - DAY_MS).toISOString();
+
+    if (!looksSignedIn(req.headers.get("authorization") ?? "")) {
+      const { count, error } = await supabase
+        .from(MEMORY_TABLE)
+        .select("session_id", { count: "exact", head: true })
+        .eq("session_id", sid)
+        .eq("role", "user")
+        .gte("created_at", since);
+      if (error) console.error("Session daily count error:", error);
+      if ((count ?? 0) >= ANON_DAILY_LIMIT) {
+        return json(
+          {
+            error: `Has usado los ${ANON_DAILY_LIMIT} mensajes gratuitos de hoy. Inicia sesión o crea una cuenta para seguir hablando con Sara, o escríbenos por WhatsApp.`,
+            limit_reached: true,
+          },
+          429,
+          allowOrigin
+        );
+      }
+    }
+
+    const { count: siteCount, error: siteError } = await supabase
+      .from(MEMORY_TABLE)
+      .select("session_id", { count: "exact", head: true })
+      .eq("role", "user")
+      .gte("created_at", since);
+    if (siteError) console.error("Site daily count error:", siteError);
+    if ((siteCount ?? 0) >= SITE_DAILY_CAP) {
+      console.warn(`Sara daily cap reached (${SITE_DAILY_CAP})`);
+      return json(
+        {
+          error: "Sara está atendiendo muchas consultas ahora mismo. Escríbenos por WhatsApp y te respondemos enseguida.",
+          daily_cap: true,
+        },
+        503,
+        allowOrigin
+      );
+    }
+  }
 
   // Traer historial (últimos 16 mensajes)
   let history: Array<{ role: string; content: string }> = [];

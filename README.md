@@ -46,7 +46,10 @@ Hay **dos proyectos** de Supabase:
 
 La URL y la clave de `.env` tienen que ser **del mismo proyecto**; si no, Supabase responde "Invalid API key" y fallan el login y el panel.
 
-Las migraciones están en `supabase/migrations` y las funciones en `supabase/functions`. Para desplegar Sara:
+Las migraciones están en `supabase/migrations`. La función de Sara (`supabase/functions/sara-chat`) es la que está desplegada en el proyecto del chatbot. Para publicar un cambio:
+
+- Desde el panel: Supabase → Edge Functions → `sara-chat` → *Code*, pegar el contenido de `index.ts` y pulsar **Deploy updates**.
+- O desde la terminal:
 
 ```sh
 npx supabase login
@@ -59,14 +62,12 @@ npx supabase functions deploy sara-chat --project-ref dnnqeydtybmzriyjqqyt
 - Toda la web: tope de seguridad de 1000 mensajes cada 24 h (secreto opcional `SARA_DAILY_CAP`). Al llegar, Sara deriva a WhatsApp.
 - Por persona: máximo 10 mensajes por minuto (antispam).
 
-Secretos que necesitan las funciones (*Supabase → Edge Functions → Secrets*):
+Secretos de Sara (*Supabase → Edge Functions → Secrets* del proyecto del chatbot):
 
-| Secreto | Lo usa |
+| Secreto | Para qué |
 | --- | --- |
-| `GEMINI_API_KEY` | `sara-chat` (Google AI Studio). Mientras no exista, Sara usa la pasarela de Lovable (`LOVABLE_API_KEY`) |
-| `GEMINI_MODEL` | opcional, por defecto `gemini-2.5-flash-lite` |
-| `SARA_DAILY_CAP` | opcional, tope diario de mensajes de toda la web (por defecto 1000) |
-| `ELEVENLABS_API_KEY` | `elevenlabs-tts` |
-| `DEEPGRAM_API_KEY` | `elevenlabs-stt` |
-| `GOOGLE_TTS_API_KEY` / `GOOGLE_SERVICE_ACCOUNT_JSON` | `google-tts` |
-| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | `send-push-notification` |
+| `VERTEX_API_KEY`, `VERTEX_PROJECT`, `VERTEX_MODEL` | IA de Google Cloud (Vertex). Si existe la clave, se usa esta |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Alternativa con Google AI Studio si no hay clave de Vertex |
+| `SARA_SYSTEM_PROMPT` | Instrucciones de Sara (personalidad, servicios, precios) |
+| `SARA_MEMORY_TABLE` | Tabla donde se guarda la conversación (por defecto `sara_memory_messages`) |
+| `SARA_DAILY_CAP` | Opcional: tope diario de mensajes de toda la web (por defecto 1000) |
