@@ -71,6 +71,13 @@ const VirtualAssistant = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Other parts of the page (e.g. the welcome guide) can open Sara
+  useEffect(() => {
+    const open = () => setIsOpen(true);
+    window.addEventListener('nova:open-sara', open);
+    return () => window.removeEventListener('nova:open-sara', open);
+  }, []);
+
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       addBotMessage('¡Hola! 👋 Soy Sara, tu asistente virtual de Nova Marketing Solutions.\n\nPuedo ayudarte a resolver dudas, ver servicios y precios, o hacer seguimiento de tu proyecto.');

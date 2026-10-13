@@ -292,7 +292,8 @@
   }
 
   /* The cookie banner steps aside while a dialog (budget form, etc.) is open */
-  body:has([role="dialog"][data-state="open"]) .cookie-banner {
+  body:has([role="dialog"][data-state="open"]) .cookie-banner,
+  body:has([role="dialog"][data-state="open"]) .welcome-guide {
     display: none;
   }
 
@@ -301,6 +302,39 @@
   .cv-auto {
     content-visibility: auto;
     contain-intrinsic-size: auto 900px;
+  }
+
+  /* Range sliders on dark backgrounds (commission calculator) */
+  .nova-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, hsl(150 70% 60%) var(--fill, 50%), hsl(0 0% 100% / 0.15) var(--fill, 50%));
+    cursor: pointer;
+  }
+
+  .nova-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid hsl(150 70% 50%);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+  }
+
+  .nova-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid hsl(150 70% 50%);
+  }
+
+  .nova-range:focus-visible {
+    outline: 2px solid hsl(150 70% 60%);
+    outline-offset: 4px;
   }
 
   /* Fine film grain for large gradient areas */

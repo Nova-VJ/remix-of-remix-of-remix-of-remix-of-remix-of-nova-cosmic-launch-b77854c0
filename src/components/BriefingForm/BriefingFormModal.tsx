@@ -312,6 +312,24 @@ const BriefingFormModal = ({
 
       // Generate readable summary
       const resumen = generateSummary(formData);
+
+      // Keep a copy in the admin panel (Leads tab). Best effort: never blocks the visitor
+      supabase
+        .from('leads')
+        .insert([{
+          name: formData.contacto_nombre || 'Sin nombre',
+          email: formData.contacto_email,
+          phone: formData.contacto_telefono || null,
+          service_type: formData.servicios.join(', ') || 'Formulario de presupuesto',
+          business_type: formData.contacto_sector || formData.contacto_negocio || null,
+          budget_range: formData.gen_presupuesto || null,
+          urgency: 'normal',
+          message: resumen.slice(0, 4000),
+          source: 'formulario_presupuesto',
+        }])
+        .then(({ error }) => {
+          if (error) console.warn('Lead copy not saved:', error.message);
+        });
       
       // Prepare form data for Formspree
       const submitData = new FormData();

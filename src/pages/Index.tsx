@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import ServicesSection from '@/components/ServicesSection';
 import PortfolioSection from '@/components/PortfolioSection';
+import OwnSystemSection from '@/components/OwnSystemSection';
 import PackagesSection from '@/components/PackagesSection';
 import ProcessSection from '@/components/ProcessSection';
 import ComparisonSection from '@/components/ComparisonSection';
@@ -20,6 +21,7 @@ import { useSpotlight } from '@/hooks/use-spotlight';
 const ShoppingCart = lazy(() => import('@/components/ShoppingCart'));
 const VirtualAssistant = lazy(() => import('@/components/VirtualAssistant'));
 const AuditPopup = lazy(() => import('@/components/AuditPopup'));
+const WelcomeGuide = lazy(() => import('@/components/WelcomeGuide'));
 import StickyMobileCTA from '@/components/StickyMobileCTA';
 import Footer from '@/components/Footer';
 
@@ -53,6 +55,7 @@ const Index = () => {
       <main className="relative pb-20 md:pb-0">
         <Navbar />
         <HeroSection />
+        <OwnSystemSection />
         <ServicesSection />
         <PortfolioSection />
         <PackagesSection />
@@ -68,6 +71,7 @@ const Index = () => {
             <ShoppingCart />
             <VirtualAssistant />
             <AuditPopup />
+            <WelcomeGuide />
           </Suspense>
         )}
       </main>

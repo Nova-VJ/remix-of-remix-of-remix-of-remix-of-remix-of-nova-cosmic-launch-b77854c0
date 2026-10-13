@@ -4,6 +4,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Project demo videos and posters
+/videos/*
+  Cache-Control: public, max-age=604800
+
 # Fonts keep their name for good; rename the file if a font is ever replaced
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable

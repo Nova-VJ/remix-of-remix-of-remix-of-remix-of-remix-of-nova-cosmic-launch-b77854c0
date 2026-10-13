@@ -15,7 +15,7 @@ type NavItem =
 const NAV_ITEMS: NavItem[] = [
   { label: 'Servicios', section: 'servicios' },
   { label: 'Precios', section: 'paquetes' },
-  { label: 'Proceso', section: 'proceso' },
+  { label: 'Proyectos', section: 'proyectos' },
   { label: 'Casos de éxito', to: '/casos-exito' },
   { label: 'Método NOVA', to: '/metodo-nova', novaIcon: true },
   { label: 'Contacto', section: 'contacto' },

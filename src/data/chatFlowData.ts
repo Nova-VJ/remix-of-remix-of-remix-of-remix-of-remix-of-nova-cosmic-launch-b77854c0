@@ -355,7 +355,7 @@ export const SERVICES_DATA = {
           'Entrega rápida'
         ],
         timeline: '1–2 semanas',
-        price: 'Desde 700 €'
+        price: 'Desde 400 €'
       },
       {
         id: 'web-pro',
@@ -370,7 +370,7 @@ export const SERVICES_DATA = {
           'Medición y analítica'
         ],
         timeline: '3–4 semanas',
-        price: 'Desde 1.200 €'
+        price: 'Desde 600 €'
       },
       {
         id: 'web-premium',
@@ -386,7 +386,7 @@ export const SERVICES_DATA = {
           '100 primeros productos añadidos gratuitos'
         ],
         timeline: '4–8 semanas',
-        price: 'Desde 1.700 €'
+        price: 'Desde 800 €'
       }
     ]
   },
