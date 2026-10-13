@@ -5,7 +5,7 @@ import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
 import serviceSocialIcon from '@/assets/service-social-icon.webp';
 import serviceContentIcon from '@/assets/service-content-icon.webp';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight, Sparkles } from 'lucide-react';
+import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight, Sparkles, Puzzle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
@@ -258,11 +258,21 @@ const ServicesSection = () => {
 
           {/* Custom project card: fills the grid and leads to the briefing form */}
           <article
-            className={cn('flex flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-accent/50 p-6', reveal(services.length * 80 + 100).className)}
+            className={cn('group flex flex-col justify-center rounded-2xl border border-dashed border-primary/40 bg-accent/50 p-6', reveal(services.length * 80 + 100).className)}
             style={reveal(services.length * 80 + 100).style}
           >
-            <span className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-primary/15">
-              <Sparkles className="h-7 w-7" />
+            {/* Layered "made to measure" emblem, in the spirit of the 3D service icons */}
+            <span className="relative mb-6 mt-1 block h-16 w-16" aria-hidden="true">
+              <span className="absolute inset-0 translate-x-2 translate-y-1 rotate-12 rounded-2xl bg-gradient-to-br from-fuchsia-300/70 to-sky-300/60 transition-transform duration-500 group-hover:rotate-[20deg]" />
+              <span
+                className="absolute inset-0 flex items-center justify-center rounded-2xl text-white shadow-[0_14px_28px_-10px_hsl(262_78%_45%/0.7),inset_0_1px_0_hsl(0_0%_100%/0.35)] transition-transform duration-500 group-hover:-translate-y-0.5"
+                style={{ backgroundImage: 'var(--gradient-purple)' }}
+              >
+                <Puzzle className="h-8 w-8 drop-shadow-[0_2px_4px_hsl(262_80%_25%/0.5)]" />
+              </span>
+              <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-primary/15">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+              </span>
             </span>
             <h3 className="text-lg font-bold text-foreground">¿Necesitas algo a medida?</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
