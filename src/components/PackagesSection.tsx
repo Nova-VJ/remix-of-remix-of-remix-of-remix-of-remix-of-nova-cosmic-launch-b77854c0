@@ -87,11 +87,11 @@ const PackagesSection = () => {
           {packages.map((pkg, index) => (
             <div
               key={pkg.id}
-              className={`relative glass-card p-7 flex flex-col transition-all duration-700 hover-lift overflow-visible ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? '!border-primary ring-1 ring-primary' : ''}`}
+              className={`relative glass-card p-7 flex flex-col transition-all duration-700 hover-lift overflow-visible ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'} ${pkg.highlight ? 'gradient-border' : ''} spotlight`}
               style={{ transitionDelay: `${index * 100 + 200}ms` }}
             >
               {pkg.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full whitespace-nowrap z-20">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 text-white text-xs font-semibold rounded-full whitespace-nowrap z-20 shadow-[0_6px_16px_-6px_hsl(262_78%_45%/0.6)]" style={{ backgroundImage: 'var(--gradient-purple)' }}>
                   Recomendado
                 </div>
               )}

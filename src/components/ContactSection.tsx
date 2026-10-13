@@ -105,7 +105,7 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
   );
 
   return (
-    <section id="contacto" ref={ref as React.RefObject<HTMLElement>} className="px-4 sm:px-6 py-20 md:py-28">
+    <section id="contacto" ref={ref as React.RefObject<HTMLElement>} className="px-4 sm:px-6 pt-4 pb-20 md:pt-8 md:pb-28">
       <div
         id="formulario"
         className={cn('relative mx-auto max-w-6xl overflow-hidden rounded-3xl', reveal(0))}

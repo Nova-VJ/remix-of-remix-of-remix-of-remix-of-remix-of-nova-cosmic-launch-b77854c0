@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { ChevronDown, MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, MessageCircle, Plus } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import SectionHeader from '@/components/SectionHeader';
+import { cn } from '@/lib/utils';
+
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
+
 const faqs = [{
   question: "¿Cuánto tiempo tarda cada servicio?",
   answer: "Plazos estimados:\n• Web Pro: 2–4 semanas\n• Branding Pro: 7–10 días\n• Contenido mensual: comienza en 5 días\n• App MVP: 4–8 semanas"
@@ -25,50 +28,101 @@ const faqs = [{
   question: "¿Puedo pedir una propuesta sin compromiso?",
   answer: "Por supuesto. Respondemos en 24 horas con una propuesta personalizada."
 }];
-const FAQSection = () => {
-  const {
-    ref,
-    isVisible
-  } = useScrollReveal({
-    threshold: 0.1
-  });
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  return <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
 
-      <div className="relative z-10 max-w-3xl mx-auto">
-        {/* Section header */}
-        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <SectionHeader eyebrow="FAQ" title="Preguntas frecuentes" className="mb-0" />
+// Structured data so search engines and AI assistants can read the answers
+const faqJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+});
+
+const FAQSection = () => {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const navigate = useNavigate();
+
+  const reveal = (delay: number) => ({
+    className: cn('transition-all duration-700', isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'),
+    style: { transitionDelay: `${delay}ms` },
+  });
+
+  return (
+    <section id="faq" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+
+      <div className="relative z-10 mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+        {/* Intro, sticky on desktop */}
+        <div className={cn('lg:sticky lg:top-28 lg:self-start', reveal(0).className)} style={reveal(0).style}>
+          <p className="eyebrow mb-3">FAQ</p>
+          <h2 className="text-3xl font-bold leading-tight text-foreground md:text-4xl">Preguntas frecuentes</h2>
+          <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+            Lo que más nos preguntan antes de empezar. ¿Tienes otra duda? Escríbenos y te respondemos en 24 h.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-start">
+            <a href={WHATSAPP_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-glow-sm inline-flex items-center justify-center gap-2 whitespace-nowrap text-primary-foreground">
+              <MessageCircle className="h-4 w-4" />
+              Cuéntanos tu proyecto
+            </a>
+            <button
+              type="button"
+              onClick={() => navigate('/?openBriefing=true')}
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-border bg-card px-6 py-3 font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+            >
+              Pide presupuesto
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        {/* FAQ items */}
-        <div className="space-y-3">
-          {faqs.map((faq, index) => <div key={index} className={`glass-card overflow-hidden transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{
-          transitionDelay: `${index * 50 + 200}ms`
-        }}>
-              <button onClick={() => setOpenIndex(openIndex === index ? null : index)} className="w-full p-5 flex items-center justify-between text-left hover:bg-muted/50 transition-colors" aria-expanded={openIndex === index}>
-                <span className="font-semibold text-foreground pr-4">{faq.question}</span>
-                <ChevronDown className={`w-5 h-5 text-primary flex-shrink-0 transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-96' : 'max-h-0'}`}>
-                <div className="px-5 pb-5 text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {faq.answer}
+        {/* Questions */}
+        <div className={cn('glass-card divide-y divide-border', reveal(150).className)} style={reveal(150).style}>
+          {faqs.map((faq, index) => {
+            const open = openIndex === index;
+            return (
+              <div key={faq.question}>
+                <h3>
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(open ? null : index)}
+                    className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-muted/40 sm:px-6"
+                    aria-expanded={open}
+                    aria-controls={`faq-panel-${index}`}
+                    id={`faq-button-${index}`}
+                  >
+                    <span className="font-semibold tracking-normal text-foreground">{faq.question}</span>
+                    <span
+                      className={cn(
+                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all duration-300',
+                        open ? 'rotate-45 border-primary bg-primary text-primary-foreground' : 'border-border text-primary'
+                      )}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </span>
+                  </button>
+                </h3>
+                {/* grid-rows 0fr -> 1fr animates to the content's real height */}
+                <div
+                  id={`faq-panel-${index}`}
+                  role="region"
+                  aria-labelledby={`faq-button-${index}`}
+                  aria-hidden={!open}
+                  className={cn('grid transition-[grid-template-rows] duration-300 ease-out', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}
+                >
+                  <div className="overflow-hidden">
+                    <p className="whitespace-pre-line px-5 pb-5 leading-relaxed text-muted-foreground sm:px-6">{faq.answer}</p>
+                  </div>
                 </div>
               </div>
-            </div>)}
-        </div>
-
-        {/* CTA */}
-        <div className={`text-center mt-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{
-        transitionDelay: '600ms'
-      }}>
-          <a href={WHATSAPP_GENERAL} target="_blank" rel="noopener noreferrer" className="btn-glow-sm inline-flex items-center gap-2 text-primary-foreground">
-            <MessageCircle className="w-4 h-4" />
-            <span> Cuéntanos tu proyecto</span>
-          </a>
+            );
+          })}
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default FAQSection;

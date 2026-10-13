@@ -73,6 +73,16 @@ for (const [path, meta] of Object.entries(pages)) {
   let html = render({ ...meta, path });
   if (path === "/" && homeShell) {
     html = replaceOnce(html, /<div id="root"><\/div>/, `<div id="root">${homeShell}</div>`);
+    // Download the app straight away but run it after the browser has painted the
+    // pre-rendered menu and hero; otherwise running the bundle delays the first paint.
+    html = replaceOnce(
+      html,
+      /<script type="module" crossorigin src="([^"]+)"><\/script>/,
+      (_, src) =>
+        `<link rel="modulepreload" crossorigin href="${src}">
+    ` +
+        `<script type="module">requestAnimationFrame(() => setTimeout(() => import("${src}")));</script>`
+    );
   }
   write(path === "/" ? "index.html" : `${path.slice(1)}.html`, html);
   count++;

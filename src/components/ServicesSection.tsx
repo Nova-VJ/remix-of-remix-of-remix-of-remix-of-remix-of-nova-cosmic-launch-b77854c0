@@ -214,7 +214,7 @@ const ServicesSection = () => {
           {services.map((service, index) => (
             <article
               key={service.id}
-              className={cn('group glass-card hover-lift p-6 flex flex-col hover:border-primary/30', reveal(index * 80 + 100).className)}
+              className={cn('group glass-card spotlight hover-lift p-6 flex flex-col hover:border-primary/30', reveal(index * 80 + 100).className)}
               style={reveal(index * 80 + 100).style}
             >
               <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-background ring-1 ring-primary/10">

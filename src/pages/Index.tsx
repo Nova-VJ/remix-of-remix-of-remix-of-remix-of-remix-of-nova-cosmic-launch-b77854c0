@@ -13,6 +13,7 @@ import ResultsSection from '@/components/ResultsSection';
 import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
 import { useIdle } from '@/hooks/use-idle';
+import { useSpotlight } from '@/hooks/use-spotlight';
 
 // Widgets that aren't needed for the first paint load once the page is idle
 const ShoppingCart = lazy(() => import('@/components/ShoppingCart'));
@@ -25,6 +26,7 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const shouldOpenBriefing = searchParams.get('openBriefing') === 'true';
   const idle = useIdle();
+  useSpotlight();
 
   // Clear the openBriefing param after it's been read
   useEffect(() => {

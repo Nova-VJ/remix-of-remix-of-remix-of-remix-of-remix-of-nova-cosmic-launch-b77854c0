@@ -22,6 +22,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import NovaMethodIcon from "@/components/NovaMethodIcon";
+import { useSpotlight } from "@/hooks/use-spotlight";
 
 const WHATSAPP_LINK = "https://wa.me/34659343822?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
 
@@ -67,7 +68,7 @@ const results = [
 
 function BenefitCard({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
-    <motion.div variants={fadeUp} className="glass-card hover-lift p-6">
+    <motion.div variants={fadeUp} className="glass-card spotlight hover-lift p-6">
       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
         <Icon className="h-5 w-5" />
       </span>
@@ -108,6 +109,8 @@ function MethodStep({ number, title, description, items, icon: Icon, last }: (ty
 }
 
 export default function MetodoNova() {
+  useSpotlight();
+
   return (
     // Skip motion animations for visitors who ask for reduced motion
     <MotionConfig reducedMotion="user">

@@ -133,6 +133,27 @@
 
   html {
     scroll-behavior: smooth;
+    /* Anchored sections stop below the fixed menu instead of under it */
+    scroll-padding-top: 5.5rem;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+
+  /* Visible keyboard focus everywhere, invisible for mouse clicks */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
@@ -146,6 +167,16 @@
   .font-display {
     font-family: 'Plus Jakarta Sans', 'Inter', 'Inter Fallback', system-ui, sans-serif;
     letter-spacing: -0.02em;
+    /* Even line lengths in headings, no lonely last words in paragraphs */
+    text-wrap: balance;
+  }
+
+  h1 {
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   /* iOS Safari zooms into any focused field under 16px now that pinch-zoom is allowed */
@@ -170,12 +201,12 @@
   /* Primary button */
   .btn-glow {
     @apply relative px-7 py-3.5 font-semibold text-base rounded-xl transition-all duration-200;
-    background: hsl(var(--primary));
-    box-shadow: var(--shadow-glow);
+    background: linear-gradient(180deg, hsl(262 80% 60%) 0%, hsl(var(--primary)) 100%);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.22), var(--shadow-glow);
   }
 
   .btn-glow:hover {
-    background: hsl(var(--nova-purple-dark));
+    background: linear-gradient(180deg, hsl(262 78% 56%) 0%, hsl(var(--nova-purple-dark)) 100%);
     transform: translateY(-1px);
     box-shadow: var(--shadow-glow-strong);
   }
@@ -221,6 +252,56 @@
     @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-primary;
   }
 
+  /* Card glow that follows the pointer (position set by useSpotlight).
+     isolation + z-index -1 keeps the glow above the card background but under its content. */
+  .spotlight {
+    isolation: isolate;
+  }
+
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(420px circle at var(--spot-x, 50%) var(--spot-y, 50%), hsl(var(--primary) / 0.09), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .spotlight:hover::before {
+    opacity: 1;
+  }
+
+  /* Animated gradient border for the highlighted offer */
+  .gradient-border {
+    border: 2px solid transparent !important;
+    background:
+      linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+      conic-gradient(from var(--border-angle), hsl(262 78% 54%), hsl(290 80% 62%), hsl(220 85% 60%), hsl(262 78% 54%)) border-box !important;
+    box-shadow: 0 24px 60px -24px hsl(262 78% 45% / 0.45);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gradient-border {
+      animation: border-spin 6s linear infinite;
+    }
+  }
+
+  /* Fine film grain for large gradient areas */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
+
+  /* Text filled with the brand gradient */
+  .text-gradient {
+    background: linear-gradient(120deg, hsl(262 78% 54%) 10%, hsl(290 75% 58%) 55%, hsl(225 85% 58%) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Video overlay */
   .video-overlay {
     @apply absolute inset-0;
@@ -228,7 +309,35 @@
   }
 }
 
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+@keyframes aurora-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(4%, -3%, 0) scale(1.06); }
+  66% { transform: translate3d(-3%, 4%, 0) scale(0.97); }
+}
+
 @layer utilities {
+  .animate-aurora {
+    animation: aurora-drift 18s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-aurora {
+      animation: none;
+    }
+  }
+
   /* Fade animations */
   .animate-fade-in {
     animation: fadeIn 0.6s ease-out forwards;

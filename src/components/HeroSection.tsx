@@ -110,7 +110,12 @@ const HeroSection = () => {
     <section className="relative overflow-hidden pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-20">
       {/* Soft background */}
       <div className="absolute inset-0 bg-grid [mask-image:linear-gradient(to_bottom,black,transparent_85%)] opacity-70" aria-hidden="true" />
-      <div className="absolute -top-40 right-0 h-[480px] w-[480px] rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -top-56 right-[-12%] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,hsl(262_85%_68%/0.30),transparent_65%)] motion-safe:animate-aurora" />
+        <div className="absolute -top-32 right-[22%] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,hsl(292_85%_72%/0.20),transparent_65%)] motion-safe:animate-aurora [animation-delay:-6s]" />
+        <div className="absolute top-48 right-[-6%] h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,hsl(215_90%_68%/0.18),transparent_65%)] motion-safe:animate-aurora [animation-delay:-12s]" />
+        <div className="absolute inset-0 bg-grain opacity-[0.04] mix-blend-multiply" />
+      </div>
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.05fr_1fr]">
         <div>
@@ -131,7 +136,7 @@ const HeroSection = () => {
 
           <h1 className="text-4xl font-extrabold leading-[1.08] text-foreground sm:text-5xl lg:text-[3.6rem]">
             Webs, apps y marketing que convierten visitas en{' '}
-            <span className="relative inline-block text-primary">
+            <span className="relative inline-block text-gradient">
               clientes
               <svg viewBox="0 0 220 14" preserveAspectRatio="none" className="absolute -bottom-1.5 left-0 h-3 w-full text-primary/35" aria-hidden="true">
                 <path d="M2 10 C 50 3, 120 2, 218 8" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />

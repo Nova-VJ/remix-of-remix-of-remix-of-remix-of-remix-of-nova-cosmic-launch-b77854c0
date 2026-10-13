@@ -142,14 +142,21 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-200",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled || isOpen
-          ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-[0_1px_0_hsl(var(--border))]"
+          ? "bg-background/90 backdrop-blur-xl border-b border-border lg:bg-transparent lg:backdrop-blur-none lg:border-transparent"
           : "bg-transparent border-b border-transparent"
       )}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        {/* On desktop the bar turns into a floating pill once the page scrolls */}
+        <div
+          className={cn(
+            "flex items-center justify-between h-16 transition-all duration-300 lg:border lg:border-transparent",
+            scrolled && !isOpen &&
+              "lg:mt-3 lg:h-14 lg:-mx-3 lg:rounded-2xl lg:border-border/70 lg:bg-background/80 lg:px-3 lg:shadow-[0_8px_30px_-12px_hsl(224_40%_12%/0.18)] lg:backdrop-blur-xl"
+          )}
+        >
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2" aria-label="NOVA Marketing Solutions, inicio">
             <img alt="NOVA Marketing Solutions" width={86} height={40} className="h-10 w-auto" src="/images/logo-nova-light.webp" />
