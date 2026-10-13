@@ -34,8 +34,10 @@ const ServiceSelector = ({ selected, onChange, preselected = [] }: ServiceSelect
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {(Object.keys(SERVICE_NAMES) as ServiceType[]).map((key) => {
+        {(Object.keys(SERVICE_NAMES) as ServiceType[]).map((key, index, all) => {
           const isSelected = selected.includes(key);
+          // An odd last option spans the full row instead of sitting alone
+          const isLoneLast = all.length % 2 === 1 && index === all.length - 1;
           const isPreselected = preselected.includes(key);
           
           return (
@@ -43,9 +45,10 @@ const ServiceSelector = ({ selected, onChange, preselected = [] }: ServiceSelect
               key={key}
               className={`
                 relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all
+                ${isLoneLast ? 'col-span-2' : ''}
                 ${isSelected 
                   ? 'border-primary bg-primary/10' 
-                  : 'border-border hover:border-primary/50'
+                  : 'border-border hover:border-primary/50 hover:bg-accent/40'
                 }
               `}
               onClick={() => handleToggle(key)}

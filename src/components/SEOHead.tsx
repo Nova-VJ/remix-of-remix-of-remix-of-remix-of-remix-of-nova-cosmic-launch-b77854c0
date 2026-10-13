@@ -9,7 +9,7 @@ interface SEOHeadProps {
 }
 
 const BASE_URL = 'https://solutionsnova.es';
-const DEFAULT_OG_IMAGE = `${BASE_URL}/nova-icon-512.png`;
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.jpg`;
 
 const setMetaTag = (attr: string, key: string, content: string) => {
   let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;

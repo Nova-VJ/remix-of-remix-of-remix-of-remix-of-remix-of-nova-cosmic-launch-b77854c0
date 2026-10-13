@@ -20,52 +20,159 @@
     <meta property="og:locale" content="es_ES" />
     <meta property="og:site_name" content="NOVA Marketing Solutions" />
     <meta property="og:url" content="https://solutionsnova.es/" />
-    <meta property="og:image" content="https://solutionsnova.es/nova-icon-512.png" />
+    <meta property="og:image" content="https://solutionsnova.es/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="NOVA Marketing Solutions: webs, apps y marketing que convierten visitas en clientes" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@NOVAMarketing" />
     <meta name="twitter:title" content="NOVA Marketing Solutions | Agencia de Marketing Digital en Valladolid" />
     <meta name="twitter:description" content="Impulsamos tu negocio hacia el éxito. Diseño web, apps, branding y redes sociales." />
-    <meta name="twitter:image" content="https://solutionsnova.es/nova-icon-512.png" />
+    <meta name="twitter:image" content="https://solutionsnova.es/og-image.jpg" />
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "NOVA Marketing Solutions",
-      "alternateName": "Nova Marketing Solutions",
-      "url": "https://solutionsnova.es",
-      "logo": "https://solutionsnova.es/nova-icon-512.png",
-      "image": "https://solutionsnova.es/nova-icon-512.png",
-      "description": "Agencia de marketing digital en Valladolid. Diseño web, desarrollo de apps, branding y gestión de redes sociales para impulsar tu negocio.",
-      "telephone": "+34659343822",
-      "email": "info@solutionsnova.es",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Valladolid",
-        "addressRegion": "Castilla y León",
-        "addressCountry": "ES"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 41.6523,
-        "longitude": -4.7245
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Valladolid" },
-        { "@type": "Country", "name": "España" }
-      ],
-      "priceRange": "€€",
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "opens": "09:00",
-        "closes": "18:00"
-      },
-      "sameAs": [],
-      "serviceType": ["Diseño Web", "Desarrollo de Apps", "Branding", "Marketing en Redes Sociales", "SEO"],
-      "@id": "https://solutionsnova.es/#organization"
+      "@graph": [
+        {
+          "@type": "LocalBusiness",
+          "name": "NOVA Marketing Solutions",
+          "alternateName": "Nova Marketing Solutions",
+          "url": "https://solutionsnova.es",
+          "logo": "https://solutionsnova.es/nova-icon-512.png",
+          "image": "https://solutionsnova.es/og-image.jpg",
+          "description": "Agencia de marketing digital en Valladolid. Diseño web, desarrollo de apps, branding y gestión de redes sociales para impulsar tu negocio.",
+          "telephone": "+34659343822",
+          "email": "info@solutionsnova.es",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Valladolid",
+            "addressRegion": "Castilla y León",
+            "addressCountry": "ES"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 41.6523,
+            "longitude": -4.7245
+          },
+          "areaServed": [
+            {
+              "@type": "City",
+              "name": "Valladolid"
+            },
+            {
+              "@type": "Country",
+              "name": "España"
+            }
+          ],
+          "priceRange": "€€",
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday"
+            ],
+            "opens": "09:00",
+            "closes": "18:00"
+          },
+          "sameAs": [],
+          "serviceType": [
+            "Diseño Web",
+            "Desarrollo de Apps",
+            "Branding",
+            "Marketing en Redes Sociales",
+            "SEO"
+          ],
+          "@id": "https://solutionsnova.es/#organization",
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Servicios de NOVA Marketing Solutions",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Páginas web",
+                  "description": "Diseño web, velocidad y posicionamiento en Google"
+                },
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "minPrice": 600,
+                  "priceCurrency": "EUR"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Aplicaciones móviles",
+                  "description": "Apps a medida publicadas en App Store y Google Play"
+                },
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "minPrice": 1700,
+                  "priceCurrency": "EUR"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Branding profesional",
+                  "description": "Identidad visual y manual de marca"
+                },
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "minPrice": 200,
+                  "priceCurrency": "EUR"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Contenido para redes sociales",
+                  "description": "Estrategia y contenido mensual"
+                },
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": 500,
+                  "priceCurrency": "EUR",
+                  "unitText": "mes"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Asistente virtual con IA",
+                  "description": "Asistente para tu web o app, pago único"
+                },
+                "priceSpecification": {
+                  "@type": "PriceSpecification",
+                  "minPrice": 100,
+                  "priceCurrency": "EUR"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://solutionsnova.es/#website",
+          "url": "https://solutionsnova.es",
+          "name": "NOVA Marketing Solutions",
+          "inLanguage": "es-ES",
+          "publisher": {
+            "@id": "https://solutionsnova.es/#organization"
+          }
+        }
+      ]
     }
     </script>
     

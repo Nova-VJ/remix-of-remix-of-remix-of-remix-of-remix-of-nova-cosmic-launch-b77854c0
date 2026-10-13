@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import Index from "./pages/Index";
-import CookieConsent from "./components/CookieConsent";
+import { useIdle } from "./hooks/use-idle";
 
 // The home page ships in the main bundle; every other page loads on demand
 const Auth = lazy(() => import("./pages/Auth"));
@@ -23,6 +23,18 @@ const LegalNotice = lazy(() => import("./pages/LegalNotice"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const CookieConsent = lazy(() => import("./components/CookieConsent"));
+
+// The cookie banner appears once the page has loaded, so it never delays the first paint
+const DeferredCookieConsent = () => {
+  const idle = useIdle(1500);
+  if (!idle) return null;
+  return (
+    <Suspense fallback={null}>
+      <CookieConsent />
+    </Suspense>
+  );
+};
 const InstalarApp = lazy(() => import("./pages/InstalarApp"));
 
 const App = () => (
@@ -53,7 +65,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        <CookieConsent />
+        <DeferredCookieConsent />
       </BrowserRouter>
     </CartProvider>
   </AuthProvider>
