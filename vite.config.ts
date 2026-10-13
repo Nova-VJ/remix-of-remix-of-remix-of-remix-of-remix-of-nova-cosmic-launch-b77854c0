@@ -13,12 +13,15 @@ export default defineConfig(() => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      // Register the service worker without blocking the first paint
+      injectRegister: "script-defer",
       strategies: "injectManifest",
       srcDir: "src",
       filename: "sw.ts",
       manifest: false,
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2}"],
+        // Code, pages and fonts work offline; images are cached as they are viewed (see src/sw.ts)
+        globPatterns: ["**/*.{js,css,html,woff2}", "favicon-96.png", "nova-icon-192.png", "images/logo-nova-light.webp"],
         // Staff-only page: don't make every visitor download it in the background
         globIgnores: ["**/Admin-*.js"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,

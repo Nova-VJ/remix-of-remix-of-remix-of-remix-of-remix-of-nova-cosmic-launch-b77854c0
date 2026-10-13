@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import serviceWebIcon from '@/assets/service-web-icon.webp';
 import serviceAppsIcon from '@/assets/service-apps-icon.webp';
 import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
@@ -10,9 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import ContentFormModal from '@/components/ContentFormModal';
 import SectionHeader from '@/components/SectionHeader';
 import { cn } from '@/lib/utils';
+
+// Only downloaded when someone asks for a content proposal
+const ContentFormModal = lazy(() => import('@/components/ContentFormModal'));
 const services = [
   {
     id: 'web',
@@ -352,7 +354,11 @@ const ServicesSection = () => {
       </div>
 
       {/* Content Form Modal */}
-      <ContentFormModal isOpen={showContentForm} onClose={() => setShowContentForm(false)} />
+      {showContentForm && (
+        <Suspense fallback={null}>
+          <ContentFormModal isOpen={showContentForm} onClose={() => setShowContentForm(false)} />
+        </Suspense>
+      )}
     </section>
   );
 };

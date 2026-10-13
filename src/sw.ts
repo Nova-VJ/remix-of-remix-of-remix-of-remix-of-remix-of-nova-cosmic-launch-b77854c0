@@ -1,10 +1,22 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { CacheFirst } from 'workbox-strategies';
+import { ExpirationPlugin } from 'workbox-expiration';
 
 declare const self: ServiceWorkerGlobalScope;
 
 // Workbox precaching (manifest injected by vite-plugin-pwa)
 precacheAndRoute(self.__WB_MANIFEST);
+
+// Images are cached as they are viewed instead of all being downloaded up front
+registerRoute(
+  ({ request, url }) => request.destination === 'image' && url.origin === self.location.origin,
+  new CacheFirst({
+    cacheName: 'nova-images',
+    plugins: [new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 })],
+  })
+);
 
 // ─── Push notification handler ───
 self.addEventListener('push', (event) => {

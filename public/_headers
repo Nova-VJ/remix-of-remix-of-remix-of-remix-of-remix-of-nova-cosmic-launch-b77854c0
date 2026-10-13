@@ -4,6 +4,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Fonts keep their name for good; rename the file if a font is ever replaced
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # The service worker must always be re-checked so updates reach visitors
 /sw.js
   Cache-Control: no-cache

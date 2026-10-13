@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SEOHead from '@/components/SEOHead';
 import { SEO_PAGES } from "@/config/seo";
@@ -12,15 +12,19 @@ import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
 import FAQSection from '@/components/FAQSection';
 import ContactSection from '@/components/ContactSection';
+import { useIdle } from '@/hooks/use-idle';
+
+// Widgets that aren't needed for the first paint load once the page is idle
+const ShoppingCart = lazy(() => import('@/components/ShoppingCart'));
+const VirtualAssistant = lazy(() => import('@/components/VirtualAssistant'));
+const AuditPopup = lazy(() => import('@/components/AuditPopup'));
 import StickyMobileCTA from '@/components/StickyMobileCTA';
-import ShoppingCart from '@/components/ShoppingCart';
 import Footer from '@/components/Footer';
-import VirtualAssistant from '@/components/VirtualAssistant';
-import AuditPopup from '@/components/AuditPopup';
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const shouldOpenBriefing = searchParams.get('openBriefing') === 'true';
+  const idle = useIdle();
 
   // Clear the openBriefing param after it's been read
   useEffect(() => {
@@ -47,9 +51,13 @@ const Index = () => {
         <ContactSection autoOpenBriefing={shouldOpenBriefing} />
         <Footer />
         <StickyMobileCTA />
-        <ShoppingCart />
-        <VirtualAssistant />
-        <AuditPopup />
+        {idle && (
+          <Suspense fallback={null}>
+            <ShoppingCart />
+            <VirtualAssistant />
+            <AuditPopup />
+          </Suspense>
+        )}
       </main>
     </>
   );

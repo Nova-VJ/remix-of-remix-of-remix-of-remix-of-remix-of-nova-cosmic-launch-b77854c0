@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Shield, Bell, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 
@@ -33,9 +32,13 @@ const Navbar = () => {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
+    // Read the scroll position on the next frame so it doesn't force a layout during the first render
+    const frame = requestAnimationFrame(onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   // Fetch unread admin notifications count
@@ -45,28 +48,39 @@ const Navbar = () => {
       return;
     }
 
-    const fetchUnread = async () => {
-      const { count } = await supabase
-        .from('admin_notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('read', false);
-      setUnreadCount(count || 0);
-    };
+    let cancelled = false;
+    let removeChannel: (() => void) | undefined;
 
-    fetchUnread();
+    // Supabase is loaded on demand (only the admin needs it here)
+    import('@/integrations/supabase/client').then(({ supabase }) => {
+      if (cancelled) return;
 
-    // Realtime subscription
-    const channel = supabase
-      .channel('admin-notif-badge')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'admin_notifications' },
-        () => fetchUnread()
-      )
-      .subscribe();
+      const fetchUnread = async () => {
+        const { count } = await supabase
+          .from('admin_notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('read', false);
+        if (!cancelled) setUnreadCount(count || 0);
+      };
+
+      fetchUnread();
+
+      // Realtime subscription
+      const channel = supabase
+        .channel('admin-notif-badge')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'admin_notifications' },
+          () => fetchUnread()
+        )
+        .subscribe();
+
+      removeChannel = () => supabase.removeChannel(channel);
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      removeChannel?.();
     };
   }, [isAdmin]);
 

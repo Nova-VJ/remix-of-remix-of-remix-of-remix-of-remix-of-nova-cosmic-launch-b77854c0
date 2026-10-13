@@ -66,6 +66,8 @@ const ResultsSection = () => {
               <img 
                 src={casosExitoBanner} 
                 alt="Casos de éxito - Aprende con nosotros"
+                width={960}
+                height={640}
                 loading="lazy"
                 decoding="async"
                 className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"

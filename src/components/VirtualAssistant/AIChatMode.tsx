@@ -9,7 +9,7 @@ import Linkify from 'linkify-react';
 import { WHATSAPP_URL } from '@/config/env';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
+import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import saraAvatar from '@/assets/sara-avatar.webp';
 import {
   Dialog,

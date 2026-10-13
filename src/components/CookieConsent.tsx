@@ -126,8 +126,8 @@ const CookieConsent = () => {
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">
                   Usamos cookies para mejorar tu experiencia y analizar el tráfico. 
-                  <Link to="/politica-de-cookies" className="text-primary hover:underline ml-1">
-                    Más información
+                  <Link to="/politica-de-cookies" className="ml-1 text-primary underline underline-offset-2 hover:no-underline">
+                    Más información sobre cookies
                   </Link>
                 </p>
               </div>

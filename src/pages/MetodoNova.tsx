@@ -1,7 +1,7 @@
 import SEOHead from "@/components/SEOHead";
 import { SEO_PAGES } from "@/config/seo";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import {
   ArrowRight,
   Smartphone,
@@ -109,7 +109,8 @@ function MethodStep({ number, title, description, items, icon: Icon, last }: (ty
 
 export default function MetodoNova() {
   return (
-    <>
+    // Skip motion animations for visitors who ask for reduced motion
+    <MotionConfig reducedMotion="user">
       <SEOHead {...SEO_PAGES["/metodo-nova"]} />
       <Navbar />
 
@@ -261,6 +262,6 @@ export default function MetodoNova() {
       </main>
 
       <Footer />
-    </>
+    </MotionConfig>
   );
 }

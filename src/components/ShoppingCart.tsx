@@ -4,7 +4,7 @@ import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
+import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import { ServiceType } from '@/components/BriefingForm/types';
 
 const WHATSAPP_NUMBER = '34659343822';

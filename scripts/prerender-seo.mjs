@@ -6,9 +6,11 @@
 //     so link previews (WhatsApp, LinkedIn...) and crawlers see it without JS.
 //   - Unknown URLs get dist/404.html with a real HTTP 404 status (Pages only
 //     falls back to index.html when there is no 404.html).
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+//   - The home page ships with its menu and hero already rendered (from
+//     dist-shell, built by vite.shell.config.ts), so it paints before the JS loads.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
@@ -62,9 +64,16 @@ function write(relativePath, html) {
   writeFileSync(file, html);
 }
 
+// Pre-rendered menu + hero for the home page only (other routes show other content)
+const shellEntry = join(root, "dist-shell", "shell.js");
+const homeShell = existsSync(shellEntry) ? (await import(pathToFileURL(shellEntry).href)).render() : "";
+
 let count = 0;
 for (const [path, meta] of Object.entries(pages)) {
-  const html = render({ ...meta, path });
+  let html = render({ ...meta, path });
+  if (path === "/" && homeShell) {
+    html = replaceOnce(html, /<div id="root"><\/div>/, `<div id="root">${homeShell}</div>`);
+  }
   write(path === "/" ? "index.html" : `${path.slice(1)}.html`, html);
   count++;
 }
@@ -86,4 +95,4 @@ write("404.html", render({
   noindex: true,
 }));
 
-console.log(`prerender-seo: wrote ${count} route pages + 404.html`);
+console.log(`prerender-seo: wrote ${count} route pages + 404.html${homeShell ? " (home page pre-rendered)" : ""}`);

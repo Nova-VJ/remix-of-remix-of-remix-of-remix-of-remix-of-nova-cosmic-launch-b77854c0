@@ -11,7 +11,7 @@ const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
     <button
       onClick={onClick}
       className="group fixed bottom-24 md:bottom-4 right-4 z-40 flex items-center gap-2 transition-all duration-300 hover:scale-105"
-      aria-label={isOpen ? 'Cerrar asistente' : 'Abrir asistente virtual Sara'}
+      aria-label={isOpen ? 'Cerrar asistente' : '¿Hablamos? Soy Sara. Abrir el asistente virtual'}
     >
       {isOpen ? (
         <div

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import BriefingFormModal from '@/components/BriefingForm/BriefingFormModal';
+import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import { cn } from '@/lib/utils';
 
 const WHATSAPP_NUMBER = '34659343822';

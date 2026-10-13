@@ -92,6 +92,14 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-3px)" },
         },
+        "nova-bob": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "nova-spin-in": {
+          from: { opacity: "0", transform: "scale(0.5) rotate(-180deg)" },
+          to: { opacity: "1", transform: "scale(1) rotate(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -101,6 +109,8 @@ export default {
         "fade-out": "fade-out 0.5s ease-out forwards",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "nova-float": "nova-float 3s ease-in-out infinite",
+        "nova-bob": "nova-bob 3s ease-in-out infinite",
+        "nova-spin-in": "nova-spin-in 0.9s cubic-bezier(0.34, 1.45, 0.64, 1) both",
       },
     },
   },
