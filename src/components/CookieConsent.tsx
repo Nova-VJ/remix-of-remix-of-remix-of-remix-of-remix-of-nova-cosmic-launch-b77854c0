@@ -120,7 +120,7 @@ const CookieConsent = () => {
     <>
       {/* Main Banner */}
       {showBanner && !showSettings && (
-        <div className="fixed bottom-0 left-0 right-0 z-[45] bg-background border-t border-border p-4 md:p-6 shadow-lg animate-in slide-in-from-bottom duration-300">
+        <div className="cookie-banner fixed bottom-0 left-0 right-0 z-[100] bg-background border-t border-border p-4 md:p-6 shadow-lg animate-in slide-in-from-bottom duration-300">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="flex-1">
