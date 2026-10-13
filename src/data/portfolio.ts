@@ -22,6 +22,8 @@ export interface PortfolioProject {
   aspect: number;
   /** Optional live demo */
   demoUrl?: string;
+  /** Text in the browser frame's address bar when there is no live demo */
+  frameLabel?: string;
   /** Visual frame around the media */
   frame: 'browser' | 'game';
 }
@@ -51,6 +53,19 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     video: '/videos/freshpooch.mp4',
     aspect: 1200 / 750,
     demoUrl: 'https://thefreshpooch.valetdemo.workers.dev',
+    frame: 'browser',
+  },
+  {
+    id: 'novasystem',
+    kind: 'Software de gestión · Comercio minorista',
+    title: 'NovaSystem: tienda, stock y contabilidad en un solo sitio',
+    description:
+      'Caja (TPV) con lector de código de barras, inventario con alertas de stock mínimo, clientes, proveedores, facturación con IVA español, gastos, informes y contabilidad con asientos del PGC. Preparado para sincronizarse con la tienda online.',
+    highlights: ['TPV', 'Inventario en tiempo real', 'Facturación e IVA', 'Contabilidad PGC', 'Informes'],
+    poster: '/videos/novasystem.webp',
+    video: '/videos/novasystem.mp4',
+    aspect: 1200 / 750,
+    frameLabel: 'novasystem · gestión integral',
     frame: 'browser',
   },
   {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
+import { ArrowRight, TrendingUp, BookOpen, Clock, Eye } from 'lucide-react';
 import dominosImage from '@/assets/dominos-presentation.webp';
 import hawkersLogo from '@/assets/hawkers-logo.webp';
 import Navbar from '@/components/Navbar';
@@ -79,7 +79,7 @@ const CasosExito = () => {
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Sparkles className="w-16 h-16 text-primary/40" />
+                      <BookOpen className="w-16 h-16 text-primary/40" />
                     </div>
                   )}
                   
@@ -129,7 +129,7 @@ const CasosExito = () => {
           {/* Coming soon */}
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-dashed border-border bg-muted/30">
-              <Sparkles className="w-5 h-5 text-muted-foreground" />
+              <Clock className="w-5 h-5 text-muted-foreground" />
               <p className="text-muted-foreground">
                 Más casos de éxito <span className="text-foreground font-medium">próximamente</span>
               </p>

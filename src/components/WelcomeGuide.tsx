@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BadgePercent, Bot, FileText, LayoutGrid, Sparkles, X } from 'lucide-react';
+import { ArrowRight, BadgePercent, Bot, FileText, LayoutGrid, MonitorPlay, X } from 'lucide-react';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 import { scrollToSectionId } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,7 @@ type Choice = 'own' | 'services' | 'projects' | 'budget' | 'sara';
 const OPTIONS: { id: Choice; label: string; icon: React.ElementType; highlight?: boolean }[] = [
   { id: 'own', label: 'Dejar de pagar comisiones a las apps', icon: BadgePercent, highlight: true },
   { id: 'services', label: 'Una web, app, marca o redes', icon: LayoutGrid },
-  { id: 'projects', label: 'Ver proyectos que hemos hecho', icon: Sparkles },
+  { id: 'projects', label: 'Ver proyectos que hemos hecho', icon: MonitorPlay },
   { id: 'budget', label: 'Pedir presupuesto ya', icon: FileText },
   { id: 'sara', label: 'Preguntar a Sara', icon: Bot },
 ];

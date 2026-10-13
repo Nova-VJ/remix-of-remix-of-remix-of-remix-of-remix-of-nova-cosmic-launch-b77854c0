@@ -1,4 +1,4 @@
-import { Folder, Rocket, Sparkles, ArrowRight } from 'lucide-react';
+import { Folder, Rocket, Plus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
@@ -19,7 +19,7 @@ const EmptyProjectsState = () => {
               
               {/* Floating decorative elements */}
               <div className="absolute -top-3 -right-3 w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/30 animate-[bounce_2s_ease-in-out_infinite]">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
+                <Plus className="w-5 h-5 text-primary-foreground" />
               </div>
               
               <div className="absolute -bottom-2 -left-2 w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center animate-[bounce_2.5s_ease-in-out_infinite_0.5s]">

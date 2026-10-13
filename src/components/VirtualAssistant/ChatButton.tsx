@@ -29,9 +29,11 @@ const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
             <img
               src={saraIcon}
               alt="Sara - Asistente Virtual"
-              className="h-14 w-14 sm:h-16 sm:w-16 rounded-full object-cover ring-2 ring-primary/40 shadow-lg shadow-primary/30 transition-shadow group-hover:shadow-xl cursor-pointer"
+              width={64}
+              height={64}
+              className="h-14 w-14 sm:h-16 sm:w-16 object-contain drop-shadow-[0_8px_16px_hsl(262_70%_40%/0.35)] cursor-pointer"
             />
-            <span className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-background" />
+            <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-emerald-400 ring-2 ring-background" />
           </span>
         </>
       )}

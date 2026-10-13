@@ -9,7 +9,11 @@ import {
   useTransform,
 } from "framer-motion";
 import {
-  Sparkles,
+  BookOpen,
+  Flag,
+  BadgeCheck,
+  House,
+  Send,
   AlertTriangle,
   Lightbulb,
   Brain,
@@ -148,7 +152,7 @@ function StickyCTA() {
       >
         <div className="flex items-center gap-2 min-w-0">
           <div className="rounded-xl border border-border/50 bg-muted/50 p-2">
-            <Sparkles className="h-4 w-4 text-foreground/85" />
+            <BookOpen className="h-4 w-4 text-foreground/85" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">¿Quieres tu propia historia de éxito?</p>
@@ -290,7 +294,7 @@ function VideoEmbed({ url, title, description }: { url: string; title: string; d
 function VerticalTimeline() {
   const milestones = [
     { year: "1960", title: "Orígenes humildes", desc: "Tom y James Monaghan compran DomiNick's por $900.", icon: Building },
-    { year: "1965", title: "Nace Domino's Pizza", desc: "Renombran la marca. Enfoque en entrega rápida.", icon: Sparkles },
+    { year: "1965", title: "Nace Domino's Pizza", desc: "Renombran la marca. Enfoque en entrega rápida.", icon: Flag },
     { year: "2008", title: "Punto de inflexión", desc: "Crisis de imagen. Deciden apostar por lo digital.", icon: AlertTriangle },
     { year: "Hoy", title: "Líder digital", desc: "90%+ ventas digitales. 76.3% desde la app.", icon: Smartphone },
     { year: "Global", title: "Expansión", desc: "+14.000 restaurantes en 89 países.", icon: Globe },
@@ -332,7 +336,7 @@ export default function CasoDominos() {
   const [tocOpen, setTocOpen] = useState(false);
 
   const sections = useMemo(() => [
-    { id: "hero", label: "Portada", icon: Sparkles },
+    { id: "hero", label: "Portada", icon: House },
     { id: "origenes", label: "Orígenes", icon: Building },
     { id: "decisiones", label: "Decisiones clave", icon: Lightbulb },
     { id: "idea", label: "La idea", icon: Brain },
@@ -428,7 +432,7 @@ export default function CasoDominos() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-2">
-            <Chip icon={Sparkles}>Caso real</Chip>
+            <Chip icon={BadgeCheck}>Caso real</Chip>
             <Chip icon={TrendingUp}>Transformación digital</Chip>
             <Chip icon={Brain}>Sistema escalable</Chip>
           </motion.div>
@@ -640,7 +644,7 @@ export default function CasoDominos() {
                   Ver servicios <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link to="/#contacto" className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/90">
-                  Contactar <Sparkles className="h-4 w-4" />
+                  Contactar <Send className="h-4 w-4" />
                 </Link>
               </div>
             </div>

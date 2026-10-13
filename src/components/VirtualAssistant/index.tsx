@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, ArrowLeft, User, MessageSquare, Sparkles, ChevronRight } from 'lucide-react';
+import { X, ArrowLeft, User, MessageSquare, MessageCircleMore, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -296,7 +296,7 @@ const VirtualAssistant = () => {
               style={{ backgroundImage: 'var(--gradient-purple)' }}
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
-                <Sparkles className="h-5 w-5" />
+                <MessageCircleMore className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold">Habla con Sara</span>

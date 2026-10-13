@@ -5,7 +5,7 @@ import serviceBrandingIcon from '@/assets/service-branding-icon.webp';
 import serviceSocialIcon from '@/assets/service-social-icon.webp';
 import serviceContentIcon from '@/assets/service-content-icon.webp';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight, Sparkles, Puzzle } from 'lucide-react';
+import { Check, Plus, TrendingUp, Search, Bot, BotMessageSquare, ChevronDown, FileEdit, ArrowRight, PencilRuler, Puzzle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
@@ -223,7 +223,7 @@ const ServicesSection = () => {
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
+                  className={`${service.id === 'content' ? 'h-[3.75rem] w-[3.75rem]' : 'h-12 w-12'} object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}
                 />
               </div>
               <h3 className="text-lg font-bold text-foreground">{service.title}</h3>
@@ -271,7 +271,7 @@ const ServicesSection = () => {
                 <Puzzle className="h-8 w-8 drop-shadow-[0_2px_4px_hsl(262_80%_25%/0.5)]" />
               </span>
               <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-primary/15">
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                <PencilRuler className="h-3.5 w-3.5 text-amber-500" />
               </span>
             </span>
             <h3 className="text-lg font-bold text-foreground">¿Necesitas algo a medida?</h3>

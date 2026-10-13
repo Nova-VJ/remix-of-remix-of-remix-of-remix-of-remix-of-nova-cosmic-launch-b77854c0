@@ -9,7 +9,14 @@ import {
   useTransform,
 } from "framer-motion";
 import {
-  Sparkles,
+  BookOpen,
+  Flag,
+  BadgeCheck,
+  House,
+  Send,
+  Fingerprint,
+  Megaphone,
+  Gem,
   AlertTriangle,
   Lightbulb,
   Flame,
@@ -224,7 +231,7 @@ function StickyCTA() {
       >
         <div className="flex items-center gap-2 min-w-0">
           <div className="rounded-xl border border-border/50 bg-muted/50 p-2">
-            <Sparkles className="h-4 w-4 text-foreground/85" />
+            <BookOpen className="h-4 w-4 text-foreground/85" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
@@ -428,7 +435,7 @@ function FlowTimeline() {
   const steps = useMemo(
     () => [
       { t: "Idea", d: "Detecta una oportunidad real.", i: Lightbulb },
-      { t: "Marca", d: "Define identidad y promesa.", i: Sparkles },
+      { t: "Marca", d: "Define identidad y promesa.", i: Fingerprint },
       { t: "Redes", d: "Visibilidad constante y contenido.", i: Globe },
       { t: "Comunidad", d: "Conexión + pertenencia.", i: Heart },
       { t: "Ventas", d: "Conversión con mensajes claros.", i: TrendingUp },
@@ -475,7 +482,7 @@ function TableBlock() {
     { k: "Producto", v: "Gafas modernas, accesibles, con estilo", i: Lightbulb },
     { k: "Canal", v: "Instagram + anuncios", i: Globe },
     { k: "Público", v: "Jóvenes digitales", i: Heart },
-    { k: "Mensaje", v: "Actitud, identidad, comunidad", i: Sparkles },
+    { k: "Mensaje", v: "Actitud, identidad, comunidad", i: Megaphone },
   ];
 
   return (
@@ -512,7 +519,7 @@ function TableBlock() {
 
 function VerticalTimeline() {
   const milestones = [
-    { year: "2013", title: "Nacimiento", desc: "Proyecto español, enfoque digital, cero tiendas físicas.", icon: Sparkles },
+    { year: "2013", title: "Nacimiento", desc: "Proyecto español, enfoque digital, cero tiendas físicas.", icon: Flag },
     { year: "Primeros pasos", title: "Validación online", desc: "Demostraron que se podía vender sin intermediarios.", icon: Lightbulb },
     { year: "2016", title: "Identidad", desc: "Campañas emocionales. Construcción de comunidad.", icon: Heart },
     { year: "2016", title: "Crisis", desc: "Error en redes. Aprendieron a proteger la marca.", icon: AlertTriangle },
@@ -611,7 +618,7 @@ export default function CasoHawkers() {
 
   const sections = useMemo(
     () => [
-      { id: "hero", label: "Portada", icon: Sparkles },
+      { id: "hero", label: "Portada", icon: House },
       { id: "intro", label: "Introducción", icon: AlertTriangle },
       { id: "chispa", label: "La chispa", icon: Zap },
       { id: "giro", label: "El giro", icon: RefreshCw },
@@ -737,7 +744,7 @@ export default function CasoHawkers() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-2">
-            <Chip icon={Sparkles}>Caso real</Chip>
+            <Chip icon={BadgeCheck}>Caso real</Chip>
             <Chip icon={TrendingUp}>Crecimiento</Chip>
             <Chip icon={Brain}>Lecciones prácticas</Chip>
           </motion.div>
@@ -989,7 +996,7 @@ export default function CasoHawkers() {
             <Lesson
               index="2"
               title="La marca vale más que el producto"
-              icon={Sparkles}
+              icon={Gem}
               bullets={["Identidad + voz + historia = recuerdo."]}
               highlight="No vendas productos: construye una historia."
             />
@@ -1028,7 +1035,7 @@ export default function CasoHawkers() {
           </Callout>
 
           <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3">
-            <StatCard label="Lo que impulsó" value="Acción" icon={Sparkles} />
+            <StatCard label="Lo que impulsó" value="Acción" icon={Zap} />
             <StatCard label="Lo que sostuvo" value="Estrategia" icon={Brain} />
             <StatCard label="Lo que escaló" value="Marketing" icon={TrendingUp} />
           </motion.div>
@@ -1077,7 +1084,7 @@ export default function CasoHawkers() {
                   to="/#contacto"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/90"
                 >
-                  Contactar <Sparkles className="h-4 w-4" />
+                  Contactar <Send className="h-4 w-4" />
                 </Link>
               </div>
             </div>
