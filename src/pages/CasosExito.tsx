@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
+import { ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
 import dominosImage from '@/assets/dominos-presentation.jpg';
 import hawkersLogo from '@/assets/hawkers-logo.jpg';
-import ThemeToggle from '@/components/ThemeToggle';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { SEO_PAGES } from "@/config/seo";
 
@@ -34,19 +35,7 @@ const CasosExito = () => {
     <>
       <SEOHead {...SEO_PAGES["/casos-exito"]} />
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            <span>Volver</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Casos de éxito</span>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="pt-28 pb-12 px-6">
@@ -143,6 +132,7 @@ const CasosExito = () => {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
     </>
   );

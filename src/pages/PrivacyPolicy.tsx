@@ -1,21 +1,16 @@
 import SEOHead from '@/components/SEOHead';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { SEO_PAGES } from "@/config/seo";
-import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const PrivacyPolicy = () => {
   return (
     <>
     <SEOHead {...SEO_PAGES["/politica-de-privacidad"]} />
-    <div className="min-h-screen bg-background py-12 px-4">
+    <Navbar />
+    <div className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
-        <Link to="/">
-          <Button variant="ghost" size="sm" className="mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver
-          </Button>
-        </Link>
+        <p className="eyebrow mb-3">Información legal</p>
 
         <h1 className="text-3xl font-bold mb-8">Política de Privacidad</h1>
         
@@ -126,6 +121,7 @@ const PrivacyPolicy = () => {
         </div>
       </div>
     </div>
+    <Footer />
     </>
   );
 };
