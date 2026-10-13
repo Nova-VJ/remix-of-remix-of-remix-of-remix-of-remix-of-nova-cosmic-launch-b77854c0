@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import { cn } from '@/lib/utils';
+import { trackLead } from '@/lib/tracking';
 
 const WHATSAPP_NUMBER = '34659343822';
 const EMAIL = 'info@solutionsnova.es';
@@ -87,6 +88,7 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
     } else {
       handleEmail();
     }
+    trackLead(`contacto_${contactMethod}`);
 
     setIsSubmitting(false);
   };
@@ -192,16 +194,16 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="name" className="text-sm font-medium">Nombre</label>
-                <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Tu nombre" required />
+                <Input id="name" name="name" autoComplete="name" value={formData.name} onChange={handleChange} placeholder="Tu nombre" required />
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="business" className="text-sm font-medium">Negocio <span className="font-normal text-muted-foreground">(opcional)</span></label>
-                <Input id="business" name="business" value={formData.business} onChange={handleChange} placeholder="Tu empresa o proyecto" />
+                <Input id="business" name="business" autoComplete="organization" value={formData.business} onChange={handleChange} placeholder="Tu empresa o proyecto" />
               </div>
               {contactMethod === 'email' && (
                 <div className="space-y-1.5 sm:col-span-2">
                   <label htmlFor="email" className="text-sm font-medium">Email</label>
-                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="tu@email.com" required />
+                  <Input id="email" name="email" type="email" autoComplete="email" value={formData.email} onChange={handleChange} placeholder="tu@email.com" required />
                 </div>
               )}
               <div className="space-y-1.5 sm:col-span-2">

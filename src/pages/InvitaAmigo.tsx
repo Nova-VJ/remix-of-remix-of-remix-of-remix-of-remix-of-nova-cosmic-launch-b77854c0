@@ -155,13 +155,16 @@ Contacto: +34659343822
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="pt-16">
+      <main id="contenido" className="pt-16">
         {/* Hero Background Image - Full width */}
-        <section className="w-full">
-          <img 
+        <section className="w-full md:mx-auto md:max-w-2xl md:px-6 md:pt-8">
+          <img
             src={referralHeroBg} 
-            alt="Programa de referidos - Invita a un amigo y gana 10% de descuento acumulable" 
-            className="w-full h-auto object-contain"
+            alt="Programa de referidos - Invita a un amigo y gana 10% de descuento acumulable"
+            width={1024}
+            height={1536}
+            fetchPriority="high"
+            className="w-full h-auto object-contain md:rounded-3xl md:shadow-2xl"
           />
         </section>
 
@@ -344,11 +347,15 @@ Contacto: +34659343822
         </section>
 
         {/* Bottom promotional image - Full width background */}
-        <section className="w-full">
-          <img 
+        <section className="w-full md:mx-auto md:max-w-2xl md:px-6 md:pb-16">
+          <img
             src={invitaBottomBg} 
-            alt="¡Digitaliza tu comercio ya!" 
-            className="w-full h-auto object-cover"
+            alt="¡Digitaliza tu comercio ya!"
+            width={1024}
+            height={1536}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto object-cover md:rounded-3xl md:shadow-2xl"
           />
         </section>
       </main>

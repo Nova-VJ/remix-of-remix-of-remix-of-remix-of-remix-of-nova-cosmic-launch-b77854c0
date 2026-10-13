@@ -37,6 +37,18 @@ Las variables `VITE_*` se leen de `.env` (solo contiene claves públicas). Para 
 
 Las cabeceras (caché de `/assets`, service worker, seguridad) están en [`public/_headers`](public/_headers).
 
+### Analítica y píxeles (opcional)
+
+Solo se cargan si el visitante los acepta en el banner de cookies, y cada uno se activa al definir su ID en *Settings → Environment variables* de Pages (y volver a desplegar):
+
+| Variable | Herramienta | Categoría de cookies |
+| --- | --- | --- |
+| `VITE_GA4_ID` | Google Analytics 4 (`G-…`) | Analíticas |
+| `VITE_GOOGLE_ADS_ID` | Google Ads (`AW-…`) | Marketing |
+| `VITE_META_PIXEL_ID` | Meta Pixel (Facebook/Instagram) | Marketing |
+
+Las solicitudes de presupuesto y los envíos del formulario de contacto se registran como evento `generate_lead` (Google) y `Lead` (Meta). El código está en [`src/lib/tracking.ts`](src/lib/tracking.ts).
+
 ## Backend (Supabase)
 
 Hay **dos proyectos** de Supabase:

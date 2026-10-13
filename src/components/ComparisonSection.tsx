@@ -26,7 +26,7 @@ const ComparisonSection = () => {
   });
 
   return (
-    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6">
+    <section ref={ref as React.RefObject<HTMLElement>} className="cv-auto relative py-20 md:py-28 px-4 sm:px-6">
       <div className="relative z-10 max-w-5xl mx-auto">
         <div {...reveal(0)}>
           <SectionHeader eyebrow="Por qué NOVA" title="Una agencia que mide resultados, no solo entrega" />

@@ -38,9 +38,10 @@ import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 
 // Images
-import dominosImage from "@/assets/dominos-presentation.jpg";
-import dominosHistorica1 from "@/assets/dominos-historica-1.jpg";
-import dominosHistorica2 from "@/assets/dominos-historica-2.jpg";
+import YouTubeFacade from "@/components/YouTubeFacade";
+import dominosImage from "@/assets/dominos-presentation.webp";
+import dominosHistorica1 from "@/assets/dominos-historica-1.webp";
+import dominosHistorica2 from "@/assets/dominos-historica-2.webp";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -113,7 +114,7 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: string; 
     >
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wider text-foreground/55">{label}</p>
+          <p className="text-xs uppercase tracking-wider text-foreground/70">{label}</p>
           <p className="mt-2 text-lg font-semibold text-foreground">{value}</p>
         </div>
         <div className="rounded-2xl border border-border/50 bg-muted/50 p-3">
@@ -280,7 +281,7 @@ function VideoEmbed({ url, title, description }: { url: string; title: string; d
         </div>
       </div>
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border/50">
-        <iframe src={url} title={title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full" />
+        <YouTubeFacade url={url} title={title} />
       </div>
     </motion.div>
   );
@@ -400,7 +401,7 @@ export default function CasoDominos() {
       <div className="fixed inset-x-0 top-2 z-[55] px-3" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-2xl border border-border/50 bg-background/80 p-2 backdrop-blur">
           <div className="flex items-center gap-2">
-            <Link to="/casos-exito" className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted">
+            <Link to="/casos-exito" aria-label="Volver a casos de éxito" className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted">
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <button onClick={() => setTocOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted">
@@ -409,7 +410,7 @@ export default function CasoDominos() {
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:block text-xs text-foreground/55">
+            <div className="hidden sm:block text-xs text-foreground/70">
               En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
@@ -418,7 +419,7 @@ export default function CasoDominos() {
         </div>
       </div>
 
-      <main className="relative mx-auto max-w-3xl px-4 pb-28 pt-24">
+      <main id="contenido" className="relative mx-auto max-w-3xl px-4 pb-28 pt-24">
         {/* HERO */}
         <motion.header id="hero" variants={stagger} initial="hidden" animate="show" className="space-y-6">
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 overflow-hidden">
@@ -444,7 +445,7 @@ export default function CasoDominos() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/55">Idea central</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">Idea central</p>
             <div className="mt-2">
               <TypingLine text="Domino's no ganó por hacer mejor pizza. Ganó por hacer más fácil comprarla." speed={18} className="text-base sm:text-lg" />
             </div>
@@ -519,8 +520,8 @@ export default function CasoDominos() {
           </motion.div>
 
           <motion.ul variants={fadeUp} className={cn("space-y-2 text-foreground/75", textSize)}>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />¿Quién consigue que el cliente te elija otra vez?</li>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />¿Quién hace que pedir sea tan sencillo que parezca automático?</li>
+            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />¿Quién consigue que el cliente te elija otra vez?</li>
+            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />¿Quién hace que pedir sea tan sencillo que parezca automático?</li>
           </motion.ul>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5">
@@ -628,7 +629,7 @@ export default function CasoDominos() {
           <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-border/50 bg-muted/30 p-7 backdrop-blur">
             <div className="flex flex-col gap-4">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wider text-foreground/55">🚀 Siguiente paso</p>
+                <p className="text-xs uppercase tracking-wider text-foreground/70">🚀 Siguiente paso</p>
                 <h3 className="mt-2 text-xl font-semibold text-foreground">¿Quieres tu propia historia de éxito?</h3>
                 <p className={cn("mt-2 text-foreground/70", textSize, lineHeight)}>
                   Te ayudamos a crear marca, presencia digital y estrategia clara para crecer.

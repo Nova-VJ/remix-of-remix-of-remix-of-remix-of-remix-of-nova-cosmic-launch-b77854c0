@@ -97,6 +97,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <Label htmlFor="contacto_nombre">Nombre *</Label>
           <Input
             id="contacto_nombre"
+            autoComplete="name"
             name="contacto_nombre"
             value={data.contacto_nombre}
             onChange={(e) => onChange('contacto_nombre', e.target.value)}
@@ -109,6 +110,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <Label htmlFor="contacto_email">Email *</Label>
           <Input
             id="contacto_email"
+            autoComplete="email"
             name="contacto_email"
             type="email"
             value={data.contacto_email}
@@ -122,6 +124,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <Label htmlFor="contacto_telefono">Teléfono</Label>
           <Input
             id="contacto_telefono"
+            autoComplete="tel"
             name="contacto_telefono"
             type="tel"
             value={data.contacto_telefono}
@@ -134,6 +137,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <Label htmlFor="contacto_negocio">Nombre del negocio *</Label>
           <Input
             id="contacto_negocio"
+            autoComplete="organization"
             name="contacto_negocio"
             value={data.contacto_negocio}
             onChange={(e) => onChange('contacto_negocio', e.target.value)}
@@ -157,6 +161,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <Label htmlFor="contacto_web">Web actual (si tienes)</Label>
           <Input
             id="contacto_web"
+            autoComplete="url"
             name="contacto_web"
             type="url"
             value={data.contacto_web}

@@ -33,7 +33,7 @@ const ResultsSection = () => {
   });
 
   return (
-    <section ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6 overflow-hidden bg-muted/40 border-y border-border">
+    <section ref={ref as React.RefObject<HTMLElement>} className="cv-auto relative py-20 md:py-28 px-4 sm:px-6 overflow-hidden bg-muted/40 border-y border-border">
       <div className="relative z-10 max-w-6xl mx-auto">
         <div {...reveal(0)}>
           <SectionHeader eyebrow="Resultados" title="Lo que conseguimos para nuestros clientes" />

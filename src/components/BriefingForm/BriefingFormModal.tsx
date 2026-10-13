@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackLead } from '@/lib/tracking';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -339,6 +340,7 @@ const BriefingFormModal = ({
 
       if (response.ok) {
         setSubmitStatus('success');
+        trackLead('formulario_presupuesto');
         
         // If from cart, add briefing to cart
         if (fromCart) {

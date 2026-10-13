@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Mail, MessageCircle, MapPin } from 'lucide-react';
+import { scrollToSectionId } from '@/lib/scroll';
 
 const goToSection = (id: string) => {
   if (window.location.pathname !== '/') {
     window.location.href = `/#${id}`;
     return;
   }
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  scrollToSectionId(id);
 };
 
 const Footer = () => {
@@ -17,7 +18,7 @@ const Footer = () => {
   const linkClass = "text-sm text-muted-foreground hover:text-foreground transition-colors";
 
   return (
-    <footer className="border-t border-border bg-muted/40 px-4 sm:px-6 pt-16 pb-8">
+    <footer className="cv-auto border-t border-border bg-muted/40 px-4 sm:px-6 pt-16 pb-8">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Brand */}

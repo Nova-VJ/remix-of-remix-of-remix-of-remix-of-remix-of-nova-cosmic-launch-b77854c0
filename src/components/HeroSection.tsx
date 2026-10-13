@@ -107,7 +107,7 @@ const HeroSection = () => {
   const openBriefing = () => navigate('/?openBriefing=true');
 
   return (
-    <section className="relative overflow-hidden pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-20">
+    <section id="contenido" className="relative overflow-hidden pt-28 pb-16 sm:pt-32 lg:pt-36 lg:pb-20">
       {/* Soft background */}
       <div className="absolute inset-0 bg-grid [mask-image:linear-gradient(to_bottom,black,transparent_85%)] opacity-70" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">

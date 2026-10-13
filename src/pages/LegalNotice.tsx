@@ -8,7 +8,7 @@ const LegalNotice = () => {
     <>
     <SEOHead {...SEO_PAGES["/aviso-legal"]} />
     <Navbar />
-    <div className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
+    <main id="contenido" className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto">
         <p className="eyebrow mb-3">Información legal</p>
 
@@ -98,7 +98,7 @@ const LegalNotice = () => {
           </section>
         </div>
       </div>
-    </div>
+    </main>
     <Footer />
     </>
   );

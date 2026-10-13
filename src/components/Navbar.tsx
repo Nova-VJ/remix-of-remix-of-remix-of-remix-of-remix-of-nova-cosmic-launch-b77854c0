@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Shield, Bell, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { scrollToSectionId } from '@/lib/scroll';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 
 const ADMIN_EMAIL = 'info@solutionsnova.es';
@@ -40,6 +41,30 @@ const Navbar = () => {
       window.removeEventListener('scroll', onScroll);
     };
   }, []);
+
+  // Highlight the menu entry of the section currently on screen (home page only)
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isHome) {
+      setActiveSection(null);
+      return;
+    }
+    const ids = NAV_ITEMS.flatMap((item) => ('section' in item ? [item.section] : []));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        }
+      },
+      // A thin band just below the menu decides which section is "current"
+      { rootMargin: '-30% 0px -65% 0px' }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [isHome]);
 
   // Fetch unread admin notifications count
   useEffect(() => {
@@ -90,7 +115,7 @@ const Navbar = () => {
       window.location.href = `/#${id}`;
       return;
     }
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    scrollToSectionId(id);
   };
 
   const openBriefing = () => {
@@ -132,14 +157,44 @@ const Navbar = () => {
         </Link>
       );
     }
+    const active = activeSection === item.section;
     return (
-      <button key={item.label} type="button" onClick={() => scrollToSection(item.section)} className={className}>
+      <button
+        key={item.label}
+        type="button"
+        onClick={() => scrollToSection(item.section)}
+        aria-current={active ? 'true' : undefined}
+        className={cn(
+          className,
+          active && 'text-foreground',
+          !mobile && 'relative after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-primary after:transition-transform after:duration-300',
+          !mobile && active && 'after:scale-x-100'
+        )}
+      >
         {item.label}
       </button>
     );
   };
 
+  // Keyboard users can jump past the menu straight to the page's main heading
+  const skipToContent = (event: React.MouseEvent) => {
+    event.preventDefault();
+    const target = document.getElementById('contenido') ?? document.querySelector<HTMLElement>('h1');
+    if (!target) return;
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: 'start' });
+  };
+
   return (
+    <>
+    <a
+      href="#contenido"
+      onClick={skipToContent}
+      className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-foreground"
+    >
+      Saltar al contenido
+    </a>
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
@@ -262,6 +317,7 @@ const Navbar = () => {
         )}
       </div>
     </nav>
+    </>
   );
 };
 

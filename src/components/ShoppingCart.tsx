@@ -183,7 +183,7 @@ const ShoppingCart = () => {
                       <div className="flex-1">
                         <p className="font-medium text-foreground text-sm">{item.name}</p>
                         <p className="text-primary font-bold">
-                          {item.price}€{item.isMonthly && <span className="text-xs font-normal text-muted-foreground">/mes</span>}
+                          <span className="text-xs font-medium text-muted-foreground">desde </span>{item.price}€{item.isMonthly && <span className="text-xs font-normal text-muted-foreground">/mes</span>}
                         </p>
                       </div>
                       <button 

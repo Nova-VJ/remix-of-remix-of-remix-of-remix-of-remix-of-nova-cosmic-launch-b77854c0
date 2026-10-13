@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { loadAnalytics, loadMarketing } from '@/lib/tracking';
 
 interface CookiePreferences {
   necessary: boolean;
@@ -45,30 +46,13 @@ const CookieConsent = () => {
   }, []);
 
   const loadScripts = (prefs: CookiePreferences) => {
-    // Only load scripts if consent was given
+    // Only load scripts if consent was given (each tool also needs its ID, see lib/tracking)
     if (prefs.analytics) {
-      loadGoogleAnalytics();
+      loadAnalytics();
     }
     if (prefs.marketing) {
-      loadGoogleAds();
-      loadMetaPixel();
+      loadMarketing();
     }
-  };
-
-  const loadGoogleAnalytics = () => {
-    // GA4 script loading placeholder
-    // In production, replace with actual GA4 ID
-    console.log('Loading Google Analytics...');
-  };
-
-  const loadGoogleAds = () => {
-    // Google Ads script loading placeholder
-    console.log('Loading Google Ads...');
-  };
-
-  const loadMetaPixel = () => {
-    // Meta Pixel script loading placeholder
-    console.log('Loading Meta Pixel...');
   };
 
   const saveConsent = (prefs: CookiePreferences) => {

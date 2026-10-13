@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { scrollToSectionId } from '@/lib/scroll';
 import SEOHead from '@/components/SEOHead';
 import { SEO_PAGES } from "@/config/seo";
 import Navbar from '@/components/Navbar';
@@ -26,6 +27,15 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const shouldOpenBriefing = searchParams.get('openBriefing') === 'true';
   const idle = useIdle();
+  const { hash } = useLocation();
+
+  // Links such as /#servicios from other pages: scroll once the sections exist
+  useEffect(() => {
+    if (!hash) return;
+    const id = decodeURIComponent(hash.slice(1));
+    const frame = requestAnimationFrame(() => scrollToSectionId(id));
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
   useSpotlight();
 
   // Clear the openBriefing param after it's been read

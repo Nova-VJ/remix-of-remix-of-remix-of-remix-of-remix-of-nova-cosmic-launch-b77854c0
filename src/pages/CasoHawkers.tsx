@@ -39,9 +39,10 @@ import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 
 // Images
-import hawkersPortada from "@/assets/hawkers-portada.jpg";
+import YouTubeFacade from "@/components/YouTubeFacade";
+import hawkersPortada from "@/assets/hawkers-portada.webp";
 import hawkersMessi1 from "@/assets/hawkers-messi-1.webp";
-import hawkersMessi2 from "@/assets/hawkers-messi-2.jpg";
+import hawkersMessi2 from "@/assets/hawkers-messi-2.webp";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -136,7 +137,7 @@ function StatCard({
     >
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wider text-foreground/55">
+          <p className="text-xs uppercase tracking-wider text-foreground/70">
             {label}
           </p>
           <p className="mt-2 text-lg font-semibold text-foreground">{value}</p>
@@ -174,7 +175,7 @@ function Lesson({
           <Icon className="h-5 w-5 text-foreground/85" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-foreground/55">
+          <p className="text-xs text-foreground/70">
             <span className="font-semibold text-foreground/80">{index}</span>{" "}
             <span className="mx-2 text-foreground/25">•</span> Lección
           </p>
@@ -182,7 +183,7 @@ function Lesson({
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
             {bullets.map((b, i) => (
               <li key={i} className="flex gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
                 <span>{b}</span>
               </li>
             ))}
@@ -495,7 +496,7 @@ function TableBlock() {
               <row.i className="h-4 w-4 text-foreground/85" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs uppercase tracking-wider text-foreground/55">
+              <p className="text-xs uppercase tracking-wider text-foreground/70">
                 {row.k}
               </p>
               <p className="mt-1 text-sm font-semibold text-foreground">{row.v}</p>
@@ -534,7 +535,7 @@ function VerticalTimeline() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-primary">{m.year}</p>
-                  <h4 className="mt-1 text-sm font-semibold text-foreground">{m.title}</h4>
+                  <h3 className="mt-1 text-sm font-semibold text-foreground">{m.title}</h3>
                   <p className="mt-1 text-xs text-foreground/65">{m.desc}</p>
                 </div>
               </div>
@@ -573,13 +574,7 @@ function VideoEmbed({ url, title, description }: { url: string; title: string; d
       </div>
       
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border/50">
-        <iframe
-          src={url}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full"
-        />
+        <YouTubeFacade url={url} title={title} />
       </div>
     </motion.div>
   );
@@ -592,10 +587,10 @@ function MessiGallery() {
     <motion.div variants={fadeUp} className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-border/50 overflow-hidden">
-          <img src={hawkersMessi1} alt="Messi con gafas Hawkers" className="w-full h-full object-cover" />
+          <img src={hawkersMessi1} alt="Messi con gafas Hawkers" width={800} height={530} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
         <div className="rounded-2xl border border-border/50 overflow-hidden">
-          <img src={hawkersMessi2} alt="Messi perfil con gafas Hawkers" className="w-full h-full object-cover" />
+          <img src={hawkersMessi2} alt="Messi perfil con gafas Hawkers" width={512} height={342} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
       </div>
       <div className="text-center">
@@ -710,6 +705,7 @@ export default function CasoHawkers() {
           <div className="flex items-center gap-2">
             <Link
               to="/casos-exito"
+              aria-label="Volver a casos de éxito"
               className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -723,7 +719,7 @@ export default function CasoHawkers() {
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:block text-xs text-foreground/55">
+            <div className="hidden sm:block text-xs text-foreground/70">
               En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
@@ -732,12 +728,12 @@ export default function CasoHawkers() {
         </div>
       </div>
 
-      <main className="relative mx-auto max-w-3xl px-4 pb-28 pt-24">
+      <main id="contenido" className="relative mx-auto max-w-3xl px-4 pb-28 pt-24">
         {/* HERO */}
         <motion.header id="hero" variants={stagger} initial="hidden" animate="show" className="space-y-6">
           {/* Portada Image */}
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 overflow-hidden">
-            <img src={hawkersPortada} alt="Hawkers productos" className="w-full h-auto" />
+            <img src={hawkersPortada} alt="Hawkers productos" width={1125} height={633} fetchPriority="high" className="w-full h-auto" />
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-2">
@@ -758,7 +754,7 @@ export default function CasoHawkers() {
 
           {/* Typing hook */}
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/55">Gancho (retención)</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">Gancho (retención)</p>
             <div className="mt-2">
               <TypingLine
                 text="La gente no compra productos. Compra cómo se siente al usarlos."
@@ -846,7 +842,7 @@ export default function CasoHawkers() {
           </Callout>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/55">Frase para recordar</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">Frase para recordar</p>
             <div className="mt-2">
               <TypingLine text="No ganaron por tener el mejor producto. Ganaron por venderlo mejor." speed={20} className="text-base sm:text-lg" />
             </div>
@@ -864,19 +860,19 @@ export default function CasoHawkers() {
 
           <motion.ul variants={fadeUp} className={cn("space-y-2 text-foreground/75", textSize)}>
             <li className="flex gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
               Las gafas eran caras
             </li>
             <li className="flex gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
               Había demasiados intermediarios
             </li>
             <li className="flex gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
               Internet permitía vender directo
             </li>
             <li className="flex gap-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/55" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
               El marketing digital era una ventaja
             </li>
           </motion.ul>
@@ -910,7 +906,7 @@ export default function CasoHawkers() {
           <FlowTimeline />
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/55">Frase para fijar la idea</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">Frase para fijar la idea</p>
             <div className="mt-2">
               <TypingLine text="Tu competencia vende cosas. Tú debes vender significado." speed={20} className="text-base sm:text-lg" />
             </div>
@@ -960,7 +956,7 @@ export default function CasoHawkers() {
             Este anuncio muestra cómo Hawkers no vendía solo gafas. Vendía <span className="font-semibold text-foreground">valores, identidad y comunidad</span>.
           </motion.p>
           
-          <motion.p variants={fadeUp} className="text-sm text-foreground/55">
+          <motion.p variants={fadeUp} className="text-sm text-foreground/70">
             📌 Importante: campaña de 2016. Prueba real de su estrategia emocional desde el inicio.
           </motion.p>
 
@@ -1062,7 +1058,7 @@ export default function CasoHawkers() {
           <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-border/50 bg-muted/30 p-7 backdrop-blur">
             <div className="flex flex-col gap-4">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wider text-foreground/55">🚀 Siguiente paso</p>
+                <p className="text-xs uppercase tracking-wider text-foreground/70">🚀 Siguiente paso</p>
                 <h3 className="mt-2 text-xl font-semibold text-foreground">
                   ¿Quieres tu propia historia de éxito?
                 </h3>

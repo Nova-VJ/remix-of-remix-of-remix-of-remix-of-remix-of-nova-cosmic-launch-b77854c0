@@ -389,7 +389,7 @@ const InstalarApp = () => {
         <SaraInstallTutorial platform={saraPlatform} onClose={() => setSaraPlatform(null)} />
       )}
 
-      <main className="pt-20 pb-16">
+      <main id="contenido" className="pt-20 pb-16">
         {/* Hero */}
         <section className="py-16 px-4 text-center">
           <div className="max-w-3xl mx-auto">

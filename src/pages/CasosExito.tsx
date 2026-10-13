@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingUp, Sparkles, Eye } from 'lucide-react';
-import dominosImage from '@/assets/dominos-presentation.jpg';
-import hawkersLogo from '@/assets/hawkers-logo.jpg';
+import dominosImage from '@/assets/dominos-presentation.webp';
+import hawkersLogo from '@/assets/hawkers-logo.webp';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
@@ -38,6 +38,7 @@ const CasosExito = () => {
       <Navbar />
 
       {/* Hero */}
+      <main id="contenido">
       <section className="pt-28 pb-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
@@ -70,6 +71,10 @@ const CasosExito = () => {
                     <img 
                       src={caso.image} 
                       alt={caso.title}
+                      width={640}
+                      height={360}
+                      fetchPriority="high"
+                      decoding="async"
                       className="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
@@ -132,6 +137,7 @@ const CasosExito = () => {
           </div>
         </div>
       </section>
+      </main>
       <Footer />
     </div>
     </>

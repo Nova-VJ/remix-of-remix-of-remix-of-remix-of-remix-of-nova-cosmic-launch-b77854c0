@@ -279,19 +279,28 @@
     border: 2px solid transparent !important;
     background:
       linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
-      conic-gradient(from var(--border-angle), hsl(262 78% 54%), hsl(290 80% 62%), hsl(220 85% 60%), hsl(262 78% 54%)) border-box !important;
+      conic-gradient(from calc(var(--border-angle) + 210deg), hsl(262 78% 54%), hsl(290 80% 62%), hsl(220 85% 60%), hsl(262 78% 54%)) border-box !important;
     box-shadow: 0 24px 60px -24px hsl(262 78% 45% / 0.45);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .gradient-border {
-      animation: border-spin 6s linear infinite;
+  /* Spins only while hovered: animating a custom property runs on the main
+     thread every frame, which cost ~2 s of work per load on mid-range phones */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .gradient-border:hover {
+      animation: border-spin 4s linear infinite;
     }
   }
 
   /* The cookie banner steps aside while a dialog (budget form, etc.) is open */
   body:has([role="dialog"][data-state="open"]) .cookie-banner {
     display: none;
+  }
+
+  /* Below-the-fold sections: the browser skips their layout and paint until they
+     approach the screen ("auto" remembers the real height once rendered) */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
   }
 
   /* Fine film grain for large gradient areas */

@@ -30,7 +30,7 @@ const NotFound = () => {
   return (
     <>
       <Navbar />
-      <main className="relative overflow-hidden px-4 pb-24 pt-32 sm:px-6 md:pt-40">
+      <main id="contenido" className="relative overflow-hidden px-4 pb-24 pt-32 sm:px-6 md:pt-40">
         <div className="absolute inset-0 bg-grid opacity-70 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" aria-hidden="true" />
         <div className="relative mx-auto max-w-2xl text-center">
           <NovaMethodIcon size={88} />

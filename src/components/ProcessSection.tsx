@@ -43,7 +43,7 @@ const ProcessSection = () => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   return (
-    <section id="proceso" ref={ref as React.RefObject<HTMLElement>} className="relative py-20 md:py-28 px-4 sm:px-6 bg-muted/40 border-y border-border">
+    <section id="proceso" ref={ref as React.RefObject<HTMLElement>} className="cv-auto relative py-20 md:py-28 px-4 sm:px-6 bg-muted/40 border-y border-border">
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section header */}
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>

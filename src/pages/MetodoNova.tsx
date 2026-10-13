@@ -119,7 +119,7 @@ export default function MetodoNova() {
 
       <main className="bg-background text-foreground">
         {/* Hero */}
-        <section className="relative overflow-hidden px-4 pb-20 pt-28 sm:px-6 md:pb-24 md:pt-36">
+        <section id="contenido" className="relative overflow-hidden px-4 pb-20 pt-28 sm:px-6 md:pb-24 md:pt-36">
           <div className="absolute inset-0 bg-grid opacity-70 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" aria-hidden="true" />
           <div className="absolute left-1/2 top-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
 
