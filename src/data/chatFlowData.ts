@@ -451,7 +451,7 @@ export const SERVICES_DATA = {
           'Respuestas personalizadas',
           'Informe mensual'
         ],
-        price: 'Desde 250 €/mes'
+        price: 'Desde 500 €/mes'
       },
       {
         id: 'social-plus',
@@ -484,7 +484,7 @@ export const SERVICES_DATA = {
           'Paleta de colores',
           'Tipografías'
         ],
-        price: 'Desde 100 €'
+        price: 'Desde 200 €'
       },
       {
         id: 'branding-pro',
@@ -497,7 +497,7 @@ export const SERVICES_DATA = {
           'Recursos y plantillas',
           'Papelería corporativa si requiere'
         ],
-        price: 'Desde 190 €'
+        price: 'A medida (según alcance)'
       }
     ]
   },

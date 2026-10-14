@@ -24,3 +24,6 @@
   X-Frame-Options: SAMEORIGIN
   Strict-Transport-Security: max-age=31536000
   Permissions-Policy: camera=(), geolocation=(), payment=(), usb=(), microphone=(self)
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  # No plugins, no <base> hijacking, no framing by other sites, forms only post here
+  Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; upgrade-insecure-requests

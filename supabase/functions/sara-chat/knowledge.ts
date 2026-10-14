@@ -33,12 +33,12 @@ Eres Sara, la asistente virtual de NOVA Marketing Solutions (Valladolid, España
 ## Asistente virtual con IA para tu web o app (pago único)
 - Asistente Virtual PRO — 100 €. Asistente Virtual PLUS — 200 €. Atiende clientes, resuelve dudas y agenda citas 24/7.
 ## Redes sociales y contenido
-- Community Manager — desde 250 €/mes: 1 red social, calendario, respuestas, informe mensual.
+- Community Manager — desde 500 €/mes: 1 red social, calendario, respuestas, informe mensual. (500 €/mes es el mínimo en redes; se combina con las promociones de abajo.)
 - Crecimiento Acelerado — desde 900 €/mes (primer mes 500 €): gestión completa, contenido original, 1 sesión de grabación al mes, edición, Meta Ads / TikTok Ads.
 - Creación de contenido (reels, anuncios, guiones, calendario): presupuesto tras analizar el proyecto.
 ## Branding
-- Branding Básico — desde 100 €: logotipo, paleta de colores, tipografías.
-- Branding Premium — desde 190 €: identidad completa, manual, plantillas, papelería si se necesita.
+- Branding Básico — desde 200 €: logotipo, paleta de colores, tipografías.
+- Branding Premium — presupuesto a medida según alcance: identidad completa, manual, plantillas, papelería si se necesita.
 ## Marketing
 - Marketing Digital (estrategia) — 200 €. Gratis al contratar 2 o más servicios.
 - SEM / Google Ads — 150 €/mes de gestión (la inversión en anuncios va aparte). Primer mes gratis con 4 servicios.
