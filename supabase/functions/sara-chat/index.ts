@@ -14,15 +14,20 @@ type Body = {
   sessionId?: string;
 };
 
-const json = (data: unknown, status = 200, origin = "*") =>
+// Solo los orígenes de la lista blanca reciben cabeceras CORS: el navegador
+// bloquea a cualquier otra web que intente usar a Sara.
+const json = (data: unknown, status = 200, origin = "") =>
   new Response(JSON.stringify(data), {
     status,
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": origin,
-      "Access-Control-Allow-Headers":
-        "authorization, x-client-info, apikey, content-type, x-anon-id",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      ...(origin
+        ? {
+          "Access-Control-Allow-Origin": origin,
+          "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-anon-id",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+        }
+        : {}),
       "Vary": "Origin",
     },
   });
@@ -31,23 +36,40 @@ const json = (data: unknown, status = 200, origin = "*") =>
 // DEMO_LIMIT en src/hooks/useSaraChat.ts (el contador del navegador se puede
 // borrar; este no).
 const ANON_DAILY_LIMIT = 10;
+// Por conexión (IP) en 24 h: impide saltarse el límite cambiando de session_id.
+// Más alto que el de sesión porque varias personas pueden compartir IP.
+const ANON_IP_DAILY_LIMIT = 30;
+const USER_IP_DAILY_LIMIT = 100;
 // Red de seguridad para la factura de IA: mensajes de toda la web en 24 h.
 const SITE_DAILY_CAP = parseInt(Deno.env.get("SARA_DAILY_CAP") ?? "1000", 10);
+const MAX_MESSAGE_CHARS = 2000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// La web inicia sesión contra su proyecto principal de Supabase, no contra este,
-// así que aquí no se puede validar el token. Solo para el límite de visitantes,
-// un JWT con role "authenticated" y sin caducar cuenta como usuario con cuenta.
-const looksSignedIn = (authHeader: string) => {
-  const token = authHeader.replace(/^Bearer\s+/i, "");
+// Proyecto de Supabase de la web, donde inician sesión los usuarios.
+const WEB_SUPABASE_URL = Deno.env.get("WEB_SUPABASE_URL") ?? "https://bxweazufzinukesvhiji.supabase.co";
+const WEB_SUPABASE_ANON_KEY = Deno.env.get("WEB_SUPABASE_ANON_KEY") ?? "";
+
+// Comprueba la sesión contra el proyecto de la web: un token inventado no cuenta.
+const isSignedIn = async (authHeader: string) => {
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  if (!WEB_SUPABASE_ANON_KEY || !token || token.split(".").length !== 3) return false;
   try {
-    const payload = token.split(".")[1];
-    if (!payload) return false;
-    const data = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    return data.role === "authenticated" && (!data.exp || data.exp * 1000 > Date.now());
+    const res = await fetch(`${WEB_SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: WEB_SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` },
+    });
+    return res.ok;
   } catch {
     return false;
   }
+};
+
+// IP real del visitante (Cloudflare la pone y rechaza las peticiones que la
+// falsifican). Se guarda resumida, nunca la IP en claro.
+const clientIpKey = async (req: Request) => {
+  const ip = req.headers.get("cf-connecting-ip") ??
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`nova-sara:${ip}`));
+  return Array.from(new Uint8Array(digest)).slice(0, 8).map((b) => b.toString(16).padStart(2, "0")).join("");
 };
 
 const isAllowedOrigin = (origin: string) => {
@@ -67,7 +89,10 @@ const isAllowedOrigin = (origin: string) => {
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") ?? "";
-  const allowOrigin = isAllowedOrigin(origin) ? origin : "*";
+  const allowOrigin = isAllowedOrigin(origin) ? origin : "";
+
+  // Peticiones desde webs ajenas: sin cabeceras CORS y rechazadas
+  if (origin && !allowOrigin) return json({ error: "Origin not allowed" }, 403);
 
   // CORS preflight
   if (req.method === "OPTIONS") return json({ ok: true }, 200, allowOrigin);
@@ -89,7 +114,7 @@ Deno.serve(async (req: Request) => {
     body?.text ??
     (Array.isArray(body?.messages) ? body.messages.at(-1)?.content : "");
 
-  const message = String(extracted ?? "").trim();
+  const message = String(extracted ?? "").trim().slice(0, MAX_MESSAGE_CHARS);
 
   if (!message) {
     return json(
@@ -105,7 +130,11 @@ Deno.serve(async (req: Request) => {
   }
 
   // ✅ Session ID (memoria por conversación) — soporta session_id y sessionId
-  const sid = String(body.session_id ?? body.sessionId ?? "").trim() || crypto.randomUUID();
+  const sid = String(body.session_id ?? body.sessionId ?? "").trim().slice(0, 100) || crypto.randomUUID();
+  // La memoria se guarda con la IP resumida delante: así se pueden contar los
+  // mensajes de una misma conexión aunque cambie de session_id.
+  const ipKey = await clientIpKey(req);
+  const memSid = `${ipKey}|${sid}`;
 
   // Secrets Gemini. Con VERTEX_API_KEY se usa Vertex AI (crédito de Google Cloud del proyecto VERTEX_PROJECT);
   // si no, Gemini de AI Studio (prepago) como antes.
@@ -134,11 +163,31 @@ Deno.serve(async (req: Request) => {
   if (supabase) {
     const since = new Date(Date.now() - DAY_MS).toISOString();
 
-    if (!looksSignedIn(req.headers.get("authorization") ?? "")) {
+    const signedIn = await isSignedIn(req.headers.get("authorization") ?? "");
+
+    const { count: ipCount, error: ipError } = await supabase
+      .from(MEMORY_TABLE)
+      .select("session_id", { count: "exact", head: true })
+      .like("session_id", `${ipKey}|%`)
+      .eq("role", "user")
+      .gte("created_at", since);
+    if (ipError) console.error("IP daily count error:", ipError);
+    if ((ipCount ?? 0) >= (signedIn ? USER_IP_DAILY_LIMIT : ANON_IP_DAILY_LIMIT)) {
+      return json(
+        {
+          error: "Has alcanzado el límite de mensajes de hoy. Escríbenos por WhatsApp y te respondemos enseguida.",
+          limit_reached: true,
+        },
+        429,
+        allowOrigin
+      );
+    }
+
+    if (!signedIn) {
       const { count, error } = await supabase
         .from(MEMORY_TABLE)
         .select("session_id", { count: "exact", head: true })
-        .eq("session_id", sid)
+        .eq("session_id", memSid)
         .eq("role", "user")
         .gte("created_at", since);
       if (error) console.error("Session daily count error:", error);
@@ -179,7 +228,7 @@ Deno.serve(async (req: Request) => {
     const { data, error } = await supabase
       .from(MEMORY_TABLE)
       .select("role, content")
-      .eq("session_id", sid)
+      .eq("session_id", memSid)
       .order("created_at", { ascending: true })
       .limit(16);
 
@@ -229,8 +278,8 @@ Deno.serve(async (req: Request) => {
   // Guardar memoria (best effort)
   if (supabase) {
     await supabase.from(MEMORY_TABLE).insert([
-      { session_id: sid, role: "user", content: message },
-      { session_id: sid, role: "assistant", content: reply },
+      { session_id: memSid, role: "user", content: message },
+      { session_id: memSid, role: "assistant", content: reply },
     ]);
   }
 

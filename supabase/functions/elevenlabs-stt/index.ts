@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { rejectForeignOrigin } from "../_shared/origin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,6 +8,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  const foreign = rejectForeignOrigin(req);
+  if (foreign) return foreign;
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
