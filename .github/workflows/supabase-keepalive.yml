@@ -1,0 +1,22 @@
+# Los proyectos gratuitos de Supabase se pausan tras 7 días sin actividad.
+# Esta tarea hace una petición ligera cada 3 días a los dos proyectos
+# (web y Sara). Las claves "anon" son públicas: ya van dentro de la web.
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ping web project
+        run: |
+          set -a; . ./.env; set +a
+          curl -fsS "$VITE_SUPABASE_URL/rest/v1/success_stories?select=id&limit=1"             -H "apikey: $VITE_SUPABASE_PUBLISHABLE_KEY" -o /dev/null -w "web %{http_code}\n"
+      - name: Ping Sara project
+        run: |
+          curl -fsS "https://dnnqeydtybmzriyjqqyt.supabase.co/rest/v1/"             -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRubnFleWR0eWJtenJpeWpxcXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1NzE5NjIsImV4cCI6MjA4MzE0Nzk2Mn0.AuRHFjLfOowvE5G9-ILPmGm309V00Zg_cy00kFqQuHQ" -o /dev/null -w "sara %{http_code}\n"

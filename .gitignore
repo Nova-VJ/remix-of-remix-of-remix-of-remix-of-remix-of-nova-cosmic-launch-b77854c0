@@ -26,3 +26,6 @@ dist-ssr
 # Cloudflare wrangler local state
 .wrangler
 dist-shell
+
+supabase/.temp/
+supabase/.db-password

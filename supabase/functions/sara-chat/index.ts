@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { SARA_KNOWLEDGE } from "./knowledge.ts";
 
 type Body = {
   // soporta distintos formatos que puede enviar el widget web
@@ -51,14 +52,14 @@ const looksSignedIn = (authHeader: string) => {
 
 const isAllowedOrigin = (origin: string) => {
   if (!origin) return false;
-  if (origin === "http://localhost:5173") return true;
   if (origin === "https://solutionsnova.es") return true;
   if (origin === "https://www.solutionsnova.es") return true;
 
-  // previews de Lovable
   try {
     const u = new URL(origin);
-    if (u.hostname.endsWith(".lovable.app")) return true;
+    // Desarrollo local y vistas previas de Cloudflare Pages
+    if (u.hostname === "localhost" || u.hostname === "127.0.0.1") return true;
+    if (u.hostname === "77851234.pages.dev" || u.hostname.endsWith(".77851234.pages.dev")) return true;
   } catch {}
 
   return false;
@@ -116,17 +117,9 @@ Deno.serve(async (req: Request) => {
   if (!VERTEX_API_KEY && !GEMINI_API_KEY)
     return json({ error: "Missing VERTEX_API_KEY / GEMINI_API_KEY" }, 500, allowOrigin);
 
-  // Prompt (desde Secrets) — se presenta 1 sola vez por conversación
-  const DEFAULT_SYSTEM = `
-Eres Sara de Nova (asistente virtual).
-Reglas:
-- Preséntate SOLO una vez al inicio de cada conversación (cuando no haya historial).
-- Responde claro, útil y en español.
-- Si falta información, dilo y sugiere contactar con Nova.
-- No inventes precios ni condiciones.
-`.trim();
-
-  const system = (Deno.env.get("SARA_SYSTEM_PROMPT") ?? DEFAULT_SYSTEM).trim();
+  // Conocimiento de NOVA (knowledge.ts) + notas opcionales desde Secrets
+  const extra = (Deno.env.get("SARA_EXTRA_PROMPT") ?? "").trim();
+  const system = extra ? `${SARA_KNOWLEDGE}\n\n# Notas adicionales\n${extra}` : SARA_KNOWLEDGE;
 
   // Supabase (memoria)
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";

@@ -1,1 +1,33 @@
-project_id = "dnnqeydtybmzriyjqqyt"
+# Proyecto de la web (base de datos, cuentas, voz y avisos).
+# Sara vive en otro proyecto: dnnqeydtybmzriyjqqyt (desplegar con --project-ref).
+project_id = "bxweazufzinukesvhiji"
+
+[auth]
+site_url = "https://solutionsnova.es"
+additional_redirect_urls = [
+  "https://solutionsnova.es/**",
+  "https://www.solutionsnova.es/**",
+  "https://77851234.pages.dev/**",
+  "https://*.77851234.pages.dev/**",
+  "http://localhost:8080/**",
+  "http://localhost:4173/**",
+]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+# Sin servidor de correo propio, Supabase solo envía unos pocos emails por hora:
+# las cuentas se activan sin confirmar el email.
+enable_confirmations = false
+
+[functions.google-tts]
+verify_jwt = false
+
+[functions.elevenlabs-stt]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.sara-chat]
+verify_jwt = false
