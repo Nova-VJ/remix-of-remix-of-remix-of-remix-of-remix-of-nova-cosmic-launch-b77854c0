@@ -108,7 +108,7 @@ const AuditPopup = () => {
             {/* Promo code */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-3 mb-5 flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-white/40 mb-0.5">Código exclusivo</p>
+                <p className="text-xs text-white/70 mb-0.5">Código exclusivo</p>
                 <p className="text-xl font-bold tracking-widest text-white font-mono">NOVA20</p>
               </div>
               <button
@@ -131,14 +131,14 @@ const AuditPopup = () => {
               </Button>
               <Button
                 variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10 font-semibold py-5 rounded-xl transition-all gap-2"
+                className="w-full border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white font-semibold py-5 rounded-xl transition-all gap-2"
                 onClick={handleEmail}
               >
                 <Mail className="w-5 h-5" />
                 Pedir auditoría por correo
               </Button>
             </div>
-            <p className="text-center text-xs text-white/30 mt-3">Sin compromiso. Respuesta en 24h.</p>
+            <p className="text-center text-xs text-white/70 mt-3">Sin compromiso. Respuesta en 24h.</p>
           </div>
         </div>
       </DialogContent>
