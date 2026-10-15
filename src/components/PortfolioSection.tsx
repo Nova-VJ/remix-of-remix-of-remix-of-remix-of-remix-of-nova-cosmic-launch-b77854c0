@@ -28,7 +28,7 @@ const MediaFrame = ({ project }: { project: PortfolioProject }) => {
         <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         <span className="ml-3 h-5 flex-1 truncate rounded-md bg-background px-2 text-[10px] leading-5 text-muted-foreground">
-          {project.demoUrl ? project.demoUrl.replace(/^https?:\/\//, '') : project.frameLabel ?? project.title}
+          {project.frameLabel ?? project.title}
         </span>
       </div>
       {media}

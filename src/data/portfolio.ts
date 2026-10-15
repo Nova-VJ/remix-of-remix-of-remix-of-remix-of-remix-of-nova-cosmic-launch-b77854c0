@@ -20,9 +20,7 @@ export interface PortfolioProject {
   video?: string;
   /** Width / height of the media, for a stable layout */
   aspect: number;
-  /** Optional live demo */
-  demoUrl?: string;
-  /** Text in the browser frame's address bar when there is no live demo */
+  /** Text in the browser frame's address bar (never a real demo address) */
   frameLabel?: string;
   /** Visual frame around the media */
   frame: 'browser' | 'game';
@@ -39,7 +37,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     poster: '/videos/valetos.webp',
     video: '/videos/valetos.mp4',
     aspect: 1200 / 750,
-    demoUrl: 'https://app.valetdemo.workers.dev',
+    frameLabel: 'valetos · panel de operaciones',
     frame: 'browser',
   },
   {
@@ -52,7 +50,7 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     poster: '/videos/freshpooch.webp',
     video: '/videos/freshpooch.mp4',
     aspect: 1200 / 750,
-    demoUrl: 'https://thefreshpooch.valetdemo.workers.dev',
+    frameLabel: 'reservas · portal de clientes',
     frame: 'browser',
   },
   {
