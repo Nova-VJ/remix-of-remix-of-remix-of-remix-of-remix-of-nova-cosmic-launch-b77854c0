@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Lightbulb } from 'lucide-react';
+import { ArrowRight, Lightbulb } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import DemoVideo from '@/components/DemoVideo';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '@/data/portfolio';
@@ -62,17 +62,6 @@ const ProjectRow = ({ project, index }: { project: PortfolioProject; index: numb
             </li>
           ))}
         </ul>
-        {project.demoUrl && (
-          <a
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-[hsl(var(--nova-purple-dark))]"
-          >
-            Probar la demo en vivo
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        )}
       </div>
     </article>
   );
