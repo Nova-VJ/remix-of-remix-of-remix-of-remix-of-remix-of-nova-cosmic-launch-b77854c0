@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
-import { precacheAndRoute } from 'workbox-precaching';
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
@@ -7,6 +8,12 @@ import { ExpirationPlugin } from 'workbox-expiration';
 declare const self: ServiceWorkerGlobalScope;
 
 // Workbox precaching (manifest injected by vite-plugin-pwa)
+// A new version takes over as soon as it is installed instead of waiting for
+// every tab to close (visitors kept seeing the previous site otherwise)
+self.skipWaiting();
+clientsClaim();
+cleanupOutdatedCaches();
+
 precacheAndRoute(self.__WB_MANIFEST);
 
 // Images are cached as they are viewed instead of all being downloaded up front

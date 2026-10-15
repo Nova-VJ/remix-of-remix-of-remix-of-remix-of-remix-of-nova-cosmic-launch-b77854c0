@@ -189,6 +189,15 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Nova" />
     <meta name="mobile-web-app-capable" content="yes" />
+      <script>
+      // When a new version of the site takes over an open tab, reload once to show it
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!reloaded) { reloaded = true; location.reload(); }
+        });
+      }
+    </script>
   </head>
 
   <body>
