@@ -2,6 +2,7 @@ import SEOHead from '@/components/SEOHead';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SEO_PAGES } from "@/config/seo";
+import { legalIdentityRows } from '@/config/legal';
 
 const LegalNotice = () => {
   return (
@@ -21,8 +22,9 @@ const LegalNotice = () => {
               En cumplimiento del deber de información recogido en el artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico, se exponen los siguientes datos:
             </p>
             <ul className="list-none space-y-1 text-muted-foreground mt-3">
-              <li><strong>Email:</strong> info@solutionsnova.es</li>
-              <li><strong>Nombre comercial:</strong> Nova Marketing Solutions</li>
+              {legalIdentityRows().map(([label, value]) => (
+                <li key={label}><strong>{label}:</strong> {value}</li>
+              ))}
             </ul>
           </section>
 

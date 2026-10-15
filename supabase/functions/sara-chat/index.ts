@@ -281,6 +281,13 @@ Deno.serve(async (req: Request) => {
       { session_id: memSid, role: "user", content: message },
       { session_id: memSid, role: "assistant", content: reply },
     ]);
+    // Conservación (política de privacidad): las conversaciones se borran al año.
+    // Basta con limpiar de vez en cuando, no en cada mensaje.
+    if (Math.random() < 0.05) {
+      const cutoff = new Date(Date.now() - 365 * DAY_MS).toISOString();
+      const { error: purgeError } = await supabase.from(MEMORY_TABLE).delete().lt("created_at", cutoff);
+      if (purgeError) console.error("Memory purge error:", purgeError);
+    }
   }
 
   // ✅ Respuesta compatible con más widgets: reply + message
