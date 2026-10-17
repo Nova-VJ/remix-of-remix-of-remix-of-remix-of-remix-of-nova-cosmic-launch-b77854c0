@@ -22,8 +22,8 @@ export default defineConfig(() => ({
       injectManifest: {
         // Code, pages and fonts work offline; images are cached as they are viewed (see src/sw.ts)
         globPatterns: ["**/*.{js,css,html,woff2}", "favicon-96.png", "nova-icon-192.png", "images/logo-nova-light.webp"],
-        // Staff-only page: don't make every visitor download it in the background
-        globIgnores: ["**/Admin-*.js"],
+        // Staff-only page and the sector demos (/demos): don't make every visitor download them in the background
+        globIgnores: ["**/Admin-*.js", "demos/**"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
     }),
