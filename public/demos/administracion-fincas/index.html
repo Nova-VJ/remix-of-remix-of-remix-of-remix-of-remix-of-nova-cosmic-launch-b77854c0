@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fincas Portalbo · Administración de fincas en Valladolid (demostración)</title>
+<meta name="description" content="Demostración de NOVA con un negocio ficticio: Administración de comunidades y alquileres con portal para vecinos, propietarios e inquilinos.">
+<!-- Negocio ficticio: no debe aparecer en Google. En la web de un cliente real se quita esta línea. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1e3550">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Fincas Portalbo · Valladolid (demostración de NOVA)">
+<meta property="og:description" content="Administración de comunidades y alquileres con portal para vecinos, propietarios e inquilinos.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20color%3D%22%2334557a%22%20class%3D%22icono%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20aria-hidden%3D%22true%22%3E%3Cpath%20d%3D%22M6%2022V4a2%202%200%200%201%202-2h8a2%202%200%200%201%202%202v18Z%22%20%2F%3E%3Cpath%20d%3D%22M6%2012H4a2%202%200%200%200-2%202v6a2%202%200%200%200%202%202h2%22%20%2F%3E%3Cpath%20d%3D%22M18%209h2a2%202%200%200%201%202%202v9a2%202%200%200%201-2%202h-2%22%20%2F%3E%3Cpath%20d%3D%22M10%206h4%22%20%2F%3E%3Cpath%20d%3D%22M10%2010h4%22%20%2F%3E%3Cpath%20d%3D%22M10%2014h4%22%20%2F%3E%3Cpath%20d%3D%22M10%2018h4%22%20%2F%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="../comun/base.css">
+<style>
+  :root { --primario: #34557a; --sobre-primario: #ffffff; --acento: #9fc0e0; --suave: #eef3f8; --fondo: #ffffff;
+    --texto: #1a2433; --texto-suave: #4a5568; --oscuro: #1e3550; --sobre-oscuro: #ffffff; --linea: #d8e1eb; --borde: #6b7686; --enlace: #34557a; --oscuro-rgb: 30 53 80; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Fincas Portalbo (negocio ficticio de demostración)",
+  "description": "Negocio ficticio creado por NOVA Marketing Solutions para enseñar una web de gestión de propiedades. No es un negocio real.",
+  "areaServed": "Valladolid",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Valladolid",
+    "addressRegion": "Castilla y León",
+    "addressCountry": "ES"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "09:00",
+      "closes": "14:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "16:30",
+      "closes": "19:00"
+    }
+  ]
+}
+</script>
+<script type="application/json" id="demo-config">
+{
+  "negocio": "Fincas Portalbo",
+  "articulo": "la administración",
+  "zona": "el barrio de La Victoria",
+  "horarioTexto": "lunes a viernes de 9:00 a 14:00 y de 16:30 a 19:00",
+  "horario": {
+    "1": [
+      [
+        "09:00",
+        "14:00"
+      ],
+      [
+        "16:30",
+        "19:00"
+      ]
+    ],
+    "2": [
+      [
+        "09:00",
+        "14:00"
+      ],
+      [
+        "16:30",
+        "19:00"
+      ]
+    ],
+    "3": [
+      [
+        "09:00",
+        "14:00"
+      ],
+      [
+        "16:30",
+        "19:00"
+      ]
+    ],
+    "4": [
+      [
+        "09:00",
+        "14:00"
+      ],
+      [
+        "16:30",
+        "19:00"
+      ]
+    ],
+    "5": [
+      [
+        "09:00",
+        "14:00"
+      ],
+      [
+        "16:30",
+        "19:00"
+      ]
+    ]
+  },
+  "minutosPorCita": 30,
+  "conHora": true,
+  "textoReserva": "Cita reservada",
+  "motivos": [
+    "Cambiar de administrador",
+    "Duda de mi comunidad",
+    "Gestión de mi alquiler",
+    "Otro asunto"
+  ],
+  "avisos": {
+    "whatsapp": {
+      "titulo": "Así funciona el botón de WhatsApp",
+      "texto": "En la web real, este botón abre WhatsApp en el móvil con el número de la administración y un mensaje ya escrito: «Hola, quería información de Fincas Portalbo». Es una demostración: la administración no existe y no tiene número."
+    },
+    "app": {
+      "titulo": "Tu app en Google Play y App Store",
+      "texto": "En una app real, estos botones llevan a la ficha de la app en Google Play (Android) y App Store (iPhone). Esta es un ejemplo: NOVA crea la app de tu negocio con tu marca y la publica en las dos tiendas."
+    }
+  },
+  "chat": {
+    "saludo": "Hola, soy el asistente de Fincas Portalbo. Te ayudo con incidencias, recibos, juntas o con cambiar de administrador.",
+    "preguntaMotivo": "¿Cuál es el motivo de la cita?",
+    "sugerencias": [
+      "Quiero avisar de una avería",
+      "Queremos cambiar de administrador",
+      "¿Dónde veo los recibos?",
+      "¿Cuándo es la junta?",
+      "Pedir cita"
+    ],
+    "intenciones": [
+      {
+        "claves": [
+          "averia",
+          "incidencia",
+          "gotera",
+          "ascensor",
+          "no funciona",
+          "roto",
+          "rota",
+          "luz del portal"
+        ],
+        "texto": "Abre la incidencia desde la app o el portal con una foto. Verás en qué punto está y cuándo va el técnico, sin tener que llamar."
+      },
+      {
+        "claves": [
+          "cambiar de administrador",
+          "cambiar administrador",
+          "nuevo administrador",
+          "presupuesto para la comunidad"
+        ],
+        "texto": "Te preparamos un presupuesto para tu comunidad y te explicamos cómo se hace el cambio. Pide cita con el motivo «Cambiar de administrador»."
+      },
+      {
+        "claves": [
+          "recibo",
+          "cuota",
+          "derrama",
+          "pagar la comunidad",
+          "moroso"
+        ],
+        "texto": "Tus recibos están en el portal y en la app. Si un vecino debe cuotas, te explicamos los pasos para reclamarlas."
+      },
+      {
+        "claves": [
+          "junta",
+          "acta",
+          "convocatoria",
+          "reunion de vecinos"
+        ],
+        "texto": "La convocatoria y el acta de cada junta llegan a todos los vecinos y quedan guardadas en el portal."
+      },
+      {
+        "claves": [
+          "alquiler",
+          "inquilino",
+          "propietario"
+        ],
+        "texto": "También gestionamos alquileres: contratos, cobros e incidencias, con acceso para el propietario y el inquilino."
+      }
+    ]
+  }
+}
+</script>
+<script src="../comun/demo.js" defer></script>
+</head>
+<body data-tema="claro">
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<p class="aviso-demo" role="note"><strong>Demostración de NOVA · negocio ficticio</strong> La administración no existe. <a href="https://solutionsnova.es/?openBriefing=true">Quiero una web así</a></p>
+
+<header class="cabecera">
+  <div class="contenedor">
+    <a class="marca" href="#contenido" aria-label="Fincas Portalbo, inicio">
+      <span class="marca__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span>
+      <span>Fincas Portalbo<small>Administración de fincas</small></span>
+    </a>
+    <nav class="menu" aria-label="Principal">
+      <a href="#servicios">Servicios</a>
+      <a href="#reserva">Reservar</a>
+      <a href="#app">App</a>
+      <a href="#horario">Horario</a>
+      <a href="#preguntas">Preguntas</a>
+    </nav>
+    <a class="boton boton--primario" href="#reserva">Reservar</a>
+  </div>
+</header>
+
+<main id="contenido">
+  <section class="portada" aria-labelledby="titulo" style="--imagen-fondo: url('../comun/fondos/administracion-fincas.webp')" data-fondo="../comun/fondos/administracion-fincas.webp">
+    <div class="contenedor">
+      <div>
+        <span class="etiqueta">Administración de fincas · Valladolid</span>
+        <h1 id="titulo">Administración de fincas en Valladolid, con todo a la vista desde el móvil</h1>
+        <p class="portada__sub">Comunidades de vecinos y alquileres. Cada vecino y propietario tiene su acceso: recibos, actas, documentos e incidencias con seguimiento.</p>
+        <div class="acciones">
+          <a class="boton boton--primario" href="#reserva">Pide una cita con el administrador</a>
+          <a class="boton boton--whatsapp" href="#" data-aviso="whatsapp"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.8 10.8 0 0 0 4.1 3.6c1.5.7 2.1.7 2.9.6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.3-.3z"/></svg> WhatsApp</a>
+        </div>
+        <ul class="ventajas"><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Portal de vecinos</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Incidencias con seguimiento</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Recibos y actas online</li></ul>
+        <a class="aviso-app" href="#app"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg> También en app: Google Play y App Store</a>
+      </div>
+      <div class="dispositivos" role="img" aria-label="Diseño de ejemplo: el panel de reservas en un portátil y la app de Fincas Portalbo en un móvil">
+       <div class="dispositivos__lienzo">
+        <div class="portatil" aria-hidden="true">
+          <div class="portatil__pantalla">
+          <div class="panel">
+            <div class="panel__menu"><span class="panel__logo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></svg></span><span class="activo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12" /><path d="M4 14h9" /><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg></span></div>
+            <div class="panel__cuerpo">
+              <div class="panel__cabecera"><strong>Avisos de hoy</strong><span class="panel__buscar"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg> Buscar</span></div>
+              <ul class="panel__lista"><li><time>09:15</time><span>Luz del portal · comunidad 14</span><em class="estado estado--pendiente">En curso</em></li><li><time>10:40</time><span>Gotera en el garaje · comunidad 9</span><em class="estado estado--pendiente">Pendiente</em></li><li><time>11:20</time><span>Revisión del ascensor · comunidad 3</span><em class="estado estado--ok">Resuelta</em></li><li><time>12:30</time><span>Recibos de octubre enviados</span><em class="estado estado--ok">Hecho</em></li><li><time>17:00</time><span>Junta ordinaria · comunidad 21</span><em class="estado estado--info">Convocada</em></li></ul>
+            </div>
+          </div>
+          </div>
+          <div class="portatil__base"></div>
+        </div>
+        <div class="movil2" aria-hidden="true">
+        <div class="movil2__pantalla">
+          <div class="app-estado"><span>9:41</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01" /><path d="M7 20v-4" /><path d="M12 20v-8" /><path d="M17 20V8" /><path d="M22 4v16" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01" /><path d="M2 8.82a15 15 0 0 1 20 0" /><path d="M5 12.859a10 10 0 0 1 14 0" /><path d="M8.5 16.429a5 5 0 0 1 7 0" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="10" x="2" y="7" rx="2" ry="2" /><line x1="22" x2="22" y1="11" y2="13" /><line x1="6" x2="6" y1="11" y2="13" /><line x1="10" x2="10" y1="11" y2="13" /><line x1="14" x2="14" y1="11" y2="13" /></svg></span></div>
+          <div class="app-cabecera"><span class="app-logo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span><strong>Fincas Portalbo</strong><span class="app-avatar"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span></div>
+          <p class="app-hola">Hola, vecino del 3.º B</p>
+          <div class="app-cita"><div class="app-cita__fecha"><small>JUE</small><b>22</b></div><div><small>Tu incidencia</small><strong>Luz del portal</strong><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg> En curso · va el electricista</span></div></div>
+          <div class="app-acciones"><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>Incidencias</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12" /><path d="M4 14h9" /><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" /></svg>Recibos</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>Actas</span></div>
+          <div class="app-aviso"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4" /><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z" /><path d="M22 19H2" /></svg><span>El acta de la última junta ya está disponible</span></div>
+          <div class="app-menu"><span class="activo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span></div>
+        </div>
+        </div>
+        <span class="sello-ejemplo" aria-hidden="true">Diseño de ejemplo</span>
+       </div>
+      </div>
+    </div>
+    <p class="credito-ia" data-credito-ia hidden>Imagen de ambiente creada con IA. Negocio y pantallas de ejemplo.</p>
+  </section>
+
+  <section id="servicios" aria-labelledby="titulo-servicios">
+    <div class="contenedor">
+      <div class="titulo-seccion">
+        <h2 id="titulo-servicios">Servicios</h2>
+        <p>Gestión clara y documentada, para que nadie tenga que llamar para preguntar.</p>
+      </div>
+      <ul class="servicios">
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span>Comunidades de vecinos</h3><p>Cuentas, juntas, actas y proveedores.</p></li>
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" /><circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></svg></span>Gestión de alquileres</h3><p>Contratos, cobros e incidencias de tus pisos.</p></li>
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg></span>Incidencias</h3><p>Se abren desde el móvil y se ve en qué punto están.</p></li>
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12" /><path d="M4 14h9" /><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" /></svg></span>Recibos y cobros</h3><p>Recibos y recordatorios automáticos.</p></li>
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg></span>Documentos</h3><p>Actas, presupuestos y contratos, cada uno con su acceso.</p></li>
+        <li class="servicio"><h3><span class="servicio__icono" aria-hidden="true"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4" /><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z" /><path d="M22 19H2" /></svg></span>Juntas</h3><p>Convocatorias y actas enviadas a todos los vecinos.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="reserva" class="zona-suave" aria-labelledby="titulo-reserva">
+    <div class="contenedor reserva">
+      <div>
+        <h2 id="titulo-reserva">Pide una cita con el administrador</h2>
+        <p>Para presidentes, vecinos y propietarios. Presencial o por videollamada.</p>
+        <ol class="pasos"><li>Elige el motivo.</li><li>Escoge día y hora.</li><li>Recibe la confirmación.</li></ol>
+        <p class="ayuda">En esta demostración el formulario funciona, pero no envía ningún dato. También puedes reservar desde el asistente del chat.</p>
+      </div>
+      <form class="tarjeta" data-reserva novalidate>
+        <div class="campo">
+          <label for="motivo">Motivo</label>
+          <select id="motivo" name="motivo" required>
+            <option value="">Elige una opción</option>
+            <option>Cambiar de administrador</option>
+            <option>Duda de mi comunidad</option>
+            <option>Gestión de mi alquiler</option>
+            <option>Otro asunto</option>
+          </select>
+        </div>
+        
+        <div class="campo--doble">
+          <div class="campo">
+            <label for="fecha">Día</label>
+            <input id="fecha" name="fecha" type="date" required aria-describedby="aviso-fecha">
+          </div>
+          <div class="campo">
+            <label for="hora">Hora</label>
+            <select id="hora" name="hora" required></select>
+          </div>
+        </div>
+        <p id="aviso-fecha" class="ayuda" data-aviso-fecha aria-live="polite"></p>
+        <div class="campo">
+          <label for="nombre">Nombre y apellidos</label>
+          <input id="nombre" name="nombre" type="text" autocomplete="name" required>
+        </div>
+        <div class="campo--doble">
+          <div class="campo">
+            <label for="telefono">Móvil</label>
+            <input id="telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" pattern="[0-9 +]{9,15}" required>
+          </div>
+          <div class="campo">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" name="correo" type="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="casilla">
+          <input id="privacidad" name="privacidad" type="checkbox" required>
+          <label for="privacidad">Acepto que la administración use mis datos solo para gestionar esta reserva.</label>
+        </div>
+        <button class="boton boton--primario" type="submit">Pedir cita</button>
+        <p class="resultado" data-resultado role="status" tabindex="-1"></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="app" class="zona-app" aria-labelledby="titulo-app">
+    <div class="contenedor">
+      <div class="moviles" role="img" aria-label="Diseño de ejemplo: dos pantallas de la app de Fincas Portalbo">
+       <div class="moviles__lienzo">
+        <div class="movil2" aria-hidden="true">
+        <div class="movil2__pantalla">
+          <div class="app-estado"><span>9:41</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01" /><path d="M7 20v-4" /><path d="M12 20v-8" /><path d="M17 20V8" /><path d="M22 4v16" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01" /><path d="M2 8.82a15 15 0 0 1 20 0" /><path d="M5 12.859a10 10 0 0 1 14 0" /><path d="M8.5 16.429a5 5 0 0 1 7 0" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="10" x="2" y="7" rx="2" ry="2" /><line x1="22" x2="22" y1="11" y2="13" /><line x1="6" x2="6" y1="11" y2="13" /><line x1="10" x2="10" y1="11" y2="13" /><line x1="14" x2="14" y1="11" y2="13" /></svg></span></div>
+          <div class="app-cabecera"><span class="app-logo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" /><path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" /></svg></span><strong>Fincas Portalbo</strong><span class="app-avatar"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span></div>
+          <p class="app-hola">Hola, vecino del 3.º B</p>
+          <div class="app-cita"><div class="app-cita__fecha"><small>JUE</small><b>22</b></div><div><small>Tu incidencia</small><strong>Luz del portal</strong><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg> En curso · va el electricista</span></div></div>
+          <div class="app-acciones"><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg>Incidencias</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12" /><path d="M4 14h9" /><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" /></svg>Recibos</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>Actas</span></div>
+          <div class="app-aviso"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4" /><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z" /><path d="M22 19H2" /></svg><span>El acta de la última junta ya está disponible</span></div>
+          <div class="app-menu"><span class="activo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span></div>
+        </div>
+        </div>
+        <div class="movil2" aria-hidden="true">
+        <div class="movil2__pantalla">
+          <div class="app-estado"><span>9:41</span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h.01" /><path d="M7 20v-4" /><path d="M12 20v-8" /><path d="M17 20V8" /><path d="M22 4v16" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01" /><path d="M2 8.82a15 15 0 0 1 20 0" /><path d="M5 12.859a10 10 0 0 1 14 0" /><path d="M8.5 16.429a5 5 0 0 1 7 0" /></svg><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="10" x="2" y="7" rx="2" ry="2" /><line x1="22" x2="22" y1="11" y2="13" /><line x1="6" x2="6" y1="11" y2="13" /><line x1="10" x2="10" y1="11" y2="13" /><line x1="14" x2="14" y1="11" y2="13" /></svg></span></div>
+          <div class="app-titulo">Pedir cita</div>
+          <span class="app-chip"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg> Duda de mi comunidad</span>
+          <p class="app-etiqueta">Elige día</p>
+          <div class="app-dias"><span><small>LUN</small><b>19</b></span><span class="activo"><small>MAR</small><b>20</b></span><span><small>MIÉ</small><b>21</b></span><span><small>JUE</small><b>22</b></span><span><small>VIE</small><b>23</b></span></div>
+          <p class="app-etiqueta">Horas libres</p>
+          <div class="app-horas"><span>09:00</span><span class="activo">10:30</span><span>12:00</span><span>13:00</span><span>16:30</span><span>18:00</span></div>
+          <span class="app-boton">Pedir cita</span>
+          <div class="app-menu"><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg></span><span class="activo"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg></span><span><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span></div>
+        </div>
+        </div>
+        <span class="sello-ejemplo" aria-hidden="true">Diseño de ejemplo</span>
+       </div>
+      </div>
+      <div>
+        <span class="zona-app__kicker"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg> Tu app en Google Play y App Store</span>
+        <h2 id="titulo-app">Fincas Portalbo, también en el móvil de tus clientes</h2>
+        <p>Tus clientes te llevan en el móvil: reservan, reciben avisos y vuelven con un toque.</p>
+        <ul>
+          <li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></svg> Incidencias</li>
+          <li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12" /><path d="M4 14h9" /><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" /></svg> Recibos</li>
+          <li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg> Actas</li>
+          <li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg> Avisos y recordatorios al momento</li>
+        </ul>
+        <div class="tiendas">
+          <button class="tienda" type="button" data-aviso="app"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5v19l10-9.5z" fill="#34a853"/><path d="M4 2.5l13 7.3-3 2.7z" fill="#4285f4"/><path d="M4 21.5l13-7.3-3-2.7z" fill="#ea4335"/><path d="M17 9.8l3.5 2-3.5 2.2-3-2.5z" fill="#fbbc04"/></svg><span><small>Disponible en</small><strong>Google Play</strong></span></button>
+          <button class="tienda" type="button" data-aviso="app"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg><span><small>Descárgala en</small><strong>App Store</strong></span></button>
+        </div>
+        <p class="zona-app__nota">Ejemplo de la app que NOVA puede crear para tu negocio, con tu marca, publicada en Google Play y App Store.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="horario" aria-labelledby="titulo-horario">
+    <div class="contenedor">
+      <div class="titulo-seccion"><h2 id="titulo-horario">Horario y cómo llegar</h2></div>
+      <div class="info">
+        <div class="tarjeta">
+          <h3>Horario</h3>
+          <table class="horario">
+            <caption class="solo-lectores">Horario de Fincas Portalbo</caption>
+            <tbody>
+              <tr><th scope="row">Lunes a viernes</th><td>9:00–14:00 y 16:30–19:00</td></tr>
+              <tr><th scope="row">Sábado y domingo</th><td>Cerrado</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tarjeta">
+          <h3>Dónde estamos</h3>
+          <p>El barrio de La Victoria, Valladolid.</p>
+          <div class="mapa"><p>En la web real, aquí va el mapa de Google con la dirección exacta del negocio.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="preguntas" class="zona-suave" aria-labelledby="titulo-preguntas">
+    <div class="contenedor">
+      <div class="titulo-seccion"><h2 id="titulo-preguntas">Preguntas frecuentes</h2></div>
+      <div class="faq">
+        <details><summary>¿Cómo aviso de una avería?</summary><p>Desde la app o el portal, con una foto; verás el seguimiento.</p></details>
+        <details><summary>¿Dónde están las actas?</summary><p>En el portal de tu comunidad, siempre disponibles.</p></details>
+        <details><summary>¿Cómo se cambia de administrador?</summary><p>Se aprueba en junta; te ayudamos con todo el proceso.</p></details>
+        <details><summary>¿Puedo pagar los recibos online?</summary><p>Sí, desde el portal.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="nova" aria-labelledby="titulo-nova">
+    <div class="contenedor">
+      <span class="nova__kicker">Esto lo ha preparado NOVA</span>
+      <h2 id="titulo-nova">¿Te imaginas tu negocio así?</h2>
+      <p class="nova__intro">Esta página es un ejemplo, con un negocio inventado, de lo que NOVA Marketing Solutions hace para gestión de propiedades. Lo que has visto funciona de verdad: la reserva, el chat y el diseño para el móvil. Y se puede llegar más lejos:</p>
+      <ul class="nova__servicios">
+        <li><span class="nova__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></svg></span><h3>Una web como esta</h3><p>Rápida en el móvil, accesible y preparada para salir en Google cuando te buscan en tu zona.</p><a class="nova__accion" href="#planes">Ver precios <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></a></li>
+        <li><span class="nova__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg></span><h3>Tu app en Google Play y App Store</h3><p>Tus clientes te llevan en el móvil: reservan, reciben avisos y vuelven con un toque.</p><a class="nova__accion" href="#app">Ver la app de ejemplo <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></a></li>
+        <li class="nova__destacada"><span class="nova__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg></span><h3>Un asistente que conversa y vende</h3><p>El chat de esta página es una versión de prueba. El tuyo lo preparamos con IA y los datos de tu negocio: conversa con tus clientes a cualquier hora y te ayuda a cerrar ventas.</p><button class="boton boton--nova" type="button" data-abrir-chat><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg> Probar el chat</button></li>
+        <li><span class="nova__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2" /><path d="M7 11v4a2 2 0 0 0 2 2h4" /><rect width="8" height="8" x="13" y="13" rx="2" /></svg></span><h3>Un sistema que crece contigo</h3><ul><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Portal de propietarios e inquilinos</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Incidencias con seguimiento</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Cobros y avisos</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Todo el historial</li></ul><a class="nova__accion" href="#proyectos">Ver software real <svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></a></li>
+      </ul>
+
+      <h3 class="nova__subtitulo" id="planes">Así quedaría con nuestros planes</h3>
+      <ul class="planes">
+        <li class="plan">
+          <span class="plan__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></svg></span>
+          <h4>Web profesional</h4>
+          <p class="plan__precio">desde 400 €</p>
+          <ul><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Una web como esta, rápida en el móvil</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Reservas online y botón de WhatsApp</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Preparada para salir en Google en tu zona</li></ul>
+          <a class="plan__boton" href="https://solutionsnova.es/?openBriefing=true">Quiero este plan</a>
+        </li>
+        <li class="plan">
+          <span class="plan__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg></span>
+          <h4>Asistente virtual</h4>
+          <p class="plan__precio">desde 100 € <small>pago único</small></p>
+          <ul><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Atiende a tus clientes a cualquier hora</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Responde con la información de tu negocio</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Puede tomar reservas desde el chat</li></ul>
+          <a class="plan__boton" href="https://solutionsnova.es/?openBriefing=true">Quiero este plan</a>
+        </li>
+        <li class="plan">
+          <span class="plan__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></svg></span>
+          <h4>App propia en Google Play y App Store</h4>
+          <p class="plan__precio">desde 1.700 €</p>
+          <ul><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Tu marca en Google Play y App Store</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Reservas, avisos y recordatorios en el móvil de tus clientes</li></ul>
+          <a class="plan__boton" href="https://solutionsnova.es/?openBriefing=true">Quiero este plan</a>
+        </li>
+        <li class="plan plan--destacado"><span class="plan__sello">El más completo</span>
+          <span class="plan__icono"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" /><path d="M12 22V12" /><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7" /><path d="m7.5 4.27 9 5.15" /></svg></span>
+          <h4>Paquete Plus</h4>
+          <p class="plan__precio">1.900 €</p>
+          <ul><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Tu propia app y tu web</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Branding y contenido para redes durante 1 mes</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>Estrategia de marketing</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>1 mes de campañas en Google gratis</li></ul>
+          <a class="plan__boton" href="https://solutionsnova.es/?openBriefing=true">Quiero este plan</a>
+        </li>
+      </ul>
+      <ul class="planes__promos"><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /><path d="m9 12 2 2 4-4" /></svg>Código NOVA20: 20 % de descuento en cualquier servicio (no válido con los paquetes).</li><li><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /><path d="m9 12 2 2 4-4" /></svg>Estrategia de marketing digital gratis al contratar 2 o más servicios.</li></ul>
+      <h3 class="nova__subtitulo" id="proyectos">Software real que ya hemos construido</h3>
+      <ul class="proyectos">
+        <li class="proyecto">
+          <div class="proyecto__media">
+            <video preload="none" playsinline muted poster="../comun/proyectos/valetos.webp" aria-label="Vídeo de ValetOS: el sistema operativo de un valet parking"><source src="../comun/proyectos/valetos.mp4" type="video/mp4"></video>
+            <button class="proyecto__play" type="button" data-video aria-label="Ver el vídeo de ValetOS"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3" /></svg></button>
+          </div>
+          <div class="proyecto__cuerpo">
+            <p class="proyecto__tipo">Plataforma SaaS · Tiempo real</p>
+            <h3>ValetOS: el sistema operativo de un valet parking</h3>
+            <p>Coches, llaves, equipo, clientes y dinero en una sola plataforma. Cinco vistas conectadas que se actualizan al instante: supervisión, app del equipo en el móvil, portal del cliente por QR, finanzas y un asistente de IA que responde por texto o voz.</p>
+            <ul class="proyecto__claves"><li>Web app + móvil</li><li>Tiempo real</li><li>Asistente con IA</li><li>Roles y permisos</li><li>Pagos y propinas</li></ul>
+          </div>
+        </li>
+        <li class="proyecto">
+          <div class="proyecto__media">
+            <video preload="none" playsinline muted poster="../comun/proyectos/freshpooch.webp" aria-label="Vídeo de The Fresh Pooch: peluquería canina a domicilio, automatizada de punta a punta"><source src="../comun/proyectos/freshpooch.mp4" type="video/mp4"></video>
+            <button class="proyecto__play" type="button" data-video aria-label="Ver el vídeo de The Fresh Pooch"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3" /></svg></button>
+          </div>
+          <div class="proyecto__cuerpo">
+            <p class="proyecto__tipo">Web + portal de clientes · Toronto (Canadá)</p>
+            <h3>The Fresh Pooch: peluquería canina a domicilio, automatizada de punta a punta</h3>
+            <p>Presupuesto exacto en menos de 90 segundos, reserva online, portal del cliente con historial, app para el profesional en ruta, panel del dueño con ingresos y un concierge con IA bilingüe que vende 24/7.</p>
+            <ul class="proyecto__claves"><li>Presupuesto instantáneo</li><li>Reservas</li><li>Portal del cliente</li><li>Panel del dueño</li><li>IA bilingüe</li></ul>
+          </div>
+        </li>
+        <li class="proyecto">
+          <div class="proyecto__media">
+            <video preload="none" playsinline muted poster="../comun/proyectos/novasystem.webp" aria-label="Vídeo de NovaSystem: tienda, stock y contabilidad en un solo sitio"><source src="../comun/proyectos/novasystem.mp4" type="video/mp4"></video>
+            <button class="proyecto__play" type="button" data-video aria-label="Ver el vídeo de NovaSystem"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3" /></svg></button>
+          </div>
+          <div class="proyecto__cuerpo">
+            <p class="proyecto__tipo">Software de gestión · Comercio minorista</p>
+            <h3>NovaSystem: tienda, stock y contabilidad en un solo sitio</h3>
+            <p>Caja (TPV) con lector de código de barras, inventario con alertas de stock mínimo, clientes, proveedores, facturación con IVA español, gastos, informes y contabilidad con asientos del PGC. Preparado para sincronizarse con la tienda online.</p>
+            <ul class="proyecto__claves"><li>TPV</li><li>Inventario en tiempo real</li><li>Facturación e IVA</li><li>Contabilidad PGC</li><li>Informes</li></ul>
+          </div>
+        </li>
+      </ul>
+      <p class="nova__nota">Vídeos de los sistemas reales; algunas pantallas usan datos de prueba. Más en <a href="https://solutionsnova.es/#proyectos">solutionsnova.es</a>.</p>
+      <div class="nova__cierre">
+        <p><strong>¿Te preparamos algo así?</strong> Escríbenos en «Cuéntanos tu proyecto» o habla con Sara, la asistente virtual de solutionsnova.es.</p>
+        <a class="boton boton--nova" href="https://solutionsnova.es/?openBriefing=true">Cuéntanos tu proyecto</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie-demo">
+  <div class="contenedor">
+    <p><strong>Fincas Portalbo</strong> · El barrio de La Victoria, Valladolid</p>
+    <p>Esta página es una <strong>demostración creada por NOVA Marketing Solutions</strong>. El negocio, sus textos, precios y datos son ficticios. ¿Quieres una web así? <a href="https://solutionsnova.es/?openBriefing=true">Cuéntanos tu proyecto</a> o habla con Sara en <a href="https://solutionsnova.es/">solutionsnova.es</a>.</p>
+  </div>
+</footer>
+
+<dialog class="dialogo" id="dialogo-aviso" aria-labelledby="titulo-aviso">
+  <h2 id="titulo-aviso" data-aviso-titulo></h2>
+  <p data-aviso-texto></p>
+  <div class="dialogo__acciones"><button class="boton boton--primario" type="button" data-cerrar>Entendido</button></div>
+</dialog>
+
+<button class="boton boton--primario chat-boton" id="chat-abrir" type="button" aria-expanded="false" aria-controls="chat"><svg class="icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg> ¿Te ayudo?</button>
+<section class="chat" id="chat" hidden aria-labelledby="titulo-chat">
+  <div class="chat__cabecera">
+    <div><h2 id="titulo-chat">Asistente de Fincas Portalbo</h2><p>Versión de prueba</p></div>
+    <button class="chat__cerrar" type="button" data-chat-cerrar aria-label="Cerrar el asistente">×</button>
+  </div>
+  <div class="chat__registro" data-chat-registro role="log" aria-live="polite" tabindex="0" aria-label="Conversación"></div>
+  <div class="chat__sugerencias" data-chat-sugerencias aria-label="Preguntas sugeridas"></div>
+  <form class="chat__form" data-chat-form>
+    <label class="solo-lectores" for="chat-pregunta">Escribe tu pregunta</label>
+    <input id="chat-pregunta" data-chat-entrada type="text" autocomplete="off" placeholder="Escribe tu pregunta">
+    <button class="boton boton--primario" type="submit">Enviar</button>
+  </form>
+  <p class="chat__nota">Versión de prueba. ¿Quieres un asistente que converse de verdad con tus clientes y te ayude a cerrar ventas? <a href="https://solutionsnova.es/?openBriefing=true">Contáctanos</a>.</p>
+</section>
+</body>
+</html>
