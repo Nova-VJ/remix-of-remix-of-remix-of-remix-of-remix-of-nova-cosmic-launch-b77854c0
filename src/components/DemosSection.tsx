@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Lightbulb } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
-import { SECTOR_DEMOS } from '@/data/demos';
+import { FOTOS_VERSION, SECTOR_DEMOS } from '@/data/demos';
 
 const DemosSection = () => (
   <section id="demos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
@@ -22,7 +22,7 @@ const DemosSection = () => (
               className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl border border-border bg-neutral-900 p-4 lg:aspect-[16/9] text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <img
-                src={`/demos/comun/fondos/${carpeta}.webp`}
+                src={`/demos/comun/fondos/${carpeta}.webp?v=${FOTOS_VERSION}`}
                 alt=""
                 loading="lazy"
                 decoding="async"
