@@ -6,6 +6,9 @@ import {
 
 // Demos por sector publicadas en /demos (páginas estáticas de public/demos, generadas en Nova-VJ/LupaNova → demos/).
 // Los negocios son ficticios y cada demo lo dice arriba. La foto es /demos/comun/fondos/<carpeta>.webp, creada con IA.
+// Súbelo cuando se cambie alguna foto, para que nadie siga viendo la anterior guardada en su navegador.
+export const FOTOS_VERSION = 2;
+
 export interface SectorDemo {
   carpeta: string;
   sector: string;

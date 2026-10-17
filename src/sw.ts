@@ -16,9 +16,10 @@ cleanupOutdatedCaches();
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-// Images are cached as they are viewed instead of all being downloaded up front
+// Images are cached as they are viewed instead of all being downloaded up front.
+// The sector demos (/demos) are left out: their photos can be replaced under the same name.
 registerRoute(
-  ({ request, url }) => request.destination === 'image' && url.origin === self.location.origin,
+  ({ request, url }) => request.destination === 'image' && url.origin === self.location.origin && !url.pathname.startsWith('/demos/'),
   new CacheFirst({
     cacheName: 'nova-images',
     plugins: [new ExpirationPlugin({ maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 })],
