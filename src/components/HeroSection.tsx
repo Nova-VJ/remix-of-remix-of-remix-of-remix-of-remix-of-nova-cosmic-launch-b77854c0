@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
-import { ArrowRight, MessageCircle, MapPin, Clock, ShieldCheck, Globe, Smartphone, Palette, Share2, TrendingUp } from 'lucide-react';
+import { ArrowRight, MessageCircle, MapPin, Clock, ShieldCheck, Globe, Smartphone, Palette, Share2, TrendingUp, Star } from 'lucide-react';
 
 const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
 
@@ -152,13 +152,23 @@ const HeroSection = () => {
           {/* Gancho principal (19-10-2026): el Plan Web por suscripción */}
           <a
             href="#plan-web"
-            className="group mt-6 flex items-center gap-3 rounded-2xl border-2 border-primary/30 bg-card/90 px-4 py-3 shadow-card transition-colors hover:border-primary/60"
+            className="group mt-7 flex max-w-xl items-center gap-4 rounded-2xl p-1.5 pr-4 text-white shadow-[0_18px_40px_-18px_hsl(262_70%_35%/0.9)] ring-1 ring-white/10 transition-transform duration-200 hover:-translate-y-0.5"
+            style={{ backgroundImage: 'var(--gradient-cosmic)' }}
           >
-            <span className="shrink-0 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-foreground">Nuevo</span>
-            <span className="text-sm leading-snug text-foreground">
-              <b>Plan Web: 25,99 €/mes.</b> Tu web con tu marca, correo profesional y un asistente virtual 24/7, todo incluido.
+            <span className="flex shrink-0 flex-col items-center justify-center rounded-xl bg-white/10 px-3.5 py-2 text-center leading-none ring-1 ring-white/15">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">Plan Web</span>
+              <span className="mt-1 text-lg font-extrabold">25,99 €</span>
+              <span className="mt-0.5 text-[10px] text-white/70">al mes</span>
             </span>
-            <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+            <span className="text-sm leading-snug">
+              <span className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-amber-300">
+                <Star className="h-3 w-3 fill-amber-300" /> Producto estrella
+              </span>
+              Tu web a medida con tu marca y un <b className="font-semibold">asistente virtual 24/7</b>, todo incluido.
+            </span>
+            <span className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[hsl(262_78%_54%)] transition-transform duration-200 group-hover:translate-x-0.5">
+              <ArrowRight className="h-4 w-4" />
+            </span>
           </a>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
