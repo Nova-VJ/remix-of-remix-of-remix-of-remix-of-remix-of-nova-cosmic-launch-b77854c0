@@ -85,7 +85,7 @@ const SubscriptionSection = () => {
 
                 <h2 className="mt-5 text-3xl font-extrabold leading-[1.1] sm:text-[2.75rem]">
                   Tu negocio, abierto las 24 horas.
-                  <span className="mt-1 block bg-gradient-to-r from-[hsl(270_95%_80%)] via-[hsl(300_90%_80%)] to-[hsl(215_95%_78%)] bg-clip-text text-transparent">
+                  <span className="mt-1 block pb-[0.15em] bg-gradient-to-r from-[hsl(270_95%_80%)] via-[hsl(300_90%_80%)] to-[hsl(215_95%_78%)] bg-clip-text text-transparent">
                     Sin pagar de golpe.
                   </span>
                 </h2>
