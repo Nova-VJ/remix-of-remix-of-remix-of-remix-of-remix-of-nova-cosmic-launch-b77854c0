@@ -62,6 +62,7 @@ La URL y la clave de `.env` tienen que ser **del mismo proyecto**; si no, Supaba
 
 Las migraciones están en `supabase/migrations`. La función de Sara (`supabase/functions/sara-chat`) es la que está desplegada en el proyecto del chatbot. Para publicar un cambio:
 
+- Automático: al cambiar `supabase/functions/sara-chat/` en `main`, la tarea de GitHub «Publicar Sara» (`.github/workflows/deploy-sara.yml`) la publica sola (necesita el secreto `SUPABASE_ACCESS_TOKEN`; también se lanza a mano desde Actions).
 - Desde el panel: Supabase → Edge Functions → `sara-chat` → *Code*, pegar el contenido de `index.ts` y pulsar **Deploy updates**.
 - O desde la terminal:
 
