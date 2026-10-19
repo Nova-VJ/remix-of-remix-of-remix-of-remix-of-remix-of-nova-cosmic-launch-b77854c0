@@ -8,7 +8,7 @@ const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing
 
 const faqs = [{
   question: "¿Qué incluye el Plan Web de 25,99 €/mes?",
-  answer: "Tu web profesional a medida con tu marca (branding), un asistente virtual que atiende a tus clientes 24/7, correo profesional con tu dominio, dominio, alojamiento y certificado de seguridad, mantenimiento y 1 cambio al mes (no acumulable). Primero evaluamos tu proyecto sin compromiso: pídelo por el formulario o por WhatsApp. El código NOVA20 no se aplica a la suscripción."
+  answer: "Tu web profesional a medida con tu marca (branding), un asistente virtual que atiende a tus clientes 24/7, correo profesional con tu dominio, dominio, alojamiento y certificado de seguridad, mantenimiento y 1 cambio al mes (no acumulable). El precio lleva el IVA incluido y no hay permanencia: te das de baja cuando quieras. Primero evaluamos tu proyecto sin compromiso: pídelo por el formulario o por WhatsApp. El código NOVA20 no se aplica a la suscripción."
 }, {
   question: "¿Cuánto tiempo tarda cada servicio?",
   answer: "Plazos estimados:\n• Web Pro: 2–4 semanas\n• Branding Pro: 7–10 días\n• Contenido mensual: comienza en 5 días\n• App MVP: 4–8 semanas"
