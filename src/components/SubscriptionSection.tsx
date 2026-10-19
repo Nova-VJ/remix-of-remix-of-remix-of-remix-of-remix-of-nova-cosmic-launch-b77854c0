@@ -4,7 +4,8 @@ import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 
 // Plan Web por suscripción (19-10-2026): el producto estrella y el gancho principal de la web y de las propuestas.
 // No se contrata en el carrito (no hay pasarela): primero evaluamos el proyecto, por el formulario o por WhatsApp.
-// El precio es sin IVA, pero no se especifica (decisión del usuario). Si cambia algo aquí, cambiarlo también en
+// 25,99 € al mes con IVA incluido y sin permanencia (decisión del usuario, 19-10-2026: a particulares se les muestra
+// siempre el precio total). Si cambia algo aquí, cambiarlo también en
 // el conocimiento de Sara (supabase/functions/sara-chat/knowledge.ts) y en Lupa (worker/systems.js).
 const WHATSAPP_PLAN = "https://wa.me/34659343822?text=" + encodeURIComponent('Hola NOVA, me interesa el Plan Web de 25,99 €/mes. Mi negocio es: _____');
 
@@ -99,6 +100,7 @@ const SubscriptionSection = () => {
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-6xl font-extrabold tracking-tight">25,99 €</span>
                     <span className="text-lg font-medium text-white/60">/mes</span>
+                    <span className="text-sm font-medium text-white/60">IVA incluido</span>
                   </div>
                   <p className="pb-2 text-sm text-white/70">
                     <span className="font-semibold text-white">Menos de lo que cuesta un café al día.</span><br />
@@ -129,7 +131,7 @@ const SubscriptionSection = () => {
                 </div>
 
                 <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/70">
-                  {['Evaluación sin compromiso', 'Respuesta en 24 h', 'Tú decides'].map((t) => (
+                  {['Sin permanencia', 'Evaluación sin compromiso', 'Respuesta en 24 h'].map((t) => (
                     <li key={t} className="flex items-center gap-1.5"><Check className="h-4 w-4 text-emerald-300" />{t}</li>
                   ))}
                 </ul>
