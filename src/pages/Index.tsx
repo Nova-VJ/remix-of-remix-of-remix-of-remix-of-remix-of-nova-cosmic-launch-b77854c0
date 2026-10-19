@@ -5,6 +5,7 @@ import SEOHead from '@/components/SEOHead';
 import { SEO_PAGES } from "@/config/seo";
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
+import SubscriptionSection from '@/components/SubscriptionSection';
 import ServicesSection from '@/components/ServicesSection';
 import PortfolioSection from '@/components/PortfolioSection';
 import DemosSection from '@/components/DemosSection';
@@ -56,6 +57,7 @@ const Index = () => {
       <main className="relative pb-20 md:pb-0">
         <Navbar />
         <HeroSection />
+        <SubscriptionSection />
         <OwnSystemSection />
         <ServicesSection />
         <PortfolioSection />

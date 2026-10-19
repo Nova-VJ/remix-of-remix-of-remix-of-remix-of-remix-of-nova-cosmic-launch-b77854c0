@@ -149,6 +149,18 @@ const HeroSection = () => {
             Un solo equipo para tu web, tu app, tu marca y tus redes.
           </p>
 
+          {/* Gancho principal (19-10-2026): el Plan Web por suscripción */}
+          <a
+            href="#plan-web"
+            className="group mt-6 flex items-center gap-3 rounded-2xl border-2 border-primary/30 bg-card/90 px-4 py-3 shadow-card transition-colors hover:border-primary/60"
+          >
+            <span className="shrink-0 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-foreground">Nuevo</span>
+            <span className="text-sm leading-snug text-foreground">
+              <b>Plan Web: 25,99 €/mes.</b> Tu web con tu marca, correo profesional y un asistente virtual 24/7, todo incluido.
+            </span>
+            <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+          </a>
+
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"

@@ -13,6 +13,7 @@ type NavItem =
   | { label: string; to: string; novaIcon?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
+  { label: 'Plan Web', section: 'plan-web' },
   { label: 'Servicios', section: 'servicios' },
   { label: 'Precios', section: 'paquetes' },
   { label: 'Proyectos', section: 'proyectos' },
