@@ -29,7 +29,7 @@ jobs:
       - name: Publicar sara-chat
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy sara-chat --project-ref dnnqeydtybmzriyjqqyt --no-verify-jwt --use-api
+        run: supabase functions deploy sara-chat --project-ref dnnqeydtybmzriyjqqyt --no-verify-jwt
       - name: Comprobar que Sara responde
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" -X OPTIONS "https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat")
