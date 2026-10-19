@@ -134,7 +134,7 @@ const Navbar = () => {
     );
   };
 
-  const linkClass = "text-sm font-medium text-foreground/70 hover:text-foreground transition-colors";
+  const linkClass = "whitespace-nowrap text-sm font-medium text-foreground/70 hover:text-foreground transition-colors";
 
   const renderItem = (item: NavItem, mobile = false) => {
     const className = cn(linkClass, mobile && "block w-full py-2.5 text-left text-base");
@@ -220,11 +220,11 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden lg:flex items-center gap-7">
+          <div className="hidden xl:flex items-center gap-6">
             {NAV_ITEMS.map((item) => renderItem(item))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             {isAdmin && (
               <Link to="/admin" className="relative flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 <Shield className="w-4 h-4" />
@@ -247,7 +247,7 @@ const Navbar = () => {
             <button
               type="button"
               onClick={openBriefing}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-[hsl(var(--nova-purple-dark))]"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-[hsl(var(--nova-purple-dark))]"
             >
               Pide presupuesto
               <ArrowRight className="h-4 w-4" />
@@ -255,7 +255,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="xl:hidden flex items-center gap-2">
             {isAdmin && (
               <button
                 type="button"
@@ -281,7 +281,7 @@ const Navbar = () => {
 
         {/* Mobile menu */}
         {isOpen && (
-          <div className="lg:hidden border-t border-border pb-5 pt-2">
+          <div className="xl:hidden border-t border-border pb-5 pt-2">
             <div className="flex flex-col">
               {NAV_ITEMS.map((item) => renderItem(item, true))}
 
