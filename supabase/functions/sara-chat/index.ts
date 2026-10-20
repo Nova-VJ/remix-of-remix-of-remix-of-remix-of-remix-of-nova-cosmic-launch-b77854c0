@@ -142,7 +142,7 @@ Deno.serve(async (req: Request) => {
   const VERTEX_PROJECT = Deno.env.get("VERTEX_PROJECT") ?? "lupa-nova";
   const VERTEX_MODEL = Deno.env.get("VERTEX_MODEL") ?? "gemini-3.5-flash-lite";
   const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
-  const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-1.5-flash";
+  const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
   if (!VERTEX_API_KEY && !GEMINI_API_KEY)
     return json({ error: "Missing VERTEX_API_KEY / GEMINI_API_KEY" }, 500, allowOrigin);
 
@@ -253,18 +253,29 @@ Deno.serve(async (req: Request) => {
     ? `https://aiplatform.googleapis.com/v1/projects/${encodeURIComponent(VERTEX_PROJECT)}/locations/global/publishers/google/models/${encodeURIComponent(VERTEX_MODEL)}:generateContent`
     : `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
 
-  const gemRes = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": VERTEX_API_KEY || GEMINI_API_KEY },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents,
-    }),
-  });
+  const aiBody = JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents });
+  const callGemini = (u: string, key: string) =>
+    fetch(u, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body: aiBody });
 
+  let gemRes = await callGemini(url, VERTEX_API_KEY || GEMINI_API_KEY);
+
+  // Si Vertex falla (p. ej. facturación desactivada en Google Cloud) y hay clave de AI Studio, se usa esa.
+  if (!gemRes.ok && VERTEX_API_KEY && GEMINI_API_KEY) {
+    console.error("Vertex failed:", gemRes.status, (await gemRes.text().catch(() => "")).slice(0, 300));
+    gemRes = await callGemini(
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`,
+      GEMINI_API_KEY
+    );
+  }
+
+  // El detalle técnico va solo al registro; el visitante ve un mensaje amable.
   if (!gemRes.ok) {
-    const errText = await gemRes.text().catch(() => "");
-    return json({ error: "AI_FAILED", details: errText.slice(0, 300) }, 500, allowOrigin);
+    console.error("AI failed:", gemRes.status, (await gemRes.text().catch(() => "")).slice(0, 300));
+    return json(
+      { error: "Ahora mismo no puedo responder. Escríbenos por WhatsApp y te atendemos enseguida.", ai_failed: true },
+      503,
+      allowOrigin
+    );
   }
 
   const gemJson = await gemRes.json();

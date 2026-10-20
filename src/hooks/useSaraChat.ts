@@ -278,7 +278,8 @@ export const useSaraChat = (): UseSaraChatReturn => {
       };
 
       setMessages(prev => [...prev, errorMessage]);
-      setError(e instanceof Error ? e.message : 'Error al enviar mensaje');
+      // The chat bubble already explains it; the raw technical error stays in the console
+      setError(null);
     } finally {
       setIsLoading(false);
     }
