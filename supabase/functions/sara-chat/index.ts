@@ -142,7 +142,7 @@ Deno.serve(async (req: Request) => {
   const VERTEX_PROJECT = Deno.env.get("VERTEX_PROJECT") ?? "lupa-nova";
   const VERTEX_MODEL = Deno.env.get("VERTEX_MODEL") ?? "gemini-3.5-flash-lite";
   const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
-  const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+  const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-3.5-flash-lite";
   if (!VERTEX_API_KEY && !GEMINI_API_KEY)
     return json({ error: "Missing VERTEX_API_KEY / GEMINI_API_KEY" }, 500, allowOrigin);
 
