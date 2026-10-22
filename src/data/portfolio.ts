@@ -32,6 +32,26 @@ export interface PortfolioProject {
 
 export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
   {
+    id: 'novasystem',
+    kind: 'Software de gestión · Comercio minorista · Nueva versión',
+    title: 'NovaStock: tu tienda, tu stock y tus cuentas, ahora también desde el móvil',
+    description:
+      'Caja (TPV) con lector de código de barras, inventario con alertas de stock mínimo, clientes, facturación con IVA español, informes y contabilidad con asientos del PGC. La nueva versión suma lo que más tiempo ahorra en el día a día: escanea los albaranes con el móvil y los productos entran solos en el inventario, compara proveedores cada semana para que compres mejor y te avisa antes de que algo se agote.',
+    highlights: ['Nuevo: albaranes con el móvil', 'Nuevo: búsqueda de proveedores', 'Nuevo: previsión de stock', 'TPV', 'Facturación e IVA', 'Contabilidad PGC'],
+    testimonial: {
+      quote:
+        'Desde que comencé a utilizar NovaStock puedo escanear los albaranes con mi móvil y agregarlos directamente al inventario, busco nuevos y mejores proveedores cada semana, controlo mi stock para ampliarlo y que nunca falte nada. ¡Es una maravilla!',
+      name: 'Patricia Velasco',
+      business: 'Ecoland',
+      rating: 5,
+    },
+    poster: '/videos/novasystem.webp',
+    video: '/videos/novasystem.mp4',
+    aspect: 1200 / 750,
+    frameLabel: 'novastock · gestión integral',
+    frame: 'browser',
+  },
+  {
     id: 'lupa',
     kind: 'Captación de clientes con IA · Uso propio',
     title: 'Lupa Nova: encuentra a tus próximos clientes mientras trabajas',
@@ -68,26 +88,6 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     video: '/videos/freshpooch.mp4',
     aspect: 1200 / 750,
     frameLabel: 'reservas · portal de clientes',
-    frame: 'browser',
-  },
-  {
-    id: 'novasystem',
-    kind: 'Software de gestión · Comercio minorista · Nueva versión',
-    title: 'NovaStock: tu tienda, tu stock y tus cuentas, ahora también desde el móvil',
-    description:
-      'Caja (TPV) con lector de código de barras, inventario con alertas de stock mínimo, clientes, facturación con IVA español, informes y contabilidad con asientos del PGC. La nueva versión suma lo que más tiempo ahorra en el día a día: escanea los albaranes con el móvil y los productos entran solos en el inventario, compara proveedores cada semana para que compres mejor y te avisa antes de que algo se agote.',
-    highlights: ['Nuevo: albaranes con el móvil', 'Nuevo: búsqueda de proveedores', 'Nuevo: previsión de stock', 'TPV', 'Facturación e IVA', 'Contabilidad PGC'],
-    testimonial: {
-      quote:
-        'Desde que comencé a utilizar NovaStock puedo escanear los albaranes con mi móvil y agregarlos directamente al inventario, busco nuevos y mejores proveedores cada semana, controlo mi stock para ampliarlo y que nunca falte nada. ¡Es una maravilla!',
-      name: 'Patricia Velasco',
-      business: 'Ecoland',
-      rating: 5,
-    },
-    poster: '/videos/novasystem.webp',
-    video: '/videos/novasystem.mp4',
-    aspect: 1200 / 750,
-    frameLabel: 'novastock · gestión integral',
     frame: 'browser',
   },
   {
