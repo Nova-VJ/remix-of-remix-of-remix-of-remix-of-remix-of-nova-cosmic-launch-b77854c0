@@ -13,65 +13,46 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import referralHeroBg from '@/assets/invita-hero-bg.webp';
 import invitaBottomBg from '@/assets/invita-bottom-bg.webp';
-
-// Configuración centralizada
-const referralConfig = {
-  whatsappNumber: '34659343822',
-  contactEmail: 'info@solutionsnova.es',
-  webUrl: 'https://solutionsnova.es',
-};
-
-const steps = [
-  {
-    icon: Share2,
-    title: 'Comparte Nova',
-    description: 'Envía tu enlace único'
-  },
-  {
-    icon: Users,
-    title: 'Tu amigo contacta',
-    description: 'Menciona tu código'
-  },
-  {
-    icon: Gift,
-    title: '¡Ambos ganan!',
-    description: '-10% para cada uno'
-  }
-];
-
-const faqs = [
-  {
-    question: '¿Cómo digo que voy de tu parte?',
-    answer: 'Cuando tu amigo contacte con Nova, solo tiene que mencionar tu nombre o usar el enlace de referido que le compartiste.'
-  },
-  {
-    question: '¿Cuándo se aplica el descuento?',
-    answer: 'El descuento se aplica una vez que tu amigo contrate cualquier servicio. Recibirás tu 10% en tu próximo pedido.'
-  },
-  {
-    question: '¿En qué servicios aplica?',
-    answer: 'El descuento aplica en todos nuestros servicios: páginas web, apps, branding, marketing digital y SEM.'
-  },
-  {
-    question: '¿Cuántos amigos puedo invitar?',
-    answer: '¡Todos los que quieras! No hay límite. Cuantos más amigos invites y contraten, más descuento acumulas.'
-  },
-  {
-    question: '¿Mi amigo también recibe descuento?',
-    answer: 'Sí, tu amigo recibe un 10% de descuento en su primera contratación al usar tu referencia.'
-  },
-  {
-    question: '¿Qué pasa si mi amigo no contrata?',
-    answer: 'No pasa nada. El descuento solo se activa cuando tu amigo efectivamente contrata un servicio.'
-  }
-];
+import { getWhatsAppNumber, getContactEmail, getSiteUrl } from "@/config/env";
+import { useTranslation } from "@/i18n";
 
 const InvitaAmigo = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isEn } = useTranslation();
   const [copiedMessage, setCopiedMessage] = useState<'link' | 'whatsapp' | 'email' | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralLink, setReferralLink] = useState('');
+
+  const steps = isEn
+    ? [
+        { icon: Share2, title: 'Share Nova', description: 'Send your unique link' },
+        { icon: Users, title: 'Your friend reaches out', description: 'They mention your code' },
+        { icon: Gift, title: 'Both win!', description: '10% off for each of you' },
+      ]
+    : [
+        { icon: Share2, title: 'Comparte Nova', description: 'Envía tu enlace único' },
+        { icon: Users, title: 'Tu amigo contacta', description: 'Menciona tu código' },
+        { icon: Gift, title: '¡Ambos ganan!', description: '-10% para cada uno' },
+      ];
+
+  const faqs = isEn
+    ? [
+        { question: 'How does my referral mention me?', answer: 'When your friend reaches out to Nova, they simply share your referral code or use your shared link.' },
+        { question: 'When is the discount applied?', answer: 'The discount activates as soon as your referral confirms any project or service.' },
+        { question: 'Which services are eligible?', answer: 'The discount applies across all services: websites, custom web apps, mobile apps, branding, and digital growth.' },
+        { question: 'How many people can I invite?', answer: 'As many as you want! There is no limit on accumulated referral benefits.' },
+        { question: 'Does my referral also get a discount?', answer: 'Yes, your referral receives a 10% discount on their first contracted service.' },
+        { question: 'What if my referral does not move forward?', answer: 'No problem at all. The reward simply stays on hold until a project is started.' },
+      ]
+    : [
+        { question: '¿Cómo digo que voy de tu parte?', answer: 'Cuando tu amigo contacte con Nova, solo tiene que mencionar tu nombre o usar el enlace de referido que le compartiste.' },
+        { question: '¿Cuándo se aplica el descuento?', answer: 'El descuento se aplica una vez que tu amigo contrate cualquier servicio. Recibirás tu 10% en tu próximo pedido.' },
+        { question: '¿En qué servicios aplica?', answer: 'El descuento aplica en todos nuestros servicios: páginas web, apps, branding, marketing digital y SEM.' },
+        { question: '¿Cuántos amigos puedo invitar?', answer: '¡Todos los que quieras! No hay límite. Cuantos más amigos invites y contraten, más descuento acumulas.' },
+        { question: '¿Mi amigo también recibe descuento?', answer: 'Sí, tu amigo recibe un 10% de descuento en su primera contratación al usar tu referencia.' },
+        { question: '¿Qué pasa si mi amigo no contrata?', answer: 'No pasa nada. El descuento solo se activa cuando tu amigo efectivamente contrata un servicio.' },
+      ];
 
   useEffect(() => {
     if (user) {
@@ -90,42 +71,58 @@ const InvitaAmigo = () => {
 
     if (profile?.referral_code) {
       setReferralCode(profile.referral_code);
-      setReferralLink(`${referralConfig.webUrl}?ref=${profile.referral_code}`);
+      setReferralLink(`${getSiteUrl()}?ref=${profile.referral_code}`);
     }
   };
 
   const messageWhatsApp = referralCode 
-    ? `Ey! Te paso Nova Marketing Solutions: hacen webs que convierten, apps y branding premium. Si pides presupuesto con mi código ${referralCode}, te dan -10% en tu primera contratación y a mí me aplican -10% extra. Mira: ${referralLink}`
+    ? (isEn
+        ? `Hey! Check out Nova Marketing Solutions: they build high-converting web apps, mobile apps, and custom software. If you request a quote using my code ${referralCode}, you'll get 10% off your first project and I'll receive 10% off too. Take a look: ${referralLink}`
+        : `Ey! Te paso Nova Marketing Solutions: hacen webs que convierten, apps y branding premium. Si pides presupuesto con mi código ${referralCode}, te dan -10% en tu primera contratación y a mí me aplican -10% extra. Mira: ${referralLink}`)
     : '';
 
-  const emailSubject = 'Te comparto una agencia que puede ayudarte (+10% descuento)';
+  const emailSubject = isEn
+    ? 'Check out Nova Marketing Solutions (+10% off)'
+    : 'Te comparto una agencia que puede ayudarte (+10% descuento)';
+
   const emailBody = referralCode 
-    ? `Hola!
+    ? (isEn
+        ? `Hi!
+
+I recommend Nova Marketing Solutions. They build high-performance web apps, mobile apps, and custom software.
+
+If you request a quote using my code ${referralCode}, you will receive a 10% discount on your first project. And I'll receive a 10% discount too.
+
+Website: ${referralLink}
+Contact: ${getContactEmail()}
+
+— Best regards!`
+        : `Hola!
 
 Te recomiendo Nova Marketing Solutions. Hacen páginas web rápidas y con SEO, apps y branding para negocios.
 
 Si solicitas presupuesto con mi código ${referralCode}, te aplican un 10% de descuento en tu primera contratación. Y a mí me aplican un 10% adicional en mi próximo servicio.
 
 Web: ${referralLink}
-Contacto: +34659343822
+Contacto: +${getWhatsAppNumber()}
 
-— ¡Gracias!`
+— ¡Gracias!`)
     : '';
 
   const copyToClipboard = async (text: string, type: 'link' | 'whatsapp' | 'email') => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedMessage(type);
-      toast.success('¡Copiado al portapapeles!');
+      toast.success(isEn ? 'Copied to clipboard!' : '¡Copiado al portapapeles!');
       setTimeout(() => setCopiedMessage(null), 2000);
     } catch {
-      toast.error('No se pudo copiar');
+      toast.error(isEn ? 'Could not copy' : 'No se pudo copiar');
     }
   };
 
   const openWhatsApp = () => {
     if (!user) {
-      toast.error('Inicia sesión para compartir tu código');
+      toast.error(isEn ? 'Sign in to share your referral link' : 'Inicia sesión para compartir tu código');
       return;
     }
     const url = `https://wa.me/?text=${encodeURIComponent(messageWhatsApp)}`;
@@ -134,7 +131,7 @@ Contacto: +34659343822
 
   const openEmail = () => {
     if (!user) {
-      toast.error('Inicia sesión para compartir tu código');
+      toast.error(isEn ? 'Sign in to share your referral link' : 'Inicia sesión para compartir tu código');
       return;
     }
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
@@ -143,7 +140,7 @@ Contacto: +34659343822
 
   const handleCopyLink = () => {
     if (!user) {
-      toast.error('Inicia sesión para obtener tu enlace');
+      toast.error(isEn ? 'Sign in to get your referral link' : 'Inicia sesión para obtener tu enlace');
       return;
     }
     copyToClipboard(referralLink, 'link');
@@ -160,7 +157,7 @@ Contacto: +34659343822
         <section className="w-full md:mx-auto md:max-w-2xl md:px-6 md:pt-8">
           <img
             src={referralHeroBg} 
-            alt="Programa de referidos - Invita a un amigo y gana 10% de descuento acumulable"
+            alt={isEn ? "Referral program - Invite a friend and earn 10% off" : "Programa de referidos - Invita a un amigo y gana 10% de descuento acumulable"}
             width={1024}
             height={1536}
             fetchPriority="high"
@@ -178,17 +175,19 @@ Contacto: +34659343822
                 <CardContent className="pt-6 text-center">
                   <Lock className="w-12 h-12 mx-auto mb-4 text-primary" />
                   <h2 className="text-xl font-bold text-foreground mb-2">
-                    Crea tu cuenta para empezar
+                    {isEn ? "Create an account to get started" : "Crea tu cuenta para empezar"}
                   </h2>
                   <p className="text-muted-foreground mb-6">
-                    Necesitas una cuenta para obtener tu código único de referidos y empezar a ganar descuentos.
+                    {isEn
+                      ? "You need an account to get your unique referral code and start earning rewards."
+                      : "Necesitas una cuenta para obtener tu código único de referidos y empezar a ganar descuentos."}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button onClick={() => navigate('/auth')} size="lg">
-                      Crear cuenta
+                      {isEn ? "Sign Up" : "Crear cuenta"}
                     </Button>
                     <Button variant="outline" onClick={() => navigate('/auth')} size="lg">
-                      Iniciar sesión
+                      {isEn ? "Log In" : "Iniciar sesión"}
                     </Button>
                   </div>
                 </CardContent>
@@ -198,9 +197,15 @@ Contacto: +34659343822
                 {/* User's referral code */}
                 <Card className="glass-card mb-8 border-primary/30">
                   <CardContent className="pt-6 text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Tu código de referido:</p>
-                    <p className="text-2xl font-bold text-primary mb-2">{referralCode || 'Cargando...'}</p>
-                    <p className="text-xs text-muted-foreground">Compártelo con tus amigos</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {isEn ? "Your referral code:" : "Tu código de referido:"}
+                    </p>
+                    <p className="text-2xl font-bold text-primary mb-2">
+                      {referralCode || (isEn ? 'Loading...' : 'Cargando...')}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {isEn ? "Share it with your colleagues and friends" : "Compártelo con tus amigos"}
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -212,7 +217,7 @@ Contacto: +34659343822
                     className="h-12 bg-[#25D366] hover:bg-[#20BD5A] text-white"
                   >
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    Invitar por WhatsApp
+                    {isEn ? "Invite via WhatsApp" : "Invitar por WhatsApp"}
                   </Button>
 
                   <Button 
@@ -222,7 +227,7 @@ Contacto: +34659343822
                     className="h-12 border-primary/50 text-foreground hover:bg-primary/10"
                   >
                     <Mail className="w-5 h-5 mr-2" />
-                    Invitar por correo
+                    {isEn ? "Invite via Email" : "Invitar por correo"}
                   </Button>
 
                   <Button 
@@ -236,7 +241,9 @@ Contacto: +34659343822
                     ) : (
                       <Link2 className="w-5 h-5 mr-2" />
                     )}
-                    {copiedMessage === 'link' ? '¡Enlace copiado!' : 'Copiar mi enlace'}
+                    {copiedMessage === 'link'
+                      ? (isEn ? 'Link copied!' : '¡Enlace copiado!')
+                      : (isEn ? 'Copy my link' : 'Copiar mi enlace')}
                   </Button>
                 </div>
               </>
@@ -245,7 +252,7 @@ Contacto: +34659343822
             {/* How it works - Compact */}
             <div className="mb-8">
               <h2 className="text-lg font-bold text-foreground text-center mb-4">
-                ¿Cómo funciona?
+                {isEn ? "How does it work?" : "¿Cómo funciona?"}
               </h2>
               <div className="grid grid-cols-3 gap-2">
                 {steps.map((step, index) => (
@@ -264,7 +271,7 @@ Contacto: +34659343822
             {user && (
               <div className="mb-8">
                 <h2 className="text-lg font-bold text-foreground text-center mb-4">
-                  Mensaje listo para compartir
+                  {isEn ? "Ready-to-share message" : "Mensaje listo para compartir"}
                 </h2>
                 
                 <Card className="glass-card">
@@ -293,24 +300,32 @@ Contacto: +34659343822
             {/* Conditions - Compact */}
             <div className="mb-8">
               <h2 className="text-lg font-bold text-foreground text-center mb-4">
-                Condiciones
+                {isEn ? "Terms & Conditions" : "Condiciones"}
               </h2>
               <ul className="space-y-1 text-xs text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                  El descuento se aplica cuando tu amigo contrata.
+                  {isEn
+                    ? "The reward is activated when your referral starts a project."
+                    : "El descuento se aplica cuando tu amigo contrata."}
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                  Tu amigo recibe -10% en su primera contratación.
+                  {isEn
+                    ? "Your referral receives 10% off their first invoice."
+                    : "Tu amigo recibe -10% en su primera contratación."}
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                  Tú recibes -10% adicional tras validación.
+                  {isEn
+                    ? "You receive a 10% credit towards your next service."
+                    : "Tú recibes -10% adicional tras validación."}
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                  Acumulable con otras promociones.
+                  {isEn
+                    ? "Combinable with active promotions."
+                    : "Acumulable con otras promociones."}
                 </li>
               </ul>
             </div>
@@ -318,7 +333,7 @@ Contacto: +34659343822
             {/* FAQ - Compact */}
             <div className="mb-6">
               <h2 className="text-lg font-bold text-foreground text-center mb-4">
-                Preguntas frecuentes
+                {isEn ? "Frequently Asked Questions" : "Preguntas frecuentes"}
               </h2>
               <Accordion type="single" collapsible className="w-full">
                 {faqs.map((faq, index) => (
@@ -339,7 +354,7 @@ Contacto: +34659343822
               <Link to="/">
                 <Button variant="ghost" size="sm" className="gap-2">
                   <ArrowLeft className="w-4 h-4" />
-                  Volver al inicio
+                  {isEn ? "Back to Home" : "Volver al inicio"}
                 </Button>
               </Link>
             </div>
@@ -350,7 +365,7 @@ Contacto: +34659343822
         <section className="w-full md:mx-auto md:max-w-2xl md:px-6 md:pb-16">
           <img
             src={invitaBottomBg} 
-            alt="¡Digitaliza tu comercio ya!"
+            alt={isEn ? "Scale your business today!" : "¡Digitaliza tu comercio ya!"}
             width={1024}
             height={1536}
             loading="lazy"

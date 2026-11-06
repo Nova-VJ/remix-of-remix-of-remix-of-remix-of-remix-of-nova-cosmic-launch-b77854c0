@@ -1,0 +1,361 @@
+export interface TranslationSchema {
+  meta: {
+    locale: 'es' | 'en';
+    siteUrl: string;
+    domain: string;
+    phone: string;
+    phoneDisplay: string;
+    email: string;
+    whatsappUrl: string;
+    currency: string;
+    currencySymbol: string;
+    agencyLocation: string;
+  };
+  nav: {
+    planWeb: string;
+    services: string;
+    pricing: string;
+    projects: string;
+    demos: string;
+    caseStudies: string;
+    novaMethod: string;
+    contact: string;
+    admin: string;
+    myAccount: string;
+    login: string;
+    getQuote: string;
+    skipToContent: string;
+    openMenu: string;
+    closeMenu: string;
+    notifications: string;
+  };
+  hero: {
+    badge: string;
+    badgeSubtitle: string;
+    titleStart: string;
+    titleGradient: string;
+    titleEnd: string;
+    description: string;
+    planPillTitle: string;
+    planPillPrice: string;
+    planPillPeriod: string;
+    planPillStar: string;
+    planPillDesc: string;
+    planPillBold: string;
+    planPillEnd: string;
+    ctaQuote: string;
+    ctaWhatsapp: string;
+    trustAgencia: string;
+    trustResponse: string;
+    trustNoCommitment: string;
+    mockupBusiness: string;
+    mockupCardConversionTitle: string;
+    mockupCardConversionSub: string;
+    mockupCardDeliveryTitle: string;
+    mockupCardDeliverySub: string;
+    chips: {
+      web: { label: string; hint: string };
+      apps: { label: string; hint: string };
+      branding: { label: string; hint: string };
+      social: { label: string; hint: string };
+    };
+  };
+  subscription: {
+    starBadge: string;
+    titleStart: string;
+    titleGradient: string;
+    description: string;
+    price: string;
+    period: string;
+    taxNote?: string;
+    coffeeLine: string;
+    coffeeSub: string;
+    ctaPrimary: string;
+    ctaWhatsapp: string;
+    guarantees: string[];
+    mockupAssistant: string;
+    mockupOnline: string;
+    mockupUserMsg: string;
+    mockupBotMsg: string;
+    mockupCardTitle: string;
+    mockupCardSub: string;
+    includesEyebrow: string;
+    includes: Array<{ title: string; text: string }>;
+    stepsEyebrow: string;
+    steps: Array<{ title: string; text: string }>;
+  };
+  ownSystem: {
+    eyebrow: string;
+    titleStart: string;
+    titleHighlight: string;
+    titleEnd: string;
+    description: string;
+    pillars: Array<{ title: string; text: string }>;
+    calcTitle: string;
+    calcOrdersLabel: string;
+    calcTicketLabel: string;
+    calcRateLabel: string;
+    calcResultLabel: string;
+    calcResultPeriod: string;
+    calcResultSub: (monthly: string) => string;
+    calcDisclaimer: string;
+    ctaPrimary: string;
+    ctaWhatsapp: string;
+  };
+  softwareBand: {
+    titleStart: string;
+    titleGradient: string;
+    description: string;
+    ctaConsultation: string;
+    ctaDemo: string;
+  };
+  services: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    startingFrom: string;
+    perMonth: string;
+    oneTimePayment: string;
+    addToQuote: string;
+    inYourQuote: string;
+    consultProposal: string;
+    web: {
+      title: string;
+      description: string;
+      includes: string[];
+      priceLabel: string;
+    };
+    apps: {
+      title: string;
+      description: string;
+      includes: string[];
+      priceLabel: string;
+    };
+    social: {
+      title: string;
+      description: string;
+      includes: string[];
+      priceLabel: string;
+    };
+    branding: {
+      title: string;
+      description: string;
+      includes: string[];
+      priceLabel: string;
+    };
+    content: {
+      title: string;
+      description: string;
+      includes: string[];
+      priceLabel: string;
+      cta: string;
+    };
+    assistantsHeader: string;
+    assistantPro: {
+      title: string;
+      subtitle: string;
+      features: string[];
+      useCase: string;
+      priceLabel: string;
+    };
+    assistantPlus: {
+      title: string;
+      subtitle: string;
+      features: string[];
+      useCase: string;
+      priceLabel: string;
+    };
+    additionalHeader: string;
+    marketing: {
+      title: string;
+      subtitle: string;
+      description: string;
+      priceLabel: string;
+      badge: string;
+    };
+    sem: {
+      title: string;
+      subtitle: string;
+      description: string;
+      priceLabel: string;
+      badge: string;
+    };
+  };
+  packages: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    recommended: string;
+    includesTitle: string;
+    bonusesTitle: string;
+    addToQuote: string;
+    addedToQuote: string;
+    pro: {
+      name: string;
+      priceLabel: string;
+      description: string;
+      includes: string[];
+      freeItems: string[];
+      note: string;
+    };
+    plus: {
+      name: string;
+      priceLabel: string;
+      description: string;
+      includes: string[];
+      freeItems: string[];
+      note: string;
+    };
+  };
+  process: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    steps: Array<{ stepNumber: string; title: string; description: string }>;
+    novaMethodTeaser: {
+      eyebrow: string;
+      title: string;
+      description: string;
+      cta: string;
+      phases: string[];
+    };
+  };
+  comparison: {
+    eyebrow: string;
+    title: string;
+    othersTitle: string;
+    novaTitle: string;
+    bottomText: string;
+    bottomBold: string;
+    rows: Array<{ others: string; nova: string }>;
+  };
+  results: {
+    eyebrow: string;
+    title: string;
+    leadStat: string;
+    leadLabel: string;
+    items: Array<{ stat: string; label: string }>;
+    caseStudiesCta: {
+      badge: string;
+      title: string;
+      description: string;
+      button: string;
+    };
+  };
+  faq: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    ctaTellUs: string;
+    ctaQuote: string;
+    items: Array<{ question: string; answer: string }>;
+  };
+  contact: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    promises: string[];
+    completeFormBtn: string;
+    completeFormTime: string;
+    directTitle: string;
+    directSubtitle: string;
+    methodWhatsapp: string;
+    methodEmail: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    businessLabel: string;
+    businessOptional: string;
+    businessPlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    messageLabel: string;
+    messagePlaceholder: string;
+    submitWhatsapp: string;
+    submitEmail: string;
+    privacyNotice: string;
+    emailSentToastTitle: string;
+    emailSentToastDesc: string;
+    requiredFieldsTitle: string;
+    requiredFieldsDesc: string;
+  };
+  footer: {
+    brandDesc: string;
+    servicesTitle: string;
+    companyTitle: string;
+    contactTitle: string;
+    copyright: string;
+    legalNotice: string;
+    privacyPolicy: string;
+    cookiePolicy: string;
+    configureCookies: string;
+  };
+  stickyCta: {
+    quote: string;
+  };
+  cart: {
+    title: string;
+    emptyTitle: string;
+    emptySubtitle: string;
+    clear: string;
+    promoPlaceholder: string;
+    applyCode: string;
+    promoApplied: string;
+    subtotal: string;
+    discount: string;
+    total: string;
+    proceedQuote: string;
+    sendWhatsapp: string;
+    sendEmail: string;
+    whatsappMessagePrefix: string;
+    selectedServices: string;
+    bonusesIncluded: string;
+    sentTitle: string;
+    sentDesc: string;
+    agentNotice: string;
+    close: string;
+  };
+  chatSara: {
+    welcomeTitle: string;
+    welcomeSubtitle: string;
+    welcomePrompt: string;
+    faqPillsTitle: string;
+    typingIndicator: string;
+    openBriefing: string;
+    openWhatsapp: string;
+    addedToCart: string;
+    addToCart: string;
+    pills: Array<{ label: string; prompt: string }>;
+  };
+  cookieConsent: {
+    bannerText: string;
+    moreInfo: string;
+    acceptAll: string;
+    rejectAll: string;
+    configure: string;
+    settingsTitle: string;
+    necessaryTitle: string;
+    necessaryDesc: string;
+    alwaysActive: string;
+    analyticsTitle: string;
+    analyticsDesc: string;
+    marketingTitle: string;
+    marketingDesc: string;
+    savePreferences: string;
+  };
+  auditPopup: {
+    badge: string;
+    titleLine1: string;
+    titleGradient: string;
+    subtitle: string;
+    benefits: string[];
+    exclusiveCode: string;
+    copied: string;
+    copy: string;
+    whatsappBtn: string;
+    emailBtn: string;
+    footerText: string;
+    whatsappMessage: string;
+    emailSubject: string;
+    emailBody: string;
+  };
+}

@@ -6,25 +6,32 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import { SEO_PAGES } from "@/config/seo";
+import { useTranslation } from "@/i18n";
 
 const CasosExito = () => {
+  const { isEn } = useTranslation();
+
   const casos = [
     {
       id: 'hawkers',
-      title: 'Hawkers: de una idea simple a una marca global',
-      description: 'Un artículo para emprendedores que quieren empezar pero sienten que les falta el mapa. Descubre cómo Hawkers construyó una marca global con marketing digital.',
+      title: isEn ? 'Hawkers: From a Simple Idea to a Global Brand' : 'Hawkers: de una idea simple a una marca global',
+      description: isEn
+        ? 'An essential breakdown for entrepreneurs looking to scale. Discover how Hawkers built an international direct-to-consumer brand with performance marketing.'
+        : 'Un artículo para emprendedores que quieren empezar pero sienten que les falta el mapa. Descubre cómo Hawkers construyó una marca global con marketing digital.',
       image: hawkersLogo,
-      tags: ['Caso real', 'Crecimiento', 'Lecciones prácticas'],
+      tags: isEn ? ['Real Case', 'Growth', 'Actionable Lessons'] : ['Caso real', 'Crecimiento', 'Lecciones prácticas'],
       featured: true,
       isNew: true,
       link: '/casos-exito/hawkers',
     },
     {
       id: 'dominos',
-      title: 'Domino\'s Pizza: Presencia no es igual a escalar',
-      description: 'Más del 90% de ventas hoy día son digitales. Descubre cómo Domino\'s convirtió el canal digital en su motor central de ventas y fidelización.',
+      title: isEn ? "Domino's Pizza: Online Presence vs True Scale" : "Domino's Pizza: Presencia no es igual a escalar",
+      description: isEn
+        ? "Over 90% of their sales are digital today. Discover how Domino's transformed their digital channel into their primary sales and retention engine."
+        : "Más del 90% de ventas hoy día son digitales. Descubre cómo Domino's convirtió el canal digital en su motor central de ventas y fidelización.",
       image: dominosImage,
-      tags: ['Sistema digital', 'Fidelización', 'App móvil'],
+      tags: isEn ? ['Digital Ecosystem', 'Loyalty', 'Mobile App'] : ['Sistema digital', 'Fidelización', 'App móvil'],
       featured: true,
       isNew: false,
       link: '/casos-exito/dominos',
@@ -43,14 +50,19 @@ const CasosExito = () => {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
             <TrendingUp className="w-4 h-4" />
-            Casos de estudio
+            {isEn ? 'Case Studies' : 'Casos de estudio'}
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-            Historias reales de <span className="text-primary">crecimiento digital</span>
+            {isEn ? (
+              <>Real stories of <span className="text-primary">digital growth</span></>
+            ) : (
+              <>Historias reales de <span className="text-primary">crecimiento digital</span></>
+            )}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Analizamos marcas que transformaron su negocio con estrategia digital. 
-            Cada caso incluye lecciones prácticas que puedes aplicar hoy.
+            {isEn
+              ? 'We analyze brands that transformed their business with digital strategy. Every case study includes practical takeaways you can apply today.'
+              : 'Analizamos marcas que transformaron su negocio con estrategia digital. Cada caso incluye lecciones prácticas que puedes aplicar hoy.'}
           </p>
         </div>
       </section>
@@ -86,7 +98,7 @@ const CasosExito = () => {
                   {/* New badge */}
                   {caso.isNew && (
                     <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
-                      NUEVO
+                      {isEn ? 'NEW' : 'NUEVO'}
                     </div>
                   )}
                   
@@ -118,7 +130,7 @@ const CasosExito = () => {
 
                   <div className="flex items-center gap-2 text-primary font-medium text-sm">
                     <Eye className="w-4 h-4" />
-                    Leer caso completo
+                    {isEn ? 'Read full case study' : 'Leer caso completo'}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -131,7 +143,11 @@ const CasosExito = () => {
             <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-dashed border-border bg-muted/30">
               <Clock className="w-5 h-5 text-muted-foreground" />
               <p className="text-muted-foreground">
-                Más casos de éxito <span className="text-foreground font-medium">próximamente</span>
+                {isEn ? (
+                  <>More case studies <span className="text-foreground font-medium">coming soon</span></>
+                ) : (
+                  <>Más casos de éxito <span className="text-foreground font-medium">próximamente</span></>
+                )}
               </p>
             </div>
           </div>

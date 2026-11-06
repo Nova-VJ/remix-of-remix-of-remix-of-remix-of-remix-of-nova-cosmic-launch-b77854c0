@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getLocale } from '@/i18n';
 
 interface SEOHeadProps {
   title: string;
@@ -8,8 +9,8 @@ interface SEOHeadProps {
   ogType?: string;
 }
 
-const BASE_URL = 'https://solutionsnova.es';
-const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.jpg`;
+const DOMAIN_ES = 'https://solutionsnova.es';
+const DOMAIN_EN = 'https://novasolutionsmkt.com';
 
 const setMetaTag = (attr: string, key: string, content: string) => {
   let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement | null;
@@ -21,11 +22,17 @@ const setMetaTag = (attr: string, key: string, content: string) => {
   el.setAttribute('content', content);
 };
 
-const setLinkTag = (rel: string, href: string) => {
-  let el = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
+const setLinkTag = (rel: string, href: string, extraAttrs?: Record<string, string>) => {
+  const selector = extraAttrs?.hreflang
+    ? `link[rel="${rel}"][hreflang="${extraAttrs.hreflang}"]`
+    : `link[rel="${rel}"]`;
+  let el = document.querySelector(selector) as HTMLLinkElement | null;
   if (!el) {
     el = document.createElement('link');
     el.setAttribute('rel', rel);
+    if (extraAttrs) {
+      Object.entries(extraAttrs).forEach(([k, v]) => el!.setAttribute(k, v));
+    }
     document.head.appendChild(el);
   }
   el.setAttribute('href', href);
@@ -35,11 +42,23 @@ const SEOHead = ({
   title,
   description,
   path = '/',
-  ogImage = DEFAULT_OG_IMAGE,
+  ogImage,
   ogType = 'website',
 }: SEOHeadProps) => {
+  const locale = getLocale();
+  const isEn = locale === 'en';
+  const baseUrl = isEn ? DOMAIN_EN : DOMAIN_ES;
+  const defaultOgImage = `${baseUrl}/og-image.jpg`;
+  const image = ogImage ?? defaultOgImage;
+
   useEffect(() => {
-    const canonicalUrl = `${BASE_URL}${path}`;
+    const normalizedPath = path === '/' ? '/' : path;
+    const canonicalUrl = `${baseUrl}${normalizedPath}`;
+    const esUrl = `${DOMAIN_ES}${normalizedPath}`;
+    const enUrl = `${DOMAIN_EN}${normalizedPath}`;
+
+    // Document language
+    document.documentElement.lang = locale;
 
     // Title
     document.title = title;
@@ -50,21 +69,26 @@ const SEOHead = ({
     // Canonical
     setLinkTag('canonical', canonicalUrl);
 
+    // Hreflang alternates connecting Spanish and English domains
+    setLinkTag('alternate', esUrl, { hreflang: 'es' });
+    setLinkTag('alternate', enUrl, { hreflang: 'en' });
+    setLinkTag('alternate', esUrl, { hreflang: 'x-default' });
+
     // Open Graph
     setMetaTag('property', 'og:title', title);
     setMetaTag('property', 'og:description', description);
     setMetaTag('property', 'og:url', canonicalUrl);
     setMetaTag('property', 'og:type', ogType);
-    setMetaTag('property', 'og:image', ogImage);
-    setMetaTag('property', 'og:locale', 'es_ES');
+    setMetaTag('property', 'og:image', image);
+    setMetaTag('property', 'og:locale', isEn ? 'en_US' : 'es_ES');
     setMetaTag('property', 'og:site_name', 'NOVA Marketing Solutions');
 
     // Twitter
     setMetaTag('name', 'twitter:title', title);
     setMetaTag('name', 'twitter:description', description);
-    setMetaTag('name', 'twitter:image', ogImage);
+    setMetaTag('name', 'twitter:image', image);
     setMetaTag('name', 'twitter:card', 'summary_large_image');
-  }, [title, description, path, ogImage, ogType]);
+  }, [title, description, path, image, ogType, baseUrl, isEn, locale]);
 
   return null;
 };

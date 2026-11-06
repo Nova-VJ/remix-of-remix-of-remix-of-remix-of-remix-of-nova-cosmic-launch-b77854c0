@@ -1,3 +1,5 @@
+import { getLocale } from "@/i18n";
+
 const SARA_ENDPOINT =
   import.meta.env.VITE_SARA_CHAT_ENDPOINT ||
   "https://dnnqeydtybmzriyjqqyt.supabase.co/functions/v1/sara-chat";
@@ -25,13 +27,14 @@ export class SaraApiError extends Error {
   }
 }
 
-// ✅ Ahora acepta sessionId y devuelve también session_id
+// Accepts sessionId and passes locale to backend
 export async function sendToSara(
   message: string,
   accessToken?: string,
   sessionId?: string
 ): Promise<{ reply: string; session_id?: string }> {
   const anonId = getOrCreateAnonId();
+  const currentLocale = getLocale();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -46,7 +49,9 @@ export async function sendToSara(
     body: JSON.stringify({
       message,
       anon_id: anonId,
-      session_id: sessionId, // ✅ importante para memoria
+      session_id: sessionId,
+      locale: currentLocale,
+      lang: currentLocale,
     }),
   });
 
@@ -63,7 +68,7 @@ export async function sendToSara(
   }
 
   return {
-    reply: (data.reply as string) ?? "",
-    session_id: data.session_id as string | undefined, // ✅ por si el backend lo devuelve
+    reply: data.reply ?? data.message ?? "",
+    session_id: data.session_id ?? sessionId,
   };
 }

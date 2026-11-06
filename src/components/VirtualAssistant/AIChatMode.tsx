@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import saraAvatar from '@/assets/sara-avatar.webp';
+import { useTranslation } from '@/i18n';
 import {
   Dialog,
   DialogContent,
@@ -43,7 +44,7 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 const normalizeSaraReply = (text: string): string => {
   // Remove all form-related URLs and placeholders - we'll handle them as buttons
   return text
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '$2')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$2')
     .replace(/\[LINK_WHATSAPP\]/gi, WHATSAPP_URL)
     .replace(/\[WHATSAPP\]/gi, WHATSAPP_URL)
     // Replace form placeholders with a special marker that won't be a URL
@@ -54,103 +55,78 @@ const normalizeSaraReply = (text: string): string => {
     .replace(/\*\*/g, '');
 };
 
-const CATALOG_ITEMS: Record<string, { id: string; name: string; price: number; type: 'service' | 'package' }> = {
-  'pkg-plus': { id: 'pkg-plus', name: 'Paquete Plus', price: 1900, type: 'package' },
-  'pkg-pro': { id: 'pkg-pro', name: 'Paquete Pro', price: 800, type: 'package' },
-  apps: { id: 'apps', name: 'Aplicación Móvil', price: 1700, type: 'service' },
-  web: { id: 'web', name: 'Página Web Profesional', price: 600, type: 'service' },
-  social: { id: 'social', name: 'Redes Sociales (mensual)', price: 500, type: 'service' },
-  branding: { id: 'branding', name: 'Branding Profesional', price: 200, type: 'service' },
-  marketing: { id: 'marketing', name: 'Marketing Digital', price: 200, type: 'service' },
-  sem: { id: 'sem', name: 'SEM - Posicionamiento Google', price: 150, type: 'service' },
-};
+const getCatalogItems = (isEn: boolean): Record<string, { id: string; name: string; price: number; type: 'service' | 'package' }> => ({
+  'pkg-plus': { id: 'pkg-plus', name: isEn ? 'Plus Package' : 'Paquete Plus', price: 1900, type: 'package' },
+  'pkg-pro': { id: 'pkg-pro', name: isEn ? 'Pro Package' : 'Paquete Pro', price: 800, type: 'package' },
+  apps: { id: 'apps', name: isEn ? 'Mobile App' : 'Aplicación Móvil', price: 1700, type: 'service' },
+  web: { id: 'web', name: isEn ? 'Professional Website' : 'Página Web Profesional', price: 600, type: 'service' },
+  social: { id: 'social', name: isEn ? 'Social Media (monthly)' : 'Redes Sociales (mensual)', price: 500, type: 'service' },
+  branding: { id: 'branding', name: isEn ? 'Brand Identity' : 'Branding Profesional', price: 200, type: 'service' },
+  marketing: { id: 'marketing', name: isEn ? 'Digital Marketing' : 'Marketing Digital', price: 200, type: 'service' },
+  sem: { id: 'sem', name: isEn ? 'SEM / Google Ads' : 'SEM - Posicionamiento Google', price: 150, type: 'service' },
+});
 
 const CATALOG_PATTERNS = [
-  { id: 'pkg-plus', regex: /\b(?:paquete|plan|pack)\s+plus\b/i },
-  { id: 'pkg-pro', regex: /\b(?:paquete|plan|pack)\s+pro\b/i },
-  { id: 'apps', regex: /\b(?:aplicaci[oó]n(?:es)?\s+m[oó]vil(?:es)?|app\s+m[oó]vil|app\s+personalizada|desarrollo\s+de\s+(?:una\s+)?app(?:s)?)\b/i },
-  { id: 'web', regex: /\b(?:p[aá]gina(?:s)?\s+web|diseño\s+web|desarrollo\s+web|sitio\s+web|tienda\s+online|tienda\s+virtual|e-commerce)\b/i },
-  { id: 'social', regex: /\b(?:redes?\s+social(?:es)?|community\s+manager|gesti[oó]n\s+de\s+redes?)\b/i },
-  { id: 'branding', regex: /\b(?:branding(?:\s+profesional)?|identidad\s+visual|diseño\s+de\s+marca)\b/i },
-  { id: 'marketing', regex: /\b(?:marketing\s+digital|estrategia\s+de\s+marketing)\b/i },
-  { id: 'sem', regex: /\b(?:posicionamiento\s+sem|google\s+ads|campa[ñn]as?\s+sem|anuncios?\s+en\s+google)\b/i },
+  { id: 'pkg-plus', regex: /\b(?:paquete|plan|pack|package)\s+plus\b/i },
+  { id: 'pkg-pro', regex: /\b(?:paquete|plan|pack|package)\s+pro\b/i },
+  { id: 'apps', regex: /\b(?:aplicaci[oó]n(?:es)?(?:\s+m[oó]vil(?:es)?)?|app(?:s)?(?:\s+m[oó]vil(?:es)?)?|mobile\s+app(?:s)?)\b/i },
+  { id: 'web', regex: /\b(?:p[aá]gina(?:s)?\s+web|sitio(?:s)?\s+web|desarrollo\s+web|dise[ñn]o\s+web|website|web\s+design)\b/i },
+  { id: 'social', regex: /\b(?:redes\s+sociales|community\s+manager|gesti[oó]n\s+de\s+redes|social\s+media)\b/i },
+  { id: 'branding', regex: /\b(?:branding|identidad\s+visual|dise[ñn]o\s+de\s+logo(?:tipo)?|brand\s+identity)\b/i },
+  { id: 'marketing', regex: /\b(?:marketing\s+digital|estrategia\s+digital|digital\s+marketing)\b/i },
+  { id: 'sem', regex: /\b(?:sem|google\s+ads|publicidad\s+en\s+google|paid\s+ads)\b/i },
 ];
 
-const extractCartProposal = (text: string): { cleanText: string; proposal: CartProposal | null } => {
+const extractCartProposal = (text: string, isEn: boolean): { cleanText: string; proposal: CartProposal | null } => {
+  const catalog = getCatalogItems(isEn);
   const items: CartProposal['items'] = [];
   const seenIds = new Set<string>();
 
-  const addItem = (item: { id: string; name?: string; price?: number; type?: string }) => {
-    if (!item || !item.id || seenIds.has(item.id)) return;
-    const catalog = CATALOG_ITEMS[item.id];
-    if (!catalog) return;
-    seenIds.add(item.id);
-    items.push({
-      id: item.id,
-      name: item.name || catalog.name,
-      price: typeof item.price === 'number' ? item.price : catalog.price,
-      type: item.type === 'package' || catalog.type === 'package' ? 'package' : 'service',
-    });
-  };
-
-  // 1. Try standard parse on [PROPUESTA_CARRITO: ...] blocks
-  const startTag = '[PROPUESTA_CARRITO:';
-  let tagIdx = text.indexOf(startTag);
-  while (tagIdx !== -1) {
-    const after = text.substring(tagIdx + startTag.length);
-    let depth = 0;
-    let endIdx = -1;
-    for (let i = 0; i < after.length; i++) {
-      if (after[i] === '{' || after[i] === '[') depth++;
-      else if (after[i] === '}' || after[i] === ']') {
-        depth--;
-        if (depth === 0) {
-          endIdx = i;
-          break;
-        }
-      }
-    }
-    if (endIdx !== -1) {
-      try {
-        const jsonStr = after.substring(0, endIdx + 1);
-        const parsed = JSON.parse(jsonStr);
-        if (parsed.items && Array.isArray(parsed.items)) {
-          parsed.items.forEach(addItem);
-        } else if (parsed.id) {
-          addItem(parsed);
-        }
-      } catch (_) {}
-    }
-    tagIdx = text.indexOf(startTag, tagIdx + startTag.length);
-  }
-
-  // 2. Fallback: extract any catalog items mentioned via JSON structure anywhere in text
-  const itemJsonRegex = /"id"\s*:\s*"([a-zA-Z0-9_-]+)"/g;
-  let match: RegExpExecArray | null;
-  while ((match = itemJsonRegex.exec(text)) !== null) {
-    const id = match[1];
-    if (CATALOG_ITEMS[id]) {
-      const surrounding = text.substring(Math.max(0, match.index - 50), Math.min(text.length, match.index + 200));
-      const nameMatch = surrounding.match(/"name"\s*:\s*"([^"]+)"/);
-      const priceMatch = surrounding.match(/"price"\s*:\s*(\d+)/);
-      const typeMatch = surrounding.match(/"type"\s*:\s*"(service|package)"/);
-      addItem({
-        id,
-        name: nameMatch ? nameMatch[1] : undefined,
-        price: priceMatch ? parseInt(priceMatch[1], 10) : undefined,
-        type: typeMatch ? typeMatch[1] : undefined,
+  const addItem = (item: { id: string; name?: string; price?: number; type?: 'service' | 'package' }) => {
+    const catalogItem = catalog[item.id];
+    if (catalogItem && !seenIds.has(item.id)) {
+      seenIds.add(item.id);
+      items.push({
+        id: item.id,
+        name: item.name || catalogItem.name,
+        price: typeof item.price === 'number' ? item.price : catalogItem.price,
+        type: item.type || catalogItem.type,
       });
     }
+  };
+
+  // 1. Explicit tag format: [PROPUESTA_CARRITO: {...}]
+  const startTag = '[PROPUESTA_CARRITO:';
+  if (text.includes(startTag)) {
+    try {
+      const idx = text.indexOf(startTag);
+      const afterTag = text.substring(idx + startTag.length);
+      const endIdx = afterTag.indexOf(']');
+      let jsonStr = endIdx !== -1 ? afterTag.substring(0, endIdx) : afterTag;
+      jsonStr = jsonStr.trim();
+      const lastBrace = jsonStr.lastIndexOf('}');
+      if (lastBrace !== -1) {
+        jsonStr = jsonStr.substring(0, lastBrace + 1);
+      }
+      const parsed = JSON.parse(jsonStr);
+      if (parsed.items && Array.isArray(parsed.items)) {
+        for (const item of parsed.items) {
+          if (item && item.id) addItem(item);
+        }
+      }
+    } catch (e) {
+      // Fallback below
+    }
   }
 
-  // 2.5. Natural language detection: if Sara mentions/recommends catalog services in text
+  // 2. Natural language matching
   for (const pattern of CATALOG_PATTERNS) {
     if (pattern.regex.test(text)) {
       addItem({ id: pattern.id });
     }
   }
 
-  // 3. Clean the text completely: NEVER allow raw JSON, tags, or unclosed braces to appear in chat
+  // 3. Clean the text completely
   let cleanText = text;
   const firstTagIdx = cleanText.indexOf(startTag);
   if (firstTagIdx !== -1) {
@@ -171,44 +147,22 @@ const extractCartProposal = (text: string): { cleanText: string; proposal: CartP
     .join('\n')
     .replace(/,?\s*\{[\s\S]*$/g, '')
     .replace(/,?\s*\[[\s\S]*$/g, '')
-    .replace(/[\}\]]\s*,?\s*$/g, '')
+    .replace(/[}\]]\s*,?\s*$/g, '')
     .replace(/[,\s]+$/, '')
     .trim();
 
-  const proposal = items.length > 0 ? { items, description: 'Servicios recomendados' } : null;
+  const proposal = items.length > 0 ? { items, description: isEn ? 'Recommended Services' : 'Servicios recomendados' } : null;
   return { cleanText, proposal };
 };
 
 const isWhatsAppLink = (url: string) => url.includes('wa.me') || url.includes('whatsapp');
-
-const QUICK_SUGGESTIONS = [
-  {
-    icon: <Globe className="w-3.5 h-3.5" />,
-    label: 'Página web profesional',
-    prompt: 'Necesito una página web profesional para mi negocio, ¿qué opciones y planes tenéis?',
-  },
-  {
-    icon: <Smartphone className="w-3.5 h-3.5" />,
-    label: 'Presupuesto app móvil',
-    prompt: 'Quiero información y presupuesto para crear una aplicación móvil para mi negocio.',
-  },
-  {
-    icon: <Briefcase className="w-3.5 h-3.5" />,
-    label: 'Paquete Pro (800€)',
-    prompt: '¿Qué incluye el Paquete Pro y qué precio tiene?',
-  },
-  {
-    icon: <Tag className="w-3.5 h-3.5" />,
-    label: 'Código NOVA20',
-    prompt: '¿Cómo funciona el código de descuento NOVA20?',
-  },
-];
 
 const SaraBubbleAvatar = () => (
   <img src={saraAvatar} alt="" className="mt-0.5 h-7 w-7 shrink-0 rounded-full object-cover" />
 );
 
 const AIChatMode = ({ onBack }: AIChatModeProps) => {
+  const { t, formatCurrency, isEn } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showBriefingModal, setShowBriefingModal] = useState(false);
@@ -250,8 +204,8 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
     addItem(item);
     setAddedItems(prev => new Set(prev).add(item.id));
     toast({
-      title: 'Añadido a tu presupuesto',
-      description: `${item.name} — ${item.price.toLocaleString('es-ES')}€`,
+      title: `🛒 ${t.chatSara.addedToCart}`,
+      description: `${item.name} — ${formatCurrency(item.price)}`,
     });
   };
 
@@ -261,7 +215,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
       return (
         <a href={href} {...props} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-[#25D366] text-primary-foreground font-medium text-xs hover:bg-[#20BD5A] transition-colors no-underline">
-          <MessageCircle className="w-3.5 h-3.5" /> Abrir WhatsApp
+          <MessageCircle className="w-3.5 h-3.5" /> {t.chatSara.openWhatsapp}
         </a>
       );
     }
@@ -290,7 +244,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                 onClick={() => setShowBriefingModal(true)}
                 className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 mb-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/90 transition-colors"
               >
-                <FileText className="w-3.5 h-3.5" /> Abrir formulario
+                <FileText className="w-3.5 h-3.5" /> {t.chatSara.openBriefing}
               </button>
             )}
           </span>
@@ -306,7 +260,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         <button
           type="button"
           onClick={onBack}
-          aria-label="Volver al menú"
+          aria-label={isEn ? "Back" : "Volver"}
           className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -314,7 +268,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         <span className="text-sm font-medium">Chat con Sara</span>
         {isDemo && (
           <span className="ml-auto pr-2 text-[11px] text-muted-foreground">
-            Te quedan {Math.max(0, DEMO_LIMIT - demoCount)} mensajes hoy
+            {isEn ? `${Math.max(0, DEMO_LIMIT - demoCount)} messages left today` : `Te quedan ${Math.max(0, DEMO_LIMIT - demoCount)} mensajes hoy`}
           </span>
         )}
       </div>
@@ -328,9 +282,9 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
               alt=""
               className="mx-auto mb-3 h-16 w-16 rounded-full object-cover ring-4 ring-primary/15 shadow-lg shadow-primary/20"
             />
-            <p className="text-base font-semibold text-foreground">Hola, soy Sara</p>
+            <p className="text-base font-semibold text-foreground">{t.chatSara.welcomeTitle}</p>
             <p className="mx-auto mt-1 max-w-[260px] text-xs leading-relaxed text-muted-foreground">
-              Te ayudo con servicios, precios orientativos y presupuestos de NOVA Marketing Solutions.
+              {t.chatSara.welcomeSubtitle}
             </p>
           </div>
         )}
@@ -338,10 +292,10 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         {messages.length <= 1 && (
           <div className="mb-4 mt-2 space-y-2">
             <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Puedes empezar por
+              {t.chatSara.faqPillsTitle}
             </p>
             <div className="grid grid-cols-2 gap-1.5">
-              {QUICK_SUGGESTIONS.map((item, idx) => (
+              {t.chatSara.pills.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -349,7 +303,6 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                   onClick={() => sendMessage(item.prompt)}
                   className="flex items-center gap-2 rounded-xl border border-border/60 bg-card/50 px-2.5 py-2 text-left text-xs text-foreground transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:pointer-events-none disabled:opacity-50"
                 >
-                  <span className="shrink-0 text-primary">{item.icon}</span>
                   <span className="leading-snug">{item.label}</span>
                 </button>
               ))}
@@ -360,7 +313,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         {messages.map((msg) => {
           const isBot = msg.role === 'assistant';
           const raw = isBot ? normalizeSaraReply(msg.content) : msg.content;
-          const { cleanText, proposal } = isBot ? extractCartProposal(raw) : { cleanText: raw, proposal: null };
+          const { cleanText, proposal } = isBot ? extractCartProposal(raw, isEn) : { cleanText: raw, proposal: null };
 
           return (
             <div key={msg.id} className="mb-3">
@@ -378,7 +331,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                     {isBot ? renderMessageContent(cleanText) : <p>{cleanText}</p>}
                   </div>
                   <span className={`text-[10px] opacity-60 mt-1 block ${msg.role === 'user' ? 'text-right' : ''}`}>
-                    {msg.createdAt.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    {msg.createdAt.toLocaleTimeString(isEn ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
@@ -394,7 +347,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                           {SERVICE_ICONS[item.id] || <ShoppingCart className="w-3 h-3" />}
                         </div>
                         <span className="text-xs font-medium flex-1 truncate">{item.name}</span>
-                        <span className="text-xs font-bold text-primary whitespace-nowrap">{item.price.toLocaleString('es-ES')}€</span>
+                        <span className="text-xs font-bold text-primary whitespace-nowrap">{formatCurrency(item.price)}</span>
                         <button
                           onClick={() => handleAddSingleItem(item)}
                           disabled={isAdded}
@@ -403,7 +356,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
                               ? 'text-primary bg-primary/10' 
                               : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
                           }`}
-                          title={isAdded ? 'Añadido' : 'Añadir a tu presupuesto'}
+                          title={isAdded ? t.chatSara.addedToCart : t.chatSara.addToCart}
                         >
                           {isAdded ? <Check className="w-3.5 h-3.5" /> : <ShoppingCart className="w-3.5 h-3.5" />}
                         </button>
@@ -420,7 +373,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           <div className="flex justify-start gap-2 mb-3">
             <SaraBubbleAvatar />
             <div className="bg-muted/70 border border-border/40 rounded-2xl rounded-tl-md px-3.5 py-2.5 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground font-medium">Sara está escribiendo</span>
+              <span className="text-xs text-muted-foreground font-medium">{t.chatSara.typingIndicator}</span>
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.3s]" />
                 <span className="w-1.5 h-1.5 rounded-full bg-primary/70 animate-bounce [animation-delay:-0.15s]" />
@@ -438,7 +391,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
         <div className="px-3 pb-2">
           <Button variant="outline" size="sm" className="w-full text-xs gap-1.5 h-8" onClick={handleScrollUp}>
             <ChevronUp className="w-3.5 h-3.5" />
-            Ver conversación anterior
+            {isEn ? "View previous conversation" : "Ver conversación anterior"}
           </Button>
         </div>
       )}
@@ -450,7 +403,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
             ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={demoLimitReached ? "Inicia sesión para continuar" : "Escribe tu mensaje..."}
+            placeholder={demoLimitReached ? (isEn ? "Log in to continue" : "Inicia sesión para continuar") : (isEn ? "Type your message..." : "Escribe tu mensaje...")}
             disabled={isLoading || demoLimitReached}
             aria-label="Mensaje para Sara"
             className="min-w-0 flex-1 bg-transparent py-1.5 text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-60"
@@ -465,7 +418,7 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           <Button
             type="submit"
             size="icon"
-            aria-label="Enviar mensaje"
+            aria-label={isEn ? "Send message" : "Enviar mensaje"}
             className="h-9 w-9 shrink-0 rounded-full"
             disabled={isLoading || !inputValue.trim() || demoLimitReached}
           >
@@ -473,7 +426,9 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           </Button>
         </div>
         <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
-          Sara es una IA y puede equivocarse. El presupuesto final te lo confirma nuestro equipo.
+          {isEn
+            ? "Sara is an AI assistant and may make mistakes. Final proposals are confirmed by our team."
+            : "Sara es una IA y puede equivocarse. El presupuesto final te lo confirma nuestro equipo."}
         </p>
       </form>
 
@@ -483,20 +438,25 @@ const AIChatMode = ({ onBack }: AIChatModeProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <LogIn className="w-5 h-5" />
-              Has llegado al límite de hoy
+              {isEn ? "You have reached today's limit" : "Has llegado al límite de hoy"}
             </DialogTitle>
             <DialogDescription>
-              Has usado los {DEMO_LIMIT} mensajes gratuitos de hoy.
-              Inicia sesión o crea una cuenta para seguir chateando con Sara, o vuelve mañana.
+              {isEn
+                ? `You have reached your ${DEMO_LIMIT} free daily messages. Log in or create an account to keep chatting with Sara, or return tomorrow.`
+                : `Has usado los ${DEMO_LIMIT} mensajes gratuitos de hoy. Inicia sesión o crea una cuenta para seguir chateando con Sara, o vuelve mañana.`}
               <br /><br />
               <span className="text-xs text-muted-foreground">
-                Tu conversación anterior se guardará automáticamente en tu cuenta.
+                {isEn ? "Your conversation history will be saved to your account." : "Tu conversación anterior se guardará automáticamente en tu cuenta."}
               </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button variant="outline" onClick={handleRegister} className="w-full sm:w-auto">Crear cuenta</Button>
-            <Button onClick={handleLogin} className="w-full sm:w-auto">Iniciar sesión</Button>
+            <Button variant="outline" onClick={handleRegister} className="w-full sm:w-auto">
+              {isEn ? "Create Account" : "Crear cuenta"}
+            </Button>
+            <Button onClick={handleLogin} className="w-full sm:w-auto">
+              {isEn ? "Log In" : "Iniciar sesión"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

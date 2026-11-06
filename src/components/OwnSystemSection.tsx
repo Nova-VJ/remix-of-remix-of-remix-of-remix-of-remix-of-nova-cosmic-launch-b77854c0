@@ -4,19 +4,10 @@ import { ArrowRight, CalendarCheck, Database, HeartHandshake, MessageCircle, Sma
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { trackLead } from '@/lib/tracking';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
+import { WHATSAPP_URL } from '@/config/env';
 
-const WHATSAPP_OWN_SYSTEM = `https://wa.me/34659343822?text=${encodeURIComponent(
-  'Hola NOVA, quiero mi propio sistema de pedidos/reservas y dejar de pagar comisiones a las apps.'
-)}`;
-
-const PILLARS = [
-  { icon: Smartphone, title: 'Tu web y tu app', text: 'Pedidos, reservas o citas directas, con tu marca y sin intermediarios.' },
-  { icon: Database, title: 'Tus clientes son tuyos', text: 'Datos, historial y contacto en tu panel, no en el de una plataforma.' },
-  { icon: HeartHandshake, title: 'Clientes que repiten', text: 'Puntos, avisos y ofertas propias para que vuelvan sin pagar por ello.' },
-  { icon: TrendingUp, title: 'Preparado para crecer', text: 'Más locales, más servicios y automatizaciones sobre el mismo sistema.' },
-];
-
-const euros = (n: number) => new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' €';
+const PILLAR_ICONS = [Smartphone, Database, HeartHandshake, TrendingUp];
 
 interface SliderProps {
   id: string;
@@ -51,6 +42,7 @@ const Slider = ({ id, label, value, min, max, step, display, onChange }: SliderP
 
 // "Why pay the apps for your own customers?" — the own-system pitch with a commission calculator
 const OwnSystemSection = () => {
+  const { t, formatCurrency, isEn } = useTranslation();
   const navigate = useNavigate();
   const { ref, isVisible } = useScrollReveal();
   const [orders, setOrders] = useState(400);
@@ -67,6 +59,12 @@ const OwnSystemSection = () => {
     style: { transitionDelay: `${delay}ms` },
   });
 
+  const whatsappMessage = isEn
+    ? "Hi NOVA, I want to build my own direct ordering/booking system and stop paying platform commissions."
+    : "Hola NOVA, quiero mi propio sistema de pedidos/reservas y dejar de pagar comisiones a las apps.";
+
+  const WHATSAPP_OWN_SYSTEM = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <section id="sistema-propio" ref={ref as React.RefObject<HTMLElement>} className="px-4 py-16 sm:px-6 md:py-24">
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] text-white" style={{ backgroundImage: 'var(--gradient-cosmic)' }}>
@@ -77,27 +75,33 @@ const OwnSystemSection = () => {
         <div className="relative grid gap-12 p-6 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14 lg:p-14">
           {/* Pitch */}
           <div {...reveal(0)}>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">Sistema propio · Sin comisiones</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
+              {t.ownSystem.eyebrow}
+            </p>
             <h2 className="mt-4 text-3xl font-extrabold leading-[1.08] md:text-5xl">
-              ¿Por qué pagar a las apps por <span className="text-emerald-300">tus propios clientes</span>?
+              {t.ownSystem.titleStart}
+              <span className="text-emerald-300">{t.ownSystem.titleHighlight}</span>
+              {t.ownSystem.titleEnd}
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-white/75">
-              Las plataformas de pedidos y reservas se quedan una comisión de cada venta, a menudo entre el 15 % y el 30 %.
-              Con tu propio sistema ese margen vuelve a tu negocio y la relación con el cliente es tuya.
+              {t.ownSystem.description}
             </p>
 
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-              {PILLARS.map((p) => (
-                <li key={p.title} className="flex gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
-                    <p.icon className="h-5 w-5 text-emerald-300" />
-                  </span>
-                  <div>
-                    <p className="font-semibold">{p.title}</p>
-                    <p className="mt-0.5 text-sm text-white/65">{p.text}</p>
-                  </div>
-                </li>
-              ))}
+              {t.ownSystem.pillars.map((p, index) => {
+                const Icon = PILLAR_ICONS[index] || Smartphone;
+                return (
+                  <li key={p.title} className="flex gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
+                      <Icon className="h-5 w-5 text-emerald-300" />
+                    </span>
+                    <div>
+                      <p className="font-semibold">{p.title}</p>
+                      <p className="mt-0.5 text-sm text-white/65">{p.text}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -106,21 +110,53 @@ const OwnSystemSection = () => {
             <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 shadow-2xl backdrop-blur-sm sm:p-8">
               <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
                 <CalendarCheck className="h-4 w-4 text-emerald-300" />
-                Calcula lo que te cuestan las comisiones
+                {t.ownSystem.calcTitle}
               </div>
 
               <div className="mt-6 space-y-6">
-                <Slider id="calc-orders" label="Pedidos o reservas al mes" value={orders} min={50} max={3000} step={50} display={new Intl.NumberFormat('es-ES').format(orders)} onChange={setOrders} />
-                <Slider id="calc-ticket" label="Ticket medio" value={ticket} min={5} max={150} step={1} display={euros(ticket)} onChange={setTicket} />
-                <Slider id="calc-rate" label="Comisión de la plataforma" value={rate} min={5} max={35} step={1} display={`${rate} %`} onChange={setRate} />
+                <Slider
+                  id="calc-orders"
+                  label={t.ownSystem.calcOrdersLabel}
+                  value={orders}
+                  min={50}
+                  max={3000}
+                  step={50}
+                  display={new Intl.NumberFormat(isEn ? 'en-US' : 'es-ES').format(orders)}
+                  onChange={setOrders}
+                />
+                <Slider
+                  id="calc-ticket"
+                  label={t.ownSystem.calcTicketLabel}
+                  value={ticket}
+                  min={5}
+                  max={150}
+                  step={1}
+                  display={formatCurrency(ticket)}
+                  onChange={setTicket}
+                />
+                <Slider
+                  id="calc-rate"
+                  label={t.ownSystem.calcRateLabel}
+                  value={rate}
+                  min={5}
+                  max={35}
+                  step={1}
+                  display={`${rate} %`}
+                  onChange={setRate}
+                />
               </div>
 
               <div className="mt-8 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-emerald-400/5 p-5 ring-1 ring-emerald-300/25" aria-live="polite">
-                <p className="text-sm text-white/75">Hoy pagas en comisiones</p>
-                <p className="mt-1 font-display text-4xl font-extrabold tracking-tight text-emerald-300 md:text-5xl">{euros(yearly)}<span className="text-lg font-semibold text-emerald-200/80"> /año</span></p>
-                <p className="mt-1 text-sm text-white/65">{euros(monthly)} al mes que podrían quedarse en tu negocio.</p>
+                <p className="text-sm text-white/75">{t.ownSystem.calcResultLabel}</p>
+                <p className="mt-1 font-display text-4xl font-extrabold tracking-tight text-emerald-300 md:text-5xl">
+                  {formatCurrency(yearly)}
+                  <span className="text-lg font-semibold text-emerald-200/80">{t.ownSystem.calcResultPeriod}</span>
+                </p>
+                <p className="mt-1 text-sm text-white/65">
+                  {t.ownSystem.calcResultSub(formatCurrency(monthly))}
+                </p>
               </div>
-              <p className="mt-3 text-xs text-white/50">Estimación orientativa con los datos que introduces.</p>
+              <p className="mt-3 text-xs text-white/50">{t.ownSystem.calcDisclaimer}</p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
@@ -128,7 +164,7 @@ const OwnSystemSection = () => {
                   onClick={() => navigate('/?openBriefing=true')}
                   className="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-white px-5 py-3 font-semibold text-[hsl(var(--nova-ink))] shadow-lg transition-transform hover:-translate-y-0.5"
                 >
-                  Quiero mi sistema propio
+                  {t.ownSystem.ctaPrimary}
                   <ArrowRight className="h-4 w-4" />
                 </button>
                 <a
@@ -139,7 +175,7 @@ const OwnSystemSection = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-5 py-3 font-semibold text-white transition-colors hover:bg-white/10"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  WhatsApp
+                  {t.ownSystem.ctaWhatsapp}
                 </a>
               </div>
             </div>

@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, PlayCircle } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
 // Intro band for the software side of NOVA, right before the "Proyectos" section it points to.
 const SoftwareBand = () => {
+  const { t } = useTranslation();
   const { ref, isVisible } = useScrollReveal();
 
   return (
@@ -23,21 +25,21 @@ const SoftwareBand = () => {
         />
         <div className="relative">
           <h2 className="font-display text-3xl font-bold leading-tight md:text-5xl">
-            Tu negocio, más inteligente.
+            {t.softwareBand.titleStart}
             <br />
             <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-violet-200 bg-clip-text pb-[0.15em] text-transparent">
-              Más automatizado. Más rentable.
+              {t.softwareBand.titleGradient}
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
-            Desarrollamos software, aplicaciones y sistemas de inteligencia artificial que ayudan a las empresas a vender más, ahorrar tiempo y controlar sus operaciones.
+            {t.softwareBand.description}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               to="/?openBriefing=true"
               className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-white px-7 py-3 font-semibold text-[#140b2e] shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
-              Solicitar asesoramiento
+              {t.softwareBand.ctaConsultation}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <a
@@ -45,7 +47,7 @@ const SoftwareBand = () => {
               className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-white/10 px-7 py-3 font-semibold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               <PlayCircle className="h-4 w-4" aria-hidden="true" />
-              Ver demostración
+              {t.softwareBand.ctaDemo}
             </a>
           </div>
         </div>

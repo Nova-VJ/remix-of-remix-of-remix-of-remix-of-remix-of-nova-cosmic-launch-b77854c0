@@ -8,15 +8,8 @@ import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import BriefingFormModal from '@/components/BriefingForm/LazyBriefingFormModal';
 import { cn } from '@/lib/utils';
 import { trackLead } from '@/lib/tracking';
-
-const WHATSAPP_NUMBER = '34659343822';
-const EMAIL = 'info@solutionsnova.es';
-
-const PROMISES = [
-  'Respuesta en 24 h',
-  'Presupuesto sin compromiso',
-  'Precio orientativo desde el primer momento',
-];
+import { useTranslation } from '@/i18n';
+import { WHATSAPP_NUMBER, CONTACT_EMAIL, CONTACT_PHONE } from '@/config/env';
 
 interface ContactSectionProps {
   /** Open the briefing form straight away (links with ?openBriefing=true) */
@@ -25,6 +18,7 @@ interface ContactSectionProps {
 
 // Closing section: briefing form, quick message by WhatsApp or email
 const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
+  const { t, isEn } = useTranslation();
   const { toast } = useToast();
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
@@ -46,9 +40,13 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      `Hola NOVA Marketing, me llamo ${formData.name || '[tu nombre]'}. ` +
-      `Mi negocio es: ${formData.business || '[tu negocio]'}. ` +
-      `${formData.message || 'Quiero información sobre vuestros servicios.'}`
+      isEn
+        ? `Hello NOVA Marketing, my name is ${formData.name || '[your name]'}. ` +
+          `My business is: ${formData.business || '[your business]'}. ` +
+          `${formData.message || 'I would like information about your digital services.'}`
+        : `Hola NOVA Marketing, me llamo ${formData.name || '[tu nombre]'}. ` +
+          `Mi negocio es: ${formData.business || '[tu negocio]'}. ` +
+          `${formData.message || 'Quiero información sobre vuestros servicios.'}`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
@@ -56,25 +54,34 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
   const handleEmail = () => {
     if (!formData.name || !formData.email || !formData.message) {
       toast({
-        title: "Campos requeridos",
-        description: "Por favor completa nombre, email y mensaje.",
+        title: t.contact.requiredFieldsTitle,
+        description: t.contact.requiredFieldsDesc,
         variant: "destructive"
       });
       return;
     }
 
-    const subject = encodeURIComponent(`Contacto desde web - ${formData.business || 'Consulta'}`);
-    const body = encodeURIComponent(
-      `Nombre: ${formData.name}\n` +
-      `Email: ${formData.email}\n` +
-      `Negocio: ${formData.business}\n\n` +
-      `Mensaje:\n${formData.message}`
+    const subject = encodeURIComponent(
+      isEn
+        ? `Website Inquiry - ${formData.business || 'Project Consultation'}`
+        : `Contacto desde web - ${formData.business || 'Consulta'}`
     );
-    window.open(`mailto:${EMAIL}?subject=${subject}&body=${body}`, '_blank');
+    const body = encodeURIComponent(
+      isEn
+        ? `Name: ${formData.name}\n` +
+          `Email: ${formData.email}\n` +
+          `Business: ${formData.business}\n\n` +
+          `Project details:\n${formData.message}`
+        : `Nombre: ${formData.name}\n` +
+          `Email: ${formData.email}\n` +
+          `Negocio: ${formData.business}\n\n` +
+          `Mensaje:\n${formData.message}`
+    );
+    window.open(`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`, '_blank');
 
     toast({
-      title: "¡Correo preparado!",
-      description: "Se abrirá tu cliente de correo para enviar el mensaje.",
+      title: t.contact.emailSentToastTitle,
+      description: t.contact.emailSentToastDesc,
     });
   };
 
@@ -120,14 +127,18 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
         <div className="relative grid gap-10 p-6 sm:p-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:p-14">
           {/* Pitch + briefing form */}
           <div className="text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-300">Contacto</p>
-            <h2 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">¿Listo para empezar?</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-300">
+              {t.contact.eyebrow}
+            </p>
+            <h2 className="mt-3 text-3xl font-bold leading-tight md:text-5xl">
+              {t.contact.title}
+            </h2>
             <p className="mt-4 text-lg leading-relaxed text-white/75">
-              Cuéntanos tu proyecto en 2 minutos y te enviamos una propuesta a medida, adaptada a lo que necesitas.
+              {t.contact.description}
             </p>
 
             <ul className="mt-7 space-y-3">
-              {PROMISES.map((item) => (
+              {t.contact.promises.map((item) => (
                 <li key={item} className="flex items-center gap-3 text-white/90">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20">
                     <Check className="h-3.5 w-3.5 text-violet-200" />
@@ -143,34 +154,34 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
               className="mt-9 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-[hsl(var(--nova-ink))] shadow-lg transition-transform hover:-translate-y-0.5 sm:w-auto"
             >
               <FileText className="h-5 w-5 text-primary" />
-              Completar formulario <span className="font-normal opacity-60">· 2 min</span>
+              {t.contact.completeFormBtn} <span className="font-normal opacity-60">{t.contact.completeFormTime}</span>
             </button>
 
             <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/70 sm:flex-row sm:flex-wrap sm:gap-x-6">
-              <a href={`mailto:${EMAIL}`} className="inline-flex items-center gap-2 transition-colors hover:text-white">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 transition-colors hover:text-white">
                 <Mail className="h-4 w-4" />
-                {EMAIL}
+                {CONTACT_EMAIL}
               </a>
               <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-white">
                 <MessageCircle className="h-4 w-4" />
-                +34 659 34 38 22
+                {CONTACT_PHONE}
               </a>
               <span className="inline-flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                Valladolid
+                {t.meta.agencyLocation}
               </span>
             </div>
           </div>
 
           {/* Quick message */}
           <form onSubmit={handleSubmit} className={cn('rounded-2xl bg-card p-6 text-foreground shadow-2xl sm:p-8', reveal(1))}>
-            <h3 className="text-xl font-bold">¿Prefieres escribirnos directamente?</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Elige cómo quieres que te respondamos.</p>
+            <h3 className="text-xl font-bold">{t.contact.directTitle}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{t.contact.directSubtitle}</p>
 
             <div className="mt-5 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1" role="radiogroup" aria-label="Canal de contacto">
               {([
-                { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
-                { id: 'email', label: 'Correo', icon: Mail },
+                { id: 'whatsapp', label: t.contact.methodWhatsapp, icon: MessageCircle },
+                { id: 'email', label: t.contact.methodEmail, icon: Mail },
               ] as const).map((option) => (
                 <button
                   key={option.id}
@@ -193,27 +204,27 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <label htmlFor="name" className="text-sm font-medium">Nombre</label>
-                <Input id="name" name="name" autoComplete="name" value={formData.name} onChange={handleChange} placeholder="Tu nombre" required />
+                <label htmlFor="name" className="text-sm font-medium">{t.contact.nameLabel}</label>
+                <Input id="name" name="name" autoComplete="name" value={formData.name} onChange={handleChange} placeholder={t.contact.namePlaceholder} required />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="business" className="text-sm font-medium">Negocio <span className="font-normal text-muted-foreground">(opcional)</span></label>
-                <Input id="business" name="business" autoComplete="organization" value={formData.business} onChange={handleChange} placeholder="Tu empresa o proyecto" />
+                <label htmlFor="business" className="text-sm font-medium">{t.contact.businessLabel} <span className="font-normal text-muted-foreground">{t.contact.businessOptional}</span></label>
+                <Input id="business" name="business" autoComplete="organization" value={formData.business} onChange={handleChange} placeholder={t.contact.businessPlaceholder} />
               </div>
               {contactMethod === 'email' && (
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label htmlFor="email" className="text-sm font-medium">Email</label>
-                  <Input id="email" name="email" type="email" autoComplete="email" value={formData.email} onChange={handleChange} placeholder="tu@email.com" required />
+                  <label htmlFor="email" className="text-sm font-medium">{t.contact.emailLabel}</label>
+                  <Input id="email" name="email" type="email" autoComplete="email" value={formData.email} onChange={handleChange} placeholder={t.contact.emailPlaceholder} required />
                 </div>
               )}
               <div className="space-y-1.5 sm:col-span-2">
-                <label htmlFor="message" className="text-sm font-medium">¿En qué podemos ayudarte?</label>
+                <label htmlFor="message" className="text-sm font-medium">{t.contact.messageLabel}</label>
                 <Textarea
                   id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Cuéntanos tu idea o proyecto..."
+                  placeholder={t.contact.messagePlaceholder}
                   required
                   rows={4}
                   className="resize-none"
@@ -223,11 +234,11 @@ const ContactSection = ({ autoOpenBriefing = false }: ContactSectionProps) => {
 
             <Button type="submit" disabled={isSubmitting} size="lg" className="mt-6 w-full">
               {contactMethod === 'whatsapp' ? <MessageCircle className="mr-2 h-5 w-5" /> : <Send className="mr-2 h-5 w-5" />}
-              {contactMethod === 'whatsapp' ? 'Continuar en WhatsApp' : 'Enviar correo'}
+              {contactMethod === 'whatsapp' ? t.contact.submitWhatsapp : t.contact.submitEmail}
             </Button>
 
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Al enviar, aceptas que te contactemos para responder tu consulta.
+              {t.contact.privacyNotice}
             </p>
           </form>
         </div>

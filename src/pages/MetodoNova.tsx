@@ -23,8 +23,8 @@ import Footer from "@/components/Footer";
 import SectionHeader from "@/components/SectionHeader";
 import NovaMethodIcon from "@/components/NovaMethodIcon";
 import { useSpotlight } from "@/hooks/use-spotlight";
-
-const WHATSAPP_LINK = "https://wa.me/34659343822?text=Hola%20NOVA%2C%20quiero%20información%20sobre%20el%20Método%20NOVA.";
+import { useTranslation } from "@/i18n";
+import { getWhatsAppNumber } from "@/config/env";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -38,34 +38,6 @@ const stagger = {
 
 const inView = { initial: "hidden", whileInView: "show", viewport: { once: true, amount: 0.15 } } as const;
 
-const benefits = [
-  { icon: Smartphone, title: "Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
-  { icon: TrendingUp, title: "Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
-  { icon: Brain, title: "Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
-  { icon: Globe, title: "Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
-  { icon: BarChart3, title: "Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
-  { icon: DollarSign, title: "Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
-];
-
-const competitiveEdge = { icon: Trophy, title: "Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." };
-
-const methodSteps = [
-  { number: "1", title: "Diagnóstico Estratégico", description: "Analizamos tu negocio, tu mercado y tus clientes.", items: ["Oportunidades ocultas", "Puntos de fuga de ventas", "Ventajas competitivas"], icon: Target },
-  { number: "2", title: "Arquitectura Digital", description: "Diseñamos tu ecosistema digital.", items: ["Web optimizada", "Embudos de venta", "Automatizaciones", "Canales de contacto", "Integraciones clave"], icon: Layers },
-  { number: "3", title: "Experiencia que convierte", description: "Creamos una experiencia clara, rápida y persuasiva. Menos pasos. Más conversiones.", items: [], icon: Zap },
-  { number: "4", title: "Activación de ventas", description: "Ponemos el sistema a trabajar.", items: ["Captación de tráfico", "Estrategia de contenidos", "Publicidad optimizada", "Seguimiento de leads"], icon: TrendingUp },
-  { number: "5", title: "Optimización constante", description: "Medimos resultados y mejoramos cada fase. Más rendimiento. Más beneficios. Más crecimiento.", items: [], icon: Repeat },
-];
-
-const outcomes = ["Vende más", "Crece más rápido", "Funciona mejor", "Se ve más profesional", "Está preparado para el futuro"];
-
-const results = [
-  { icon: Zap, text: "Un sistema escalable" },
-  { icon: DollarSign, text: "Una máquina de ventas" },
-  { icon: Globe, text: "Una marca profesional" },
-  { icon: TrendingUp, text: "Un proyecto preparado para el futuro" },
-];
-
 function BenefitCard({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
     <motion.div variants={fadeUp} className="glass-card spotlight hover-lift p-6">
@@ -78,7 +50,7 @@ function BenefitCard({ icon: Icon, title, description }: { icon: React.ElementTy
   );
 }
 
-function MethodStep({ number, title, description, items, icon: Icon, last }: (typeof methodSteps)[number] & { last: boolean }) {
+function MethodStep({ number, title, description, items, icon: Icon, last }: { number: string; title: string; description: string; items: string[]; icon: React.ElementType; last: boolean }) {
   return (
     <motion.li variants={fadeUp} className="relative grid grid-cols-[3rem_1fr] gap-4 sm:gap-6">
       <div className="relative flex justify-center">
@@ -110,6 +82,68 @@ function MethodStep({ number, title, description, items, icon: Icon, last }: (ty
 
 export default function MetodoNova() {
   useSpotlight();
+  const { isEn } = useTranslation();
+
+  const whatsappText = isEn
+    ? "Hello NOVA, I'd like more information about the NOVA Method."
+    : "Hola NOVA, quiero información sobre el Método NOVA.";
+  const whatsappLink = `https://wa.me/${getWhatsAppNumber()}?text=${encodeURIComponent(whatsappText)}`;
+
+  const benefits = isEn
+    ? [
+        { icon: Smartphone, title: "24/7 Accessibility", description: "Your business active around the clock, on any device. Buy, book, or inquire in seconds. Less friction = More sales." },
+        { icon: TrendingUp, title: "Scalable Sales Engine", description: "Automations, sales funnels, direct messaging, payment gateways, and scheduling. Your business scales even while you rest." },
+        { icon: Brain, title: "Engineered Strategy", description: "We do not build generic pages. We architect conversion engines. Every touchpoint is designed to attract, persuade, and convert." },
+        { icon: Globe, title: "Authoritative Brand Presence", description: "Your brand commands trust and industry excellence. A professional digital presence commands premium pricing." },
+        { icon: BarChart3, title: "Data-Driven Optimization", description: "We measure, test, and refine continuously. Real metrics drive every improvement, not guesswork." },
+        { icon: DollarSign, title: "Higher Profit Margins", description: "Eliminate manual friction. Maximize operational velocity. Capture more revenue per customer." },
+      ]
+    : [
+        { icon: Smartphone, title: "Accesibilidad total", description: "Tu negocio disponible 24/7, desde cualquier lugar y dispositivo. Comprar, reservar o contactar en segundos. Menos fricción = Más ventas." },
+        { icon: TrendingUp, title: "Sistema de ventas escalable", description: "Automatizaciones, embudos de venta, integraciones con WhatsApp, pagos y reservas. Tu negocio crece incluso cuando tú no estás." },
+        { icon: Brain, title: "Estrategia real", description: "No hacemos páginas bonitas. Creamos máquinas de conversión. Cada elemento está pensado para atraer, convencer y convertir." },
+        { icon: Globe, title: "Presencia profesional", description: "Tu marca transmite confianza, autoridad y calidad. Un negocio profesional vende más." },
+        { icon: BarChart3, title: "Datos y optimización", description: "Analizamos, medimos y mejoramos continuamente. Decisiones basadas en datos, no en suposiciones." },
+        { icon: DollarSign, title: "Más rentabilidad", description: "Menos procesos manuales. Más eficiencia. Más beneficio." },
+      ];
+
+  const competitiveEdge = isEn
+    ? { icon: Trophy, title: "Competitive Edge", description: "While competitors improvise, your business operates on an engineered growth engine." }
+    : { icon: Trophy, title: "Ventaja competitiva", description: "Mientras otros improvisan, tú tienes un sistema sólido." };
+
+  const methodSteps = isEn
+    ? [
+        { number: "1", title: "Strategic Discovery", description: "We analyze your business model, competitive landscape, and audience behavior.", items: ["Growth bottlenecks", "Conversion leaks", "Competitive edges"], icon: Target },
+        { number: "2", title: "Digital Architecture", description: "We engineer your full-stack digital ecosystem.", items: ["High-speed web app", "Conversion funnels", "Automations", "Omnichannel contact", "Core integrations"], icon: Layers },
+        { number: "3", title: "High-Converting Experience", description: "We build an intuitive, frictionless, and persuasive customer journey. Fewer steps. Higher conversion.", items: [], icon: Zap },
+        { number: "4", title: "Sales Activation", description: "We deploy your system into live operation.", items: ["Targeted traffic", "Content frameworks", "Performance campaigns", "Automated lead follow-ups"], icon: TrendingUp },
+        { number: "5", title: "Continuous Optimization", description: "We track live results and optimize each stage of the funnel. Higher yield. Greater margins. Scalable growth.", items: [], icon: Repeat },
+      ]
+    : [
+        { number: "1", title: "Diagnóstico Estratégico", description: "Analizamos tu negocio, tu mercado y tus clientes.", items: ["Oportunidades ocultas", "Puntos de fuga de ventas", "Ventajas competitivas"], icon: Target },
+        { number: "2", title: "Arquitectura Digital", description: "Diseñamos tu ecosistema digital.", items: ["Web optimizada", "Embudos de venta", "Automatizaciones", "Canales de contacto", "Integraciones clave"], icon: Layers },
+        { number: "3", title: "Experiencia que convierte", description: "Creamos una experiencia clara, rápida y persuasiva. Menos pasos. Más conversiones.", items: [], icon: Zap },
+        { number: "4", title: "Activación de ventas", description: "Ponemos el sistema a trabajar.", items: ["Captación de tráfico", "Estrategia de contenidos", "Publicidad optimizada", "Seguimiento de leads"], icon: TrendingUp },
+        { number: "5", title: "Optimización constante", description: "Medimos resultados y mejoramos cada fase. Más rendimiento. Más beneficios. Más crecimiento.", items: [], icon: Repeat },
+      ];
+
+  const outcomes = isEn
+    ? ["Sells more predictably", "Scales with velocity", "Operates seamlessly", "Projects enterprise authority", "Is built for the future"]
+    : ["Vende más", "Crece más rápido", "Funciona mejor", "Se ve más profesional", "Está preparado para el futuro"];
+
+  const results = isEn
+    ? [
+        { icon: Zap, text: "A scalable ecosystem" },
+        { icon: DollarSign, text: "An automated sales engine" },
+        { icon: Globe, text: "An authoritative modern brand" },
+        { icon: TrendingUp, text: "A future-proof digital asset" },
+      ]
+    : [
+        { icon: Zap, text: "Un sistema escalable" },
+        { icon: DollarSign, text: "Una máquina de ventas" },
+        { icon: Globe, text: "Una marca profesional" },
+        { icon: TrendingUp, text: "Un proyecto preparado para el futuro" },
+      ];
 
   return (
     // Skip motion animations for visitors who ask for reduced motion
@@ -128,22 +162,41 @@ export default function MetodoNova() {
               <NovaMethodIcon size={104} />
             </div>
 
-            <motion.p variants={fadeUp} className="eyebrow mt-8">Método NOVA</motion.p>
+            <motion.p variants={fadeUp} className="eyebrow mt-8">
+              {isEn ? "The NOVA Method" : "Método NOVA"}
+            </motion.p>
             <motion.h1 variants={fadeUp} className="mt-3 text-4xl font-extrabold leading-[1.1] text-foreground sm:text-5xl md:text-6xl">
-              La ventaja <span className="text-primary">NOVA</span>
+              {isEn ? (
+                <>The <span className="text-primary">NOVA</span> Advantage</>
+              ) : (
+                <>La ventaja <span className="text-primary">NOVA</span></>
+              )}
             </motion.h1>
             <motion.p variants={fadeUp} className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Convierte tu negocio en un sistema digital que vende, escala y crece contigo.
+              {isEn
+                ? "Turn your business into an automated digital system that converts, scales, and grows with you."
+                : "Convierte tu negocio en un sistema digital que vende, escala y crece contigo."}
             </motion.p>
 
             <motion.figure variants={fadeUp} className="glass-card mx-auto mt-10 max-w-2xl p-6 text-left sm:p-8">
               <div className="absolute inset-y-0 left-0 w-1 bg-primary" aria-hidden="true" />
               <p className="text-lg text-foreground/80">
-                Hoy no gana quien tiene el mejor producto.{" "}
-                <span className="font-semibold text-foreground">Gana quien hace más fácil comprar.</span>
+                {isEn ? (
+                  <>
+                    Today, having the best product isn't enough.{" "}
+                    <span className="font-semibold text-foreground">The winner is whoever makes buying easiest.</span>
+                  </>
+                ) : (
+                  <>
+                    Hoy no gana quien tiene el mejor producto.{" "}
+                    <span className="font-semibold text-foreground">Gana quien hace más fácil comprar.</span>
+                  </>
+                )}
               </p>
               <p className="mt-3 text-muted-foreground">
-                La digitalización ya no es una opción. Es la diferencia entre crecer o quedarse atrás.
+                {isEn
+                  ? "Digital transformation is no longer optional. It is the defining line between scaling up or falling behind."
+                  : "La digitalización ya no es una opción. Es la diferencia entre crecer o quedarse atrás."}
               </p>
             </motion.figure>
           </motion.div>
@@ -152,7 +205,10 @@ export default function MetodoNova() {
         {/* Benefits */}
         <section className="px-4 py-20 sm:px-6 md:py-24">
           <div className="mx-auto max-w-6xl">
-            <SectionHeader eyebrow="Beneficios" title="¿Qué consigue tu negocio al digitalizarse con NOVA?" />
+            <SectionHeader
+              eyebrow={isEn ? "Benefits" : "Beneficios"}
+              title={isEn ? "What does your business achieve by scaling with NOVA?" : "¿Qué consigue tu negocio al digitalizarse con NOVA?"}
+            />
             <motion.div variants={stagger} {...inView} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((b) => (
                 <BenefitCard key={b.title} {...b} />
@@ -179,11 +235,24 @@ export default function MetodoNova() {
           <div className="mx-auto max-w-3xl">
             <div className="mb-12 flex flex-col items-center text-center">
               <NovaMethodIcon size={68} onView />
-              <h2 className="mt-6 text-3xl font-bold leading-tight text-foreground md:text-4xl">El Método NOVA</h2>
-              <p className="mt-3 text-lg text-muted-foreground">Nuestro sistema para hacer crecer tu negocio</p>
+              <h2 className="mt-6 text-3xl font-bold leading-tight text-foreground md:text-4xl">
+                {isEn ? "The NOVA Method" : "El Método NOVA"}
+              </h2>
+              <p className="mt-3 text-lg text-muted-foreground">
+                {isEn ? "Our framework to scale your business" : "Nuestro sistema para hacer crecer tu negocio"}
+              </p>
               <p className="mt-6 max-w-xl text-foreground/80">
-                No trabajamos al azar. Seguimos un proceso probado que convierte negocios tradicionales en{" "}
-                <span className="font-semibold text-foreground">máquinas digitales de ventas</span>.
+                {isEn ? (
+                  <>
+                    We don't rely on guesswork. We execute a proven system that turns traditional businesses into{" "}
+                    <span className="font-semibold text-foreground">high-performance digital sales engines</span>.
+                  </>
+                ) : (
+                  <>
+                    No trabajamos al azar. Seguimos un proceso probado que convierte negocios tradicionales en{" "}
+                    <span className="font-semibold text-foreground">máquinas digitales de ventas</span>.
+                  </>
+                )}
               </p>
             </div>
 
@@ -199,8 +268,10 @@ export default function MetodoNova() {
         <section className="px-4 py-20 sm:px-6 md:py-24">
           <motion.div variants={stagger} {...inView} className="mx-auto grid max-w-5xl gap-5 md:grid-cols-2">
             <motion.div variants={fadeUp} className="glass-card p-6 sm:p-8">
-              <p className="eyebrow">El resultado</p>
-              <h2 className="mt-2 text-2xl font-bold text-foreground">Un negocio que…</h2>
+              <p className="eyebrow">{isEn ? "The Outcome" : "El resultado"}</p>
+              <h2 className="mt-2 text-2xl font-bold text-foreground">
+                {isEn ? "A business that…" : "Un negocio que…"}
+              </h2>
               <ul className="mt-5 space-y-3">
                 {outcomes.map((item) => (
                   <li key={item} className="flex items-center gap-3 font-semibold text-foreground">
@@ -212,8 +283,10 @@ export default function MetodoNova() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="glass-card p-6 sm:p-8">
-              <p className="eyebrow">En resumen</p>
-              <h2 className="mt-2 text-2xl font-bold text-foreground">El Método NOVA convierte tu negocio en:</h2>
+              <p className="eyebrow">{isEn ? "In Summary" : "En resumen"}</p>
+              <h2 className="mt-2 text-2xl font-bold text-foreground">
+                {isEn ? "The NOVA Method transforms your business into:" : "El Método NOVA convierte tu negocio en:"}
+              </h2>
               <ul className="mt-5 space-y-3">
                 {results.map((r) => (
                   <li key={r.text} className="flex items-center gap-3 font-semibold text-foreground">
@@ -239,23 +312,27 @@ export default function MetodoNova() {
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" aria-hidden="true" />
             <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
             <div className="relative mx-auto max-w-2xl">
-              <h2 className="text-3xl font-bold text-white md:text-5xl">Tu negocio puede crecer más</h2>
-              <p className="mt-4 text-lg text-white/75 md:text-xl">Nosotros te mostramos cómo.</p>
+              <h2 className="text-3xl font-bold text-white md:text-5xl">
+                {isEn ? "Your business can scale faster" : "Tu negocio puede crecer más"}
+              </h2>
+              <p className="mt-4 text-lg text-white/75 md:text-xl">
+                {isEn ? "We'll show you exactly how." : "Nosotros te mostramos cómo."}
+              </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a
-                  href={WHATSAPP_LINK}
+                  href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 font-semibold text-[hsl(var(--nova-ink))] shadow-lg transition-transform hover:-translate-y-0.5"
                 >
                   <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                  Cuéntanos tu proyecto
+                  {isEn ? "Tell us about your project" : "Cuéntanos tu proyecto"}
                 </a>
                 <Link
                   to="/#servicios"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-7 py-3.5 font-semibold text-white transition-colors hover:bg-white/10"
                 >
-                  Haz crecer tu negocio hoy
+                  {isEn ? "Scale your business today" : "Haz crecer tu negocio hoy"}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>

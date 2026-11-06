@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { SARA_KNOWLEDGE } from "./knowledge.ts";
+import { SARA_KNOWLEDGE, SARA_KNOWLEDGE_EN } from "./knowledge.ts";
 
 type Body = {
   // soporta distintos formatos que puede enviar el widget web
@@ -12,6 +12,10 @@ type Body = {
   // session id en dos variantes
   session_id?: string;
   sessionId?: string;
+
+  // idioma / locale
+  locale?: string;
+  lang?: string;
 };
 
 // Solo los orígenes de la lista blanca reciben cabeceras CORS: el navegador
@@ -76,13 +80,18 @@ const isAllowedOrigin = (origin: string) => {
   if (!origin) return false;
   if (origin === "https://solutionsnova.es") return true;
   if (origin === "https://www.solutionsnova.es") return true;
+  if (origin === "https://novasolutionsmkt.com") return true;
+  if (origin === "https://www.novasolutionsmkt.com") return true;
 
   try {
     const u = new URL(origin);
     // Desarrollo local y vistas previas de Cloudflare Pages
     if (u.hostname === "localhost" || u.hostname === "127.0.0.1") return true;
     if (u.hostname === "77851234.pages.dev" || u.hostname.endsWith(".77851234.pages.dev")) return true;
-  } catch {}
+    if (u.hostname.endsWith(".pages.dev")) return true;
+  } catch {
+    // URL malformada recibida en cabecera Origin
+  }
 
   return false;
 };
@@ -146,9 +155,17 @@ Deno.serve(async (req: Request) => {
   if (!VERTEX_API_KEY && !GEMINI_API_KEY)
     return json({ error: "Missing VERTEX_API_KEY / GEMINI_API_KEY" }, 500, allowOrigin);
 
+  // Detección de idioma (recibido desde el frontend o según el dominio de origen)
+  const isEn = Boolean(
+    body?.locale === "en" ||
+    body?.lang === "en" ||
+    origin.includes("novasolutionsmkt.com")
+  );
+  const baseKnowledge = isEn ? SARA_KNOWLEDGE_EN : SARA_KNOWLEDGE;
+
   // Conocimiento de NOVA (knowledge.ts) + notas opcionales desde Secrets
-  const extra = (Deno.env.get("SARA_EXTRA_PROMPT") ?? "").trim();
-  const system = extra ? `${SARA_KNOWLEDGE}\n\n# Notas adicionales\n${extra}` : SARA_KNOWLEDGE;
+  const extra = (Deno.env.get(isEn ? "SARA_EXTRA_PROMPT_EN" : "SARA_EXTRA_PROMPT") ?? (isEn ? "" : (Deno.env.get("SARA_EXTRA_PROMPT") ?? ""))).trim();
+  const system = extra ? `${baseKnowledge}\n\n# ${isEn ? "Additional Notes" : "Notas adicionales"}\n${extra}` : baseKnowledge;
 
   // Supabase (memoria)
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
@@ -175,7 +192,9 @@ Deno.serve(async (req: Request) => {
     if ((ipCount ?? 0) >= (signedIn ? USER_IP_DAILY_LIMIT : ANON_IP_DAILY_LIMIT)) {
       return json(
         {
-          error: "Has alcanzado el límite de mensajes de hoy. Escríbenos por WhatsApp y te respondemos enseguida.",
+          error: isEn
+            ? "You have reached your daily message limit. Contact us via WhatsApp or email and we will get back to you shortly."
+            : "Has alcanzado el límite de mensajes de hoy. Escríbenos por WhatsApp y te respondemos enseguida.",
           limit_reached: true,
         },
         429,
@@ -194,7 +213,9 @@ Deno.serve(async (req: Request) => {
       if ((count ?? 0) >= ANON_DAILY_LIMIT) {
         return json(
           {
-            error: `Has usado los ${ANON_DAILY_LIMIT} mensajes gratuitos de hoy. Inicia sesión o crea una cuenta para seguir hablando con Sara, o escríbenos por WhatsApp.`,
+            error: isEn
+              ? `You have reached the ${ANON_DAILY_LIMIT} free messages for today. Sign in to keep chatting with Sara, or reach out via WhatsApp.`
+              : `Has usado los ${ANON_DAILY_LIMIT} mensajes gratuitos de hoy. Inicia sesión o crea una cuenta para seguir hablando con Sara, o escríbenos por WhatsApp.`,
             limit_reached: true,
           },
           429,
@@ -213,7 +234,9 @@ Deno.serve(async (req: Request) => {
       console.warn(`Sara daily cap reached (${SITE_DAILY_CAP})`);
       return json(
         {
-          error: "Sara está atendiendo muchas consultas ahora mismo. Escríbenos por WhatsApp y te respondemos enseguida.",
+          error: isEn
+            ? "Sara is currently assisting many clients. Contact us via WhatsApp or email and we will get back to you right away."
+            : "Sara está atendiendo muchas consultas ahora mismo. Escríbenos por WhatsApp y te respondemos enseguida.",
           daily_cap: true,
         },
         503,
@@ -244,7 +267,7 @@ Deno.serve(async (req: Request) => {
       parts: [{ text: m.content }],
     })),
     // Si NO hay historial, insertamos un “hola” interno para que se presente una vez
-    ...(hasHistory ? [] : [{ role: "user", parts: [{ text: "Hola" }] }]),
+    ...(hasHistory ? [] : [{ role: "user", parts: [{ text: isEn ? "Hello" : "Hola" }] }]),
     { role: "user", parts: [{ text: message }] },
   ];
 
@@ -272,7 +295,12 @@ Deno.serve(async (req: Request) => {
   if (!gemRes.ok) {
     console.error("AI failed:", gemRes.status, (await gemRes.text().catch(() => "")).slice(0, 300));
     return json(
-      { error: "Ahora mismo no puedo responder. Escríbenos por WhatsApp y te atendemos enseguida.", ai_failed: true },
+      {
+        error: isEn
+          ? "I am currently unable to reply. Please reach out via WhatsApp or email and our team will get back to you shortly."
+          : "Ahora mismo no puedo responder. Escríbenos por WhatsApp y te atendemos enseguida.",
+        ai_failed: true,
+      },
       503,
       allowOrigin
     );
@@ -284,7 +312,7 @@ Deno.serve(async (req: Request) => {
       ?.map((p: any) => p?.text)
       .filter(Boolean)
       .join("") ||
-    "Ahora mismo no puedo responder. Inténtalo de nuevo.";
+    (isEn ? "I am currently unable to reply. Please try again." : "Ahora mismo no puedo responder. Inténtalo de nuevo.");
 
   // Guardar memoria (best effort)
   if (supabase) {

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { X, Rocket, CheckCircle2, Zap, MessageCircle, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { WHATSAPP_URL } from '@/config/env';
+import { WHATSAPP_URL, CONTACT_EMAIL } from '@/config/env';
+import { useTranslation } from '@/i18n';
 
 const POPUP_CLOSED_KEY = 'audit_popup_closed';
 const POPUP_CTA_KEY = 'audit_popup_cta_clicked';
 
 const AuditPopup = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -39,7 +41,7 @@ const AuditPopup = () => {
     localStorage.setItem(POPUP_CTA_KEY, Date.now().toString());
     setIsOpen(false);
     window.open(
-      `${WHATSAPP_URL}?text=${encodeURIComponent('Hola Nova, me interesa la auditoría gratuita. Mi código es NOVA20.')}`,
+      `${WHATSAPP_URL}?text=${encodeURIComponent(t.auditPopup.whatsappMessage)}`,
       '_blank'
     );
   };
@@ -48,7 +50,7 @@ const AuditPopup = () => {
     localStorage.setItem(POPUP_CTA_KEY, Date.now().toString());
     setIsOpen(false);
     window.open(
-      `mailto:info@solutionsnova.es?subject=${encodeURIComponent('Solicitud de auditoría gratuita – NOVA20')}&body=${encodeURIComponent('Hola Nova,\n\nMe interesa recibir la auditoría gratuita de mi web/negocio.\n\nMi código promocional es NOVA20.\n\nQuedo atento/a a su respuesta.\n\nSaludos.')}`,
+      `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t.auditPopup.emailSubject)}&body=${encodeURIComponent(t.auditPopup.emailBody)}`,
       '_blank'
     );
   };
@@ -77,25 +79,23 @@ const AuditPopup = () => {
             {/* Header badge */}
             <div className="inline-flex items-center gap-2 bg-[hsl(270,80%,60%,0.2)] border border-[hsl(270,80%,60%,0.4)] rounded-full px-3 py-1 mb-5">
               <Rocket className="w-3.5 h-3.5 text-[hsl(var(--nova-purple-light))]" />
-              <span className="text-xs font-semibold text-[hsl(var(--nova-purple-light))] uppercase tracking-wider">Oferta exclusiva</span>
+              <span className="text-xs font-semibold text-[hsl(var(--nova-purple-light))] uppercase tracking-wider">
+                {t.auditPopup.badge}
+              </span>
             </div>
 
             {/* Main heading */}
             <h2 className="text-2xl font-bold text-white leading-snug mb-2">
-              ¿Tu web realmente está<br />
+              {t.auditPopup.titleLine1}<br />
               <span className="bg-gradient-to-r from-[hsl(270,90%,75%)] to-[hsl(235,80%,70%)] bg-clip-text text-transparent">
-                generando clientes?
+                {t.auditPopup.titleGradient}
               </span>
             </h2>
-            <p className="text-sm text-white/50 mb-5">Te lo revelamos en 24h, gratis.</p>
+            <p className="text-sm text-white/50 mb-5">{t.auditPopup.subtitle}</p>
 
             {/* Benefits */}
             <div className="space-y-3 mb-6">
-              {[
-                'Auditoría profesional personalizada e informe.',
-                'Plan de automatización de reservas, ventas, inventario y mucho más.',
-                '20% de descuento en tu primer proyecto.',
-              ].map((benefit, i) => (
+              {t.auditPopup.benefits.map((benefit, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[hsl(270,80%,60%,0.2)] flex items-center justify-center">
                     <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(var(--nova-purple-light))]" />
@@ -108,7 +108,7 @@ const AuditPopup = () => {
             {/* Promo code */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-3 mb-5 flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-white/70 mb-0.5">Código exclusivo</p>
+                <p className="text-xs text-white/70 mb-0.5">{t.auditPopup.exclusiveCode}</p>
                 <p className="text-xl font-bold tracking-widest text-white font-mono">NOVA20</p>
               </div>
               <button
@@ -116,29 +116,33 @@ const AuditPopup = () => {
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-[hsl(270,80%,60%,0.25)] hover:bg-[hsl(270,80%,60%,0.4)] border border-[hsl(270,80%,60%,0.4)] rounded-lg text-xs font-medium text-[hsl(var(--nova-purple-light))] transition-all"
               >
                 <Zap className="w-3.5 h-3.5" />
-                {copied ? '¡Copiado!' : 'Copiar'}
+                {copied ? t.auditPopup.copied : t.auditPopup.copy}
               </button>
             </div>
 
-            {/* CTA Buttons - WhatsApp & Email */}
-            <div className="space-y-2">
+            {/* Actions */}
+            <div className="flex gap-3">
               <Button
-                className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold py-5 rounded-xl shadow-lg transition-all gap-2"
                 onClick={handleWhatsApp}
+                className="flex-1 bg-[#25D366] hover:bg-[#20ba5a] text-white font-semibold text-sm"
               >
-                <MessageCircle className="w-5 h-5" />
-                Pedir auditoría por WhatsApp
+                <MessageCircle className="w-4 h-4 mr-2" />
+                {t.auditPopup.whatsappBtn}
               </Button>
               <Button
-                variant="outline"
-                className="w-full border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white font-semibold py-5 rounded-xl transition-all gap-2"
                 onClick={handleEmail}
+                variant="outline"
+                className="flex-1 border-white/20 text-white hover:bg-white/10 font-semibold text-sm"
               >
-                <Mail className="w-5 h-5" />
-                Pedir auditoría por correo
+                <Mail className="w-4 h-4 mr-2" />
+                {t.auditPopup.emailBtn}
               </Button>
             </div>
-            <p className="text-center text-xs text-white/70 mt-3">Sin compromiso. Respuesta en 24h.</p>
+
+            {/* Footer note */}
+            <p className="text-center text-xs text-white/30 mt-4">
+              {t.auditPopup.footerText}
+            </p>
           </div>
         </div>
       </DialogContent>

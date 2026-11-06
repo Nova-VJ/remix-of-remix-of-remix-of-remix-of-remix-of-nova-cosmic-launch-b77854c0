@@ -4,6 +4,7 @@ import { Switch } from '@/components/ui/switch';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { loadAnalytics, loadMarketing } from '@/lib/tracking';
+import { useTranslation } from '@/i18n';
 
 interface CookiePreferences {
   necessary: boolean;
@@ -17,6 +18,7 @@ const COOKIE_CONSENT_KEY = 'cookie_consent';
 const CONSENT_VERSION = '1.0';
 
 const CookieConsent = () => {
+  const { t } = useTranslation();
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>({
@@ -46,7 +48,6 @@ const CookieConsent = () => {
   }, []);
 
   const loadScripts = (prefs: CookiePreferences) => {
-    // Only load scripts if consent was given (each tool also needs its ID, see lib/tracking)
     if (prefs.analytics) {
       loadAnalytics();
     }
@@ -109,9 +110,9 @@ const CookieConsent = () => {
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">
-                  Usamos cookies para mejorar tu experiencia y analizar el tráfico. 
+                  {t.cookieConsent.bannerText} 
                   <Link to="/politica-de-cookies" className="ml-1 text-primary underline underline-offset-2 hover:no-underline">
-                    Más información sobre cookies
+                    {t.cookieConsent.moreInfo}
                   </Link>
                 </p>
               </div>
@@ -121,20 +122,20 @@ const CookieConsent = () => {
                   size="sm"
                   onClick={handleRejectAll}
                 >
-                  Rechazar
+                  {t.cookieConsent.rejectAll}
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => setShowSettings(true)}
                 >
-                  Configurar
+                  {t.cookieConsent.configure}
                 </Button>
                 <Button 
                   size="sm"
                   onClick={handleAcceptAll}
                 >
-                  Aceptar
+                  {t.cookieConsent.acceptAll}
                 </Button>
               </div>
             </div>
@@ -147,7 +148,7 @@ const CookieConsent = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50">
           <div className="bg-background rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="font-semibold">Configurar cookies</h2>
+              <h2 className="font-semibold">{t.cookieConsent.settingsTitle}</h2>
               <Button 
                 variant="ghost" 
                 size="icon"
@@ -166,9 +167,9 @@ const CookieConsent = () => {
               {/* Necessary */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-medium text-sm">Necesarias</p>
+                  <p className="font-medium text-sm">{t.cookieConsent.necessaryTitle}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Imprescindibles para el funcionamiento de la web. No se pueden desactivar.
+                    {t.cookieConsent.necessaryDesc}
                   </p>
                 </div>
                 <Switch checked disabled className="data-[state=checked]:bg-primary" />
@@ -177,9 +178,9 @@ const CookieConsent = () => {
               {/* Analytics */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-medium text-sm">Analíticas</p>
+                  <p className="font-medium text-sm">{t.cookieConsent.analyticsTitle}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Nos ayudan a entender cómo usas la web para mejorarla.
+                    {t.cookieConsent.analyticsDesc}
                   </p>
                 </div>
                 <Switch 
@@ -191,9 +192,9 @@ const CookieConsent = () => {
               {/* Marketing */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="font-medium text-sm">Marketing</p>
+                  <p className="font-medium text-sm">{t.cookieConsent.marketingTitle}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Permiten mostrarte anuncios relevantes en otras plataformas.
+                    {t.cookieConsent.marketingDesc}
                   </p>
                 </div>
                 <Switch 
@@ -204,7 +205,7 @@ const CookieConsent = () => {
 
               <div className="text-xs text-muted-foreground">
                 <Link to="/politica-de-cookies" className="text-primary hover:underline">
-                  Ver política de cookies completa
+                  {t.cookieConsent.moreInfo}
                 </Link>
               </div>
             </div>
@@ -215,13 +216,13 @@ const CookieConsent = () => {
                 className="flex-1"
                 onClick={handleRejectAll}
               >
-                Rechazar todo
+                {t.cookieConsent.rejectAll}
               </Button>
               <Button 
                 className="flex-1"
                 onClick={handleSaveSettings}
               >
-                Guardar preferencias
+                {t.cookieConsent.savePreferences}
               </Button>
             </div>
           </div>

@@ -3,160 +3,199 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SEO_PAGES } from "@/config/seo";
 import { LEGAL_ENTITY, LEGAL_UPDATED, legalIdentityRows } from '@/config/legal';
+import { useTranslation } from '@/i18n';
 
 const PrivacyPolicy = () => {
+  const { isEn } = useTranslation();
+
   return (
     <>
-    <SEOHead {...SEO_PAGES["/politica-de-privacidad"]} />
-    <Navbar />
-    <main id="contenido" className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
-      <div className="max-w-3xl mx-auto">
-        <p className="eyebrow mb-3">Información legal</p>
-
-        <h1 className="text-3xl font-bold mb-8">Política de Privacidad</h1>
-
-        <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
-          <p className="text-muted-foreground">
-            Esta política explica cómo tratamos tus datos personales conforme al Reglamento (UE) 2016/679 General de Protección de Datos (RGPD), la Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD) y la Ley 34/2002 de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE).
+      <SEOHead {...SEO_PAGES["/politica-de-privacidad"]} />
+      <Navbar />
+      <main id="contenido" className="min-h-screen bg-background pt-28 pb-20 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          <p className="eyebrow mb-3">
+            {isEn ? "Legal Information" : "Información legal"}
           </p>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">1. Responsable del Tratamiento</h2>
-            <ul className="list-none space-y-1 text-muted-foreground">
-              {legalIdentityRows().map(([label, value]) => (
-                <li key={label}><strong>{label}:</strong> {value}</li>
-              ))}
-            </ul>
-          </section>
+          <h1 className="text-3xl font-bold mb-8">
+            {isEn ? "Privacy Policy" : "Política de Privacidad"}
+          </h1>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">2. Datos que Recogemos</h2>
-            <p className="text-muted-foreground">
-              Solo tratamos los datos que nos facilitas o que son necesarios para atenderte:
-            </p>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li>Formularios de contacto y de presupuesto (nombre, email, teléfono, sector y lo que nos cuentes de tu proyecto)</li>
-              <li>Conversaciones con nuestra asistente virtual, Sara</li>
-              <li>Citas, tickets de soporte y solicitudes de contenido</li>
-              <li>Registro de cuenta en nuestro portal de clientes</li>
-              <li>Contacto por WhatsApp o email</li>
-              <li>Datos técnicos de seguridad (ver apartado 8)</li>
-            </ul>
-            <p className="text-muted-foreground">
-              No compartas datos especialmente sensibles (salud, ideología, etc.) en los formularios ni en el chat.
-            </p>
-          </section>
+          {isEn ? (
+            /* REVISAR: Legal counsel should review US state privacy disclosures (e.g., CCPA/CPRA, VCDPA) */
+            <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
+              <p className="text-muted-foreground">
+                This Privacy Policy describes how Nova Marketing Solutions ("we", "us", or "our") collects, uses, and shares your personal information when you visit or interact with our website at novasolutionsmkt.com.
+              </p>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">3. Finalidad del Tratamiento</h2>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li>Responder a tus solicitudes y consultas</li>
-              <li>Prepararte y enviarte presupuestos personalizados</li>
-              <li>Gestionar la relación comercial si contratas nuestros servicios</li>
-              <li>Proporcionarte soporte técnico y acceso al portal de cliente</li>
-              <li>Enviarte información comercial sobre nuestros servicios, solo si nos has dado tu consentimiento</li>
-              <li>Proteger la web frente a abusos y envíos automáticos</li>
-            </ul>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">1. Data Controller & Business Information</h2>
+                <ul className="list-none space-y-1 text-muted-foreground">
+                  {legalIdentityRows().map(([label, value]) => (
+                    <li key={label}><strong>{label}:</strong> {value}</li>
+                  ))}
+                </ul>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">4. Base Jurídica</h2>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li><strong>Consentimiento</strong> (art. 6.1.a RGPD): al enviar un formulario, escribir a Sara o aceptar recibir comunicaciones. Puedes retirarlo cuando quieras.</li>
-              <li><strong>Ejecución de un contrato o medidas precontractuales</strong> (art. 6.1.b RGPD): presupuestos y servicios contratados.</li>
-              <li><strong>Obligación legal</strong> (art. 6.1.c RGPD): facturación y obligaciones fiscales.</li>
-              <li><strong>Interés legítimo</strong> (art. 6.1.f RGPD): seguridad de la web y prevención de abusos.</li>
-            </ul>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">2. Information We Collect</h2>
+                <p className="text-muted-foreground">
+                  We collect information that you voluntarily provide directly to us, including:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>Contact and project inquiry forms (full name, email address, phone number, business name, and project scope)</li>
+                  <li>Inquiries and messages sent to our AI virtual assistant, Sara</li>
+                  <li>Client portal registration and account details</li>
+                  <li>Direct communications via email or messaging platforms</li>
+                  <li>Technical data such as IP address, browser type, and operating system collected for operational security</li>
+                </ul>
+                <p className="text-muted-foreground mt-2">
+                  We do not solicit or intentionally collect sensitive personal information (such as health data, biometric data, or government IDs) through our public forms or chat.
+                </p>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">5. Conservación de Datos</h2>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li>Solicitudes de contacto: hasta 12 meses si no hay relación comercial</li>
-              <li>Conversaciones con Sara: el tiempo necesario para darte continuidad, como máximo 12 meses</li>
-              <li>Datos de clientes: durante la relación comercial y los plazos legales posteriores</li>
-              <li>Datos de facturación: 6 años (obligación fiscal)</li>
-              <li>Registros de seguridad de los formularios: 2 días</li>
-              <li>Comunicaciones comerciales: hasta que pidas la baja</li>
-            </ul>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">3. How We Use Your Information</h2>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>To respond to your inquiries and schedule consultations</li>
+                  <li>To prepare customized service proposals and cost estimates</li>
+                  <li>To provide, maintain, and improve our digital services</li>
+                  <li>To manage client relationships and project deliverables</li>
+                  <li>To prevent fraud, spam, and technical abuse</li>
+                </ul>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">6. Destinatarios y Encargados del Tratamiento</h2>
-            <p className="text-muted-foreground">
-              No vendemos ni cedemos tus datos a terceros, salvo obligación legal. Para prestar el servicio nos apoyamos en estos proveedores, que actúan como encargados del tratamiento:
-            </p>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li><strong>Cloudflare:</strong> alojamiento de la web, red de distribución y seguridad</li>
-              <li><strong>Supabase:</strong> base de datos, cuentas de usuario y funciones del servidor</li>
-              <li><strong>Google (Gemini / Vertex AI):</strong> genera las respuestas de la asistente virtual Sara</li>
-              <li><strong>Formspree:</strong> recepción de los formularios de presupuesto</li>
-              <li><strong>Google (Gmail) y Brevo:</strong> envío de correos electrónicos</li>
-              <li><strong>Google Analytics y Meta (Facebook/Instagram):</strong> analítica y publicidad, solo si aceptas las cookies correspondientes</li>
-            </ul>
-            <p className="text-muted-foreground">
-              Algunos de estos proveedores pueden tratar datos fuera del Espacio Económico Europeo; en ese caso lo hacen con garantías adecuadas (Marco de Privacidad de Datos UE-EE. UU. o Cláusulas Contractuales Tipo de la Comisión Europea).
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">4. Information Sharing & Third-Party Disclosure</h2>
+                <p className="text-muted-foreground">
+                  We do not sell, rent, or trade your personal information. We may share necessary data with trusted service providers who assist us in operating our website, hosting databases, and sending communications, under strict confidentiality agreements.
+                </p>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">7. Comunicaciones Comerciales</h2>
-            <p className="text-muted-foreground">
-              Solo te enviamos información comercial por correo si nos has dado tu consentimiento. Cada correo se identifica como publicidad e incluye cómo darte de baja: basta con responder «baja» o escribir a <strong>{LEGAL_ENTITY.email}</strong>, y no volveremos a escribirte.
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">5. Your Privacy Rights</h2>
+                <p className="text-muted-foreground">
+                  /* REVISAR: Consumer privacy rights under US state laws (California, Texas, Virginia, etc.) */
+                  Depending on your jurisdiction, you may have rights regarding your personal information, including:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>The right to know what personal information we collect and how it is used</li>
+                  <li>The right to request deletion of your personal information</li>
+                  <li>The right to correct inaccurate personal data</li>
+                  <li>The right to non-discrimination for exercising your privacy rights</li>
+                </ul>
+                <p className="text-muted-foreground mt-2">
+                  To exercise any of these rights, please email us at <strong>info@novasolutionsmkt.com</strong>.
+                </p>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">8. Seguridad</h2>
-            <p className="text-muted-foreground">
-              Aplicamos medidas técnicas y organizativas para proteger tus datos: conexiones cifradas, acceso restringido por roles y protección frente a envíos automáticos. Para limitar abusos guardamos una huella cifrada e irreversible de la dirección IP desde la que se envían formularios o mensajes a Sara (la de los formularios se borra a los 2 días); nunca guardamos la IP en claro.
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">6. Data Security & Retention</h2>
+                <p className="text-muted-foreground">
+                  We implement industry-standard administrative, technical, and physical safeguards to protect your personal information against unauthorized access, alteration, or disclosure. We retain your information only as long as necessary to fulfill the purposes outlined in this policy or to comply with applicable legal obligations.
+                </p>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">9. Tus Derechos</h2>
-            <p className="text-muted-foreground">Puedes ejercer en cualquier momento los derechos de:</p>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              <li><strong>Acceso:</strong> saber qué datos tenemos sobre ti</li>
-              <li><strong>Rectificación:</strong> corregir datos inexactos</li>
-              <li><strong>Supresión:</strong> eliminar tus datos</li>
-              <li><strong>Oposición:</strong> oponerte a un tratamiento</li>
-              <li><strong>Limitación:</strong> restringir el tratamiento</li>
-              <li><strong>Portabilidad:</strong> recibir tus datos en un formato estructurado</li>
-              <li><strong>Retirar el consentimiento</strong> que nos hayas dado, sin que afecte a lo tratado antes</li>
-            </ul>
-            <p className="text-muted-foreground">
-              Escríbenos a <strong>{LEGAL_ENTITY.email}</strong> indicando en el asunto el derecho que quieres ejercer. Te responderemos en el plazo máximo de un mes.
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">7. Updates to This Policy</h2>
+                <p className="text-muted-foreground">
+                  We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.
+                </p>
+                <p className="text-muted-foreground mt-2">
+                  <strong>Last updated:</strong> {LEGAL_UPDATED}
+                </p>
+              </section>
+            </div>
+          ) : (
+            <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
+              <p className="text-muted-foreground">
+                Esta política explica cómo tratamos tus datos personales conforme al Reglamento (UE) 2016/679 General de Protección de Datos (RGPD), la Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD) y la Ley 34/2002 de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE).
+              </p>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">10. Reclamaciones</h2>
-            <p className="text-muted-foreground">
-              Si consideras que no hemos tratado tus datos correctamente, puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD): <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.aepd.es</a>
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">1. Responsable del Tratamiento</h2>
+                <ul className="list-none space-y-1 text-muted-foreground">
+                  {legalIdentityRows().map(([label, value]) => (
+                    <li key={label}><strong>{label}:</strong> {value}</li>
+                  ))}
+                </ul>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">11. Menores</h2>
-            <p className="text-muted-foreground">
-              Nuestros servicios no están dirigidos a menores de 18 años. No recogemos datos de menores intencionadamente.
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">2. Datos que Recogemos</h2>
+                <p className="text-muted-foreground">
+                  Solo tratamos los datos que nos facilitas o que son necesarios para atenderte:
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>Formularios de contacto y de presupuesto (nombre, email, teléfono, sector y lo que nos cuentes de tu proyecto)</li>
+                  <li>Conversaciones con nuestra asistente virtual, Sara</li>
+                  <li>Citas, tickets de soporte y solicitudes de contenido</li>
+                  <li>Registro de cuenta en nuestro portal de clientes</li>
+                  <li>Contacto por WhatsApp o email</li>
+                  <li>Datos técnicos de seguridad (ver apartado 8)</li>
+                </ul>
+                <p className="text-muted-foreground">
+                  No compartas datos especialmente sensibles (salud, ideología, etc.) en los formularios ni en el chat.
+                </p>
+              </section>
 
-          <section>
-            <h2 className="text-xl font-semibold mb-3">12. Actualizaciones</h2>
-            <p className="text-muted-foreground">
-              Esta política puede actualizarse para adaptarla a cambios legales o del servicio. Te recomendamos revisarla periódicamente.
-            </p>
-            <p className="text-muted-foreground mt-4">
-              <strong>Última actualización:</strong> {LEGAL_UPDATED}
-            </p>
-          </section>
+              <section>
+                <h2 className="text-xl font-semibold mb-3">3. Finalidad del Tratamiento</h2>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>Responder a tus solicitudes y consultas</li>
+                  <li>Prepararte y enviarte presupuestos personalizados</li>
+                  <li>Gestionar la relación comercial si contratas nuestros servicios</li>
+                  <li>Proporcionarte soporte técnico y acceso al portal de cliente</li>
+                  <li>Enviarte información comercial sobre nuestros servicios, solo si nos has dado tu consentimiento</li>
+                  <li>Proteger la web frente a abusos y envíos automáticos</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">4. Legitimación</h2>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li><strong>Consentimiento (art. 6.1.a RGPD):</strong> al rellenar un formulario, escribirnos por el chat o suscribirte a comunicaciones comerciales. Puedes retirarlo en cualquier momento.</li>
+                  <li><strong>Ejecución de un contrato o medidas precontractuales (art. 6.1.b RGPD):</strong> para preparar tu presupuesto o prestarte los servicios contratados.</li>
+                  <li><strong>Interés legítimo (art. 6.1.f RGPD):</strong> para garantizar la seguridad de la web y prevenir el fraude.</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">5. Conservación de los Datos</h2>
+                <p className="text-muted-foreground">
+                  Conservamos tus datos mientras se mantenga la relación comercial o durante el tiempo necesario para responder a tu consulta y cumplir las obligaciones legales aplicables.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">6. Destinatarios</h2>
+                <p className="text-muted-foreground">
+                  No vendemos ni cedemos tus datos a terceros, salvo obligación legal. Para prestarte servicio utilizamos proveedores tecnológicos de confianza con las debidas garantías de confidencialidad y seguridad.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">7. Derechos</h2>
+                <p className="text-muted-foreground">
+                  Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando un correo a <strong>info@solutionsnova.es</strong> indicando el derecho que deseas ejercer.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">8. Modificaciones</h2>
+                <p className="text-muted-foreground">
+                  Nos reservamos el derecho a modificar esta política para adaptarla a novedades legislativas o jurisprudenciales.
+                </p>
+                <p className="text-muted-foreground mt-2">
+                  <strong>Última actualización:</strong> {LEGAL_UPDATED}
+                </p>
+              </section>
+            </div>
+          )}
         </div>
-      </div>
-    </main>
-    <Footer />
+      </main>
+      <Footer />
     </>
   );
 };

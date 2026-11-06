@@ -5,26 +5,12 @@ import { Button } from '@/components/ui/button';
 import casosExitoBanner from '@/assets/casos-exito-banner.webp';
 import SectionHeader from '@/components/SectionHeader';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/i18n';
 
-const results = [
-  {
-    icon: Rocket,
-    stat: "<10 días",
-    label: "webs optimizadas"
-  },
-  {
-    icon: Smartphone,
-    stat: "Apps",
-    label: "publicadas en App Store y Google Play"
-  },
-  {
-    icon: Target,
-    stat: "Marcas",
-    label: "listas para escalar"
-  },
-];
+const RESULT_ICONS = [Rocket, Smartphone, Target];
 
 const ResultsSection = () => {
+  const { t } = useTranslation();
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   const reveal = (delay: number) => ({
@@ -36,7 +22,7 @@ const ResultsSection = () => {
     <section ref={ref as React.RefObject<HTMLElement>} className="cv-auto relative py-20 md:py-28 px-4 sm:px-6 overflow-hidden bg-muted/40 border-y border-border">
       <div className="relative z-10 max-w-6xl mx-auto">
         <div {...reveal(0)}>
-          <SectionHeader eyebrow="Resultados" title="Lo que conseguimos para nuestros clientes" />
+          <SectionHeader eyebrow={t.results.eyebrow} title={t.results.title} />
         </div>
 
         {/* Bento grid: one headline result, three supporting ones */}
@@ -51,8 +37,8 @@ const ResultsSection = () => {
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
                 <TrendingUp className="h-5 w-5 text-violet-200" />
               </span>
-              <p className="mt-8 font-display text-6xl font-extrabold tracking-tight sm:text-7xl">+120%</p>
-              <p className="mt-2 text-lg text-white/75">generación de leads</p>
+              <p className="mt-8 font-display text-6xl font-extrabold tracking-tight sm:text-7xl">{t.results.leadStat}</p>
+              <p className="mt-2 text-lg text-white/75">{t.results.leadLabel}</p>
 
               {/* Decorative growth line */}
               <svg viewBox="0 0 300 90" className="mt-auto h-24 w-full pt-6" aria-hidden="true">
@@ -73,23 +59,26 @@ const ResultsSection = () => {
             </div>
           </div>
 
-          {results.map((result, index) => (
-            <div
-              key={result.stat}
-              className={cn(
-                'glass-card spotlight hover-lift p-6',
-                index === 0 && 'col-span-2',
-                reveal(index * 100 + 250).className
-              )}
-              style={reveal(index * 100 + 250).style}
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
-                <result.icon className="h-5 w-5" />
-              </span>
-              <p className="mt-5 font-display text-3xl font-extrabold tracking-tight text-foreground">{result.stat}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{result.label}</p>
-            </div>
-          ))}
+          {t.results.items.map((result, index) => {
+            const Icon = RESULT_ICONS[index] || Rocket;
+            return (
+              <div
+                key={result.stat}
+                className={cn(
+                  'glass-card spotlight hover-lift p-6',
+                  index === 0 && 'col-span-2',
+                  reveal(index * 100 + 250).className
+                )}
+                style={reveal(index * 100 + 250).style}
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <p className="mt-5 font-display text-3xl font-extrabold tracking-tight text-foreground">{result.stat}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{result.label}</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Casos de éxito CTA - Image and Text */}
@@ -98,28 +87,38 @@ const ResultsSection = () => {
             <div className="relative group cursor-pointer overflow-hidden rounded-xl border border-border">
               <img
                 src={casosExitoBanner}
-                alt="Casos de éxito - Aprende con nosotros"
-                width={1024}
-                height={768}
+                alt={t.results.caseStudiesCta.title}
+                width={700}
+                height={400}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-48 md:h-64 object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <span className="text-sm font-medium text-primary flex items-center gap-1">
+                  {t.results.caseStudiesCta.button} <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
             </div>
           </Link>
 
-          <div>
-            <p className="eyebrow mb-3">Casos de éxito</p>
-            <h3 className="text-2xl font-bold text-foreground">Aprende de marcas que lo hicieron bien</h3>
-            <p className="mt-3 text-muted-foreground leading-relaxed">
-              Analizamos historias reales de negocios que crecieron con estrategia digital y te contamos qué hicieron y cómo aplicarlo al tuyo.
+          <div className="flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium w-fit mb-3">
+              <TrendingUp className="w-3.5 h-3.5" />
+              {t.results.caseStudiesCta.badge}
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+              {t.results.caseStudiesCta.title}
+            </h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              {t.results.caseStudiesCta.description}
             </p>
-            <Link to="/casos-exito" className="mt-6 inline-block">
-              <Button size="lg" className="font-semibold">
-                Ver casos de éxito
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+            <Button asChild className="w-fit">
+              <Link to="/casos-exito">
+                {t.results.caseStudiesCta.button}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

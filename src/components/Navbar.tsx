@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { scrollToSectionId } from '@/lib/scroll';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
+import { useTranslation } from '@/i18n';
 
 const ADMIN_EMAIL = 'info@solutionsnova.es';
 
@@ -12,18 +13,8 @@ type NavItem =
   | { label: string; section: string }
   | { label: string; to: string; novaIcon?: boolean };
 
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Plan Web', section: 'plan-web' },
-  { label: 'Servicios', section: 'servicios' },
-  { label: 'Precios', section: 'paquetes' },
-  { label: 'Proyectos', section: 'proyectos' },
-  { label: 'Demos', section: 'demos' },
-  { label: 'Casos de éxito', to: '/casos-exito' },
-  { label: 'Método NOVA', to: '/metodo-nova', novaIcon: true },
-  { label: 'Contacto', section: 'contacto' },
-];
-
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -32,6 +23,17 @@ const Navbar = () => {
   const navigate = useNavigate();
   const isHome = location.pathname === '/';
   const isAdmin = user?.email === ADMIN_EMAIL;
+
+  const NAV_ITEMS: NavItem[] = [
+    { label: t.nav.planWeb, section: 'plan-web' },
+    { label: t.nav.services, section: 'servicios' },
+    { label: t.nav.pricing, section: 'paquetes' },
+    { label: t.nav.projects, section: 'proyectos' },
+    { label: t.nav.demos, section: 'demos' },
+    { label: t.nav.caseStudies, to: '/casos-exito' },
+    { label: t.nav.novaMethod, to: '/metodo-nova', novaIcon: true },
+    { label: t.nav.contact, section: 'contacto' },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -195,7 +197,7 @@ const Navbar = () => {
       onClick={skipToContent}
       className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-foreground"
     >
-      Saltar al contenido
+      {t.nav.skipToContent}
     </a>
     <nav
       className={cn(
@@ -228,7 +230,7 @@ const Navbar = () => {
             {isAdmin && (
               <Link to="/admin" className="relative flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 <Shield className="w-4 h-4" />
-                Admin
+                {t.nav.admin}
                 <NotificationBadge />
               </Link>
             )}
@@ -236,11 +238,11 @@ const Navbar = () => {
             {user ? (
               <Link to="/dashboard" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
                 <User className="w-4 h-4" />
-                Mi cuenta
+                {t.nav.myAccount}
               </Link>
             ) : (
               <Link to="/auth" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-                Acceder
+                {t.nav.login}
               </Link>
             )}
 
@@ -249,7 +251,7 @@ const Navbar = () => {
               onClick={openBriefing}
               className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-[hsl(var(--nova-purple-dark))]"
             >
-              Pide presupuesto
+              {t.nav.getQuote}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -261,7 +263,7 @@ const Navbar = () => {
                 type="button"
                 onClick={() => navigate('/admin')}
                 className="relative p-2 text-foreground/80 hover:text-primary transition-colors"
-                aria-label="Notificaciones"
+                aria-label={t.nav.notifications}
               >
                 <Bell className="w-5 h-5" />
                 <NotificationBadge />
@@ -271,7 +273,7 @@ const Navbar = () => {
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 text-foreground"
-              aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-label={isOpen ? t.nav.closeMenu : t.nav.openMenu}
               aria-expanded={isOpen}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -288,7 +290,7 @@ const Navbar = () => {
               {isAdmin && (
                 <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-2 py-2.5 text-base font-medium text-primary">
                   <Shield className="w-4 h-4" />
-                  Admin
+                  {t.nav.admin}
                   {unreadCount > 0 && (
                     <span className="flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
                       {unreadCount > 99 ? '99+' : unreadCount}
@@ -304,14 +306,14 @@ const Navbar = () => {
                   className="flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground"
                 >
                   <User className="w-4 h-4" />
-                  {user ? 'Mi cuenta' : 'Acceder'}
+                  {user ? t.nav.myAccount : t.nav.login}
                 </Link>
                 <button
                   type="button"
                   onClick={openBriefing}
                   className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
                 >
-                  Pide presupuesto
+                  {t.nav.getQuote}
                 </button>
               </div>
             </div>

@@ -4,56 +4,50 @@ import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import SectionHeader from '@/components/SectionHeader';
-
-const packages = [
-  {
-    id: 'pkg-pro',
-    name: "Paquete Pro",
-    price: 800,
-    priceLabel: "800€",
-    icon: Crown,
-    description: "Ideal para emprendedores que quieren presencia web y redes.",
-    includes: [
-      "Página web profesional",
-      "Contenido para redes sociales (1 mes)",
-    ],
-    freeItems: ["Marketing Digital GRATIS"],
-    highlight: false,
-    note: "Ahorra vs compra individual",
-  },
-  {
-    id: 'pkg-plus',
-    name: "Paquete Plus",
-    price: 1900,
-    priceLabel: "1.900€",
-    icon: Gem,
-    description: "El pack completo para transformar tu negocio digitalmente.",
-    includes: [
-      "Página web profesional",
-      "Contenido para redes sociales (1 mes)",
-      "Branding profesional",
-      "Aplicación móvil MVP",
-    ],
-    freeItems: ["Marketing Digital GRATIS", "1 mes de SEM GRATIS"],
-    highlight: true,
-    note: "No acumulable con código NOVA20",
-  }
-];
+import { useTranslation } from '@/i18n';
 
 const PackagesSection = () => {
+  const { t, isEn } = useTranslation();
   const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
   const { addItem, items, isPromoApplied } = useCart();
+
+  const packages = [
+    {
+      id: 'pkg-pro',
+      name: t.packages.pro.name,
+      price: 800,
+      priceLabel: t.packages.pro.priceLabel,
+      icon: Crown,
+      description: t.packages.pro.description,
+      includes: t.packages.pro.includes,
+      freeItems: t.packages.pro.freeItems,
+      highlight: false,
+      note: t.packages.pro.note,
+    },
+    {
+      id: 'pkg-plus',
+      name: t.packages.plus.name,
+      price: 1900,
+      priceLabel: t.packages.plus.priceLabel,
+      icon: Gem,
+      description: t.packages.plus.description,
+      includes: t.packages.plus.includes,
+      freeItems: t.packages.plus.freeItems,
+      highlight: true,
+      note: t.packages.plus.note,
+    }
+  ];
 
   const handleAddPackage = (pkg: typeof packages[0]) => {
     // Check if already has items
     if (items.length > 0) {
-      toast.error('Vacía tu presupuesto antes de añadir un paquete');
+      toast.error(isEn ? 'Clear your quote before adding a package' : 'Vacía tu presupuesto antes de añadir un paquete');
       return;
     }
     
-    // Check if Paquete Plus and NOVA30 applied
+    // Check if Paquete Plus and promo applied
     if (pkg.id === 'pkg-plus' && isPromoApplied) {
-      toast.error('Paquete Plus no es compatible con el código NOVA20');
+      toast.error(isEn ? 'Plus Package is not compatible with the NOVA20 code' : 'Paquete Plus no es compatible con el código NOVA20');
       return;
     }
 
@@ -64,7 +58,7 @@ const PackagesSection = () => {
       type: 'package' as const,
     };
     addItem(cartItem);
-    toast.success(`${pkg.name} añadido a tu presupuesto`);
+    toast.success(isEn ? `${pkg.name} added to your quote` : `${pkg.name} añadido a tu presupuesto`);
   };
 
   const isInCart = (id: string) => items.some(item => item.id === id);
@@ -76,9 +70,9 @@ const PackagesSection = () => {
         {/* Section header */}
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <SectionHeader
-            eyebrow="Precios"
-            title="Paquetes para empezar con todo"
-            subtitle="Combina servicios y ahorra. Incluyen bonificaciones que no tendrías comprándolos por separado."
+            eyebrow={t.packages.eyebrow}
+            title={t.packages.title}
+            subtitle={t.packages.subtitle}
           />
         </div>
 
@@ -92,7 +86,7 @@ const PackagesSection = () => {
             >
               {pkg.highlight && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 text-white text-xs font-semibold rounded-full whitespace-nowrap z-20 shadow-[0_6px_16px_-6px_hsl(262_78%_45%/0.6)]" style={{ backgroundImage: 'var(--gradient-purple)' }}>
-                  Recomendado
+                  {t.packages.recommended}
                 </div>
               )}
 
@@ -111,7 +105,7 @@ const PackagesSection = () => {
 
               {/* Includes */}
               <div className="mb-4">
-                <p className="text-sm font-medium text-foreground mb-2">Incluye:</p>
+                <p className="text-sm font-medium text-foreground mb-2">{t.packages.includesTitle}</p>
                 <ul className="space-y-2">
                   {pkg.includes.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
@@ -126,7 +120,7 @@ const PackagesSection = () => {
               <div className="mb-6 p-3 rounded-xl bg-primary/5 border border-primary/20">
                 <p className="text-sm font-medium text-primary mb-2 flex items-center gap-2">
                   <Gift className="w-4 h-4" />
-                  Bonificaciones incluidas:
+                  {t.packages.bonusesTitle}
                 </p>
                 <ul className="space-y-1">
                   {pkg.freeItems.map((item, i) => (
@@ -150,23 +144,18 @@ const PackagesSection = () => {
                 {isInCart(pkg.id) ? (
                   <>
                     <Check className="w-4 h-4 mr-2" />
-                    En tu presupuesto
+                    {t.packages.addedToQuote}
                   </>
                 ) : (
                   <>
                     <Plus className="w-4 h-4 mr-2" />
-                    Elegir este paquete
+                    {t.packages.addToQuote}
                   </>
                 )}
               </Button>
             </div>
           ))}
         </div>
-
-        {/* Individual services note */}
-        <p className="text-center text-muted-foreground text-sm mt-8">
-          ¿Prefieres servicios sueltos? Añádelos desde la sección de servicios.
-        </p>
       </div>
     </section>
   );

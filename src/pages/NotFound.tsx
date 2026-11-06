@@ -4,15 +4,23 @@ import { ArrowRight, Home, LayoutGrid, MessageCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NovaMethodIcon from "@/components/NovaMethodIcon";
-
-const SUGGESTIONS = [
-  { to: "/", label: "Inicio", hint: "Webs, apps y marketing", icon: Home },
-  { to: "/#servicios", label: "Servicios y precios", hint: "Lo que podemos hacer por ti", icon: LayoutGrid },
-  { to: "/#contacto", label: "Contacto", hint: "Respuesta en 24 h", icon: MessageCircle },
-];
+import { useTranslation } from "@/i18n";
 
 const NotFound = () => {
   const location = useLocation();
+  const { isEn } = useTranslation();
+
+  const suggestions = isEn
+    ? [
+        { to: "/", label: "Home", hint: "Websites, apps & marketing", icon: Home },
+        { to: "/#servicios", label: "Services & pricing", hint: "What we can build for you", icon: LayoutGrid },
+        { to: "/#contacto", label: "Contact", hint: "Response within 24 hours", icon: MessageCircle },
+      ]
+    : [
+        { to: "/", label: "Inicio", hint: "Webs, apps y marketing", icon: Home },
+        { to: "/#servicios", label: "Servicios y precios", hint: "Lo que podemos hacer por ti", icon: LayoutGrid },
+        { to: "/#contacto", label: "Contacto", hint: "Respuesta en 24 h", icon: MessageCircle },
+      ];
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
@@ -35,13 +43,17 @@ const NotFound = () => {
         <div className="relative mx-auto max-w-2xl text-center">
           <NovaMethodIcon size={88} />
           <p className="mt-8 font-display text-7xl font-extrabold tracking-tight text-gradient md:text-8xl">404</p>
-          <h1 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">Esta página se ha perdido en el espacio</h1>
+          <h1 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">
+            {isEn ? "This page got lost in space" : "Esta página se ha perdido en el espacio"}
+          </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            Puede que el enlace esté mal escrito o que la página ya no exista. Te dejamos algunos sitios por donde seguir.
+            {isEn
+              ? "The link might be broken or the page may no longer exist. Here are a few places to help you get back on track."
+              : "Puede que el enlace esté mal escrito o que la página ya no exista. Te dejamos algunos sitios por donde seguir."}
           </p>
 
           <div className="mt-10 grid gap-3 text-left sm:grid-cols-3">
-            {SUGGESTIONS.map((item) => (
+            {suggestions.map((item) => (
               <Link key={item.to} to={item.to} className="group glass-card hover-lift p-5">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
                   <item.icon className="h-5 w-5" />

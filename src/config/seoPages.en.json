@@ -1,0 +1,42 @@
+{
+  "/": {
+    "title": "NOVA Marketing Solutions | Digital Agency: Websites, Apps & Growth",
+    "description": "Accelerate your business with conversion-focused websites, mobile apps, brand identity, and performance marketing. Request your free custom quote."
+  },
+  "/aviso-legal": {
+    "title": "Terms of Service & Legal Notice | NOVA Marketing Solutions",
+    "description": "Legal notice, terms of service, and website conditions of use for novasolutionsmkt.com."
+  },
+  "/casos-exito": {
+    "title": "Case Studies & Client Results | NOVA Marketing Solutions",
+    "description": "Discover how we help brands scale with proven digital growth strategies. Real case studies from Hawkers, Domino's, and more."
+  },
+  "/casos-exito/dominos": {
+    "title": "Domino's Pizza Case Study: Winning Digital Strategy | NOVA Marketing",
+    "description": "How Domino's transformed its business with digital channels and app ecosystems. Strategic takeaways for any growing company."
+  },
+  "/casos-exito/hawkers": {
+    "title": "Hawkers Case Study: Simple Idea to Global Brand | NOVA Marketing",
+    "description": "Discover how Hawkers disrupted e-commerce and scaled a worldwide sunglasses brand. Actionable lessons for modern founders."
+  },
+  "/instalar-app": {
+    "title": "Install NOVA App | Fast Mobile Access to Client Portal",
+    "description": "Install the NOVA Marketing Solutions web application on iOS or Android. Instant access to project updates and support."
+  },
+  "/invita-a-un-amigo": {
+    "title": "Refer a Friend & Earn 10% Off | NOVA Marketing Solutions",
+    "description": "Share NOVA with your network. Both you and your friend receive a 10% discount on any digital service."
+  },
+  "/metodo-nova": {
+    "title": "The NOVA Method | Proven Digital Roadmap for High Growth",
+    "description": "Our proprietary 5-phase framework: Strategic Diagnosis, Digital Architecture, Conversion UX, Sales Activation, and Ongoing Optimization."
+  },
+  "/politica-de-cookies": {
+    "title": "Cookie Policy | NOVA Marketing Solutions",
+    "description": "Information on cookie usage, analytics, and tracking preferences on novasolutionsmkt.com."
+  },
+  "/politica-de-privacidad": {
+    "title": "Privacy Policy | NOVA Marketing Solutions",
+    "description": "Learn how we safeguard your personal data. Transparent privacy practices for NOVA Marketing Solutions."
+  }
+}

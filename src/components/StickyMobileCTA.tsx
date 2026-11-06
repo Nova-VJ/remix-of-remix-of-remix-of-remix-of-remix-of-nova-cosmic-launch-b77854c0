@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, MessageCircle } from 'lucide-react';
-
-const WHATSAPP_GENERAL = "https://wa.me/34659343822?text=Hola%20NOVA%20Marketing%2C%20quiero%20pedir%20un%20presupuesto%20gratuito.%20Mi%20proyecto%20es%3A%20_____%20y%20me%20gustar%C3%ADa%20recibir%20asesoramiento.";
+import { useTranslation } from '@/i18n';
+import { WHATSAPP_URL } from '@/config/env';
 
 const StickyMobileCTA = () => {
+  const { t, isEn } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -13,14 +14,14 @@ const StickyMobileCTA = () => {
         onClick={() => navigate('/?openBriefing=true')}
         className="btn-glow-sm flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-primary-foreground"
       >
-        <span className="font-semibold">Pide presupuesto</span>
+        <span className="font-semibold">{t.stickyCta.quote}</span>
         <ArrowRight className="h-4 w-4" />
       </button>
       <a
-        href={WHATSAPP_GENERAL}
+        href={WHATSAPP_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Escríbenos por WhatsApp"
+        aria-label={isEn ? "Chat on WhatsApp" : "Escríbenos por WhatsApp"}
         className="flex w-14 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-[#25D366] transition-colors active:bg-accent"
       >
         <MessageCircle className="h-5 w-5" />
