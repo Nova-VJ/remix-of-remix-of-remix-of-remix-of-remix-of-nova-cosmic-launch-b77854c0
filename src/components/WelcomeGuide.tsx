@@ -4,6 +4,7 @@ import { ArrowRight, BadgePercent, Bot, FileText, LayoutGrid, MonitorPlay, X } f
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 import { scrollToSectionId } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
+import { L } from '@/i18n';
 
 const DISMISSED_KEY = 'nova-guide-dismissed';
 const SNOOZE_DAYS = 14;
@@ -12,11 +13,11 @@ const SHOW_AFTER_MS = 5000;
 type Choice = 'own' | 'services' | 'projects' | 'budget' | 'sara';
 
 const OPTIONS: { id: Choice; label: string; icon: React.ElementType; highlight?: boolean }[] = [
-  { id: 'own', label: 'Dejar de pagar comisiones a las apps', icon: BadgePercent, highlight: true },
-  { id: 'services', label: 'Una web, app, marca o redes', icon: LayoutGrid },
-  { id: 'projects', label: 'Ver proyectos que hemos hecho', icon: MonitorPlay },
-  { id: 'budget', label: 'Pedir presupuesto ya', icon: FileText },
-  { id: 'sara', label: 'Preguntar a Sara', icon: Bot },
+  { id: 'own', label: L('Dejar de pagar comisiones a las apps', 'Stop paying commissions to delivery and booking apps'), icon: BadgePercent, highlight: true },
+  { id: 'services', label: L('Una web, app, marca o redes', 'A website, app, brand or social media'), icon: LayoutGrid },
+  { id: 'projects', label: L('Ver proyectos que hemos hecho', 'See projects we have built'), icon: MonitorPlay },
+  { id: 'budget', label: L('Pedir presupuesto ya', 'Get a free quote'), icon: FileText },
+  { id: 'sara', label: L('Preguntar a Sara', 'Ask Sara'), icon: Bot },
 ];
 
 const recentlyDismissed = () => {
@@ -85,7 +86,7 @@ const WelcomeGuide = () => {
 
   return (
     <aside
-      aria-label="¿Qué te trae por aquí?"
+      aria-label={L('¿Qué te trae por aquí?', 'What brings you here?')}
       className={cn(
         'welcome-guide fixed bottom-[5.5rem] left-3 right-20 z-40 md:bottom-24 md:left-auto md:right-4 md:w-[21rem]',
         'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-500'
@@ -95,14 +96,14 @@ const WelcomeGuide = () => {
         <div className="flex items-start gap-3 p-4 pb-3">
           <img src={metodoNovaIcon} alt="" width={36} height={36} className="h-9 w-9 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
-            <p className="font-display font-bold text-foreground">¿Qué te trae por aquí?</p>
-            <p className="text-xs text-muted-foreground">Te llevamos directo a lo que buscas.</p>
+            <p className="font-display font-bold text-foreground">{L('¿Qué te trae por aquí?', 'What brings you here?')}</p>
+            <p className="text-xs text-muted-foreground">{L('Te llevamos directo a lo que buscas.', 'We’ll take you straight to what you need.')}</p>
           </div>
           <button
             type="button"
             onClick={dismiss}
             className="-mr-1 -mt-1 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Cerrar"
+            aria-label={L('Cerrar', 'Close')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -130,7 +131,7 @@ const WelcomeGuide = () => {
           onClick={dismiss}
           className="w-full border-t border-border py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
         >
-          Solo estoy mirando
+          {L('Solo estoy mirando', 'Just browsing')}
         </button>
       </div>
     </aside>

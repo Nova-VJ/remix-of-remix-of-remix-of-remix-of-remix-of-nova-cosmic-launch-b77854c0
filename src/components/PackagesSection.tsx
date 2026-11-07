@@ -4,7 +4,7 @@ import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import SectionHeader from '@/components/SectionHeader';
-import { useTranslation } from '@/i18n';
+import { useTranslation, L } from '@/i18n';
 
 const PackagesSection = () => {
   const { t, isEn } = useTranslation();
@@ -156,6 +156,11 @@ const PackagesSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Individual services note */}
+        <p className="text-center text-muted-foreground text-sm mt-8">
+          {L('¿Prefieres servicios sueltos? Añádelos desde la sección de servicios.', 'Prefer individual services? Add them from the services section.')}
+        </p>
       </div>
     </section>
   );

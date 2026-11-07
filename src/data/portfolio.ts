@@ -1,3 +1,5 @@
+import { isEn } from '@/i18n';
+
 // Projects shown in the "Proyectos" section of the home page.
 // The section hides itself while this list is empty.
 //
@@ -30,7 +32,7 @@ export interface PortfolioProject {
   testimonial?: { quote: string; name: string; business: string; photo?: string; rating: number };
 }
 
-export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
+const PROJECTS_ES: PortfolioProject[] = [
   {
     id: 'novasystem',
     kind: 'Software de gestión · Comercio minorista · Nueva versión',
@@ -103,3 +105,60 @@ export const PORTFOLIO_PROJECTS: PortfolioProject[] = [
     frame: 'game',
   },
 ];
+
+// English texts for novasolutionsmkt.com (same projects, same media)
+const EN: Record<string, Partial<PortfolioProject>> = {
+  novasystem: {
+    kind: 'Business software · Retail · New version',
+    title: 'NovaStock: your store, your stock and your books, now from your phone too',
+    description:
+      'Point of sale with barcode scanner, inventory with low-stock alerts, customers, invoicing, reports and accounting. The new version adds what saves the most time day to day: scan delivery notes with your phone and the products go straight into your inventory, compare suppliers every week to buy better, and get alerted before anything runs out.',
+    highlights: ['New: delivery notes from your phone', 'New: supplier search', 'New: stock forecasting', 'Point of sale', 'Invoicing', 'Accounting'],
+    frameLabel: 'novastock · all-in-one management',
+  },
+  lupa: {
+    kind: 'AI client acquisition · In-house tool',
+    title: 'Lupa Nova: find your next clients while you work',
+    description:
+      'Pick a niche and a city (dentists in Miami, auto shops in Dallas, hotels on the coast…) and Lupa finds every business in the area, analyzes each website one by one and spots what is costing them customers: no chat, no online booking, slow on mobile, outdated. Then it prepares a personalized value proposal for each one and sends it under your name, only where outreach is allowed. You just talk to the ones who reply.',
+    highlights: ['Any niche', 'City-wide analysis', 'Personalized proposals', 'Automatic sending', 'Reply tracking'],
+    frameLabel: 'lupa nova · opportunities',
+    note: 'Screenshot with sample businesses.',
+  },
+  valetos: {
+    kind: 'SaaS platform · Real time',
+    title: 'ValetOS: the operating system for a valet parking business',
+    description:
+      'Cars, keys, staff, customers and money on one platform. Five connected views that update instantly: supervision, the team’s mobile app, a customer portal by QR code, finances and an AI assistant that answers by text or voice.',
+    highlights: ['Web app + mobile', 'Real time', 'AI assistant', 'Roles & permissions', 'Payments & tips'],
+    frameLabel: 'valetos · operations dashboard',
+  },
+  freshpooch: {
+    kind: 'Website + client portal · Home services',
+    title: 'A service business, automated end to end',
+    description:
+      'An exact quote in under 90 seconds, online booking, a client portal with full history, an app for the professional on the road, an owner dashboard with revenue and a bilingual AI concierge that sells 24/7.',
+    highlights: ['Instant quotes', 'Bookings', 'Client portal', 'Owner dashboard', 'Bilingual AI'],
+    frameLabel: 'bookings · client portal',
+  },
+  cardgame: {
+    kind: 'Personal project · Video game',
+    title: 'A strategy card game, from idea to game board',
+    description:
+      'Two factions, heroes with powers, an animated turn-based board and a compendium to build decks. Game design, interface and logic: proof that we also bring personal projects to life.',
+    highlights: ['Game design', 'Animated interface', 'Deck builder', 'Turn-based logic'],
+  },
+};
+
+export const PORTFOLIO_PROJECTS: PortfolioProject[] = isEn
+  ? PROJECTS_ES.map((p) => ({
+      ...p,
+      ...EN[p.id],
+      // Real client words, translated; the original Spanish stays on solutionsnova.es
+      testimonial: p.testimonial && {
+        ...p.testimonial,
+        quote:
+          'Since I started using NovaStock I can scan delivery notes with my phone and add them straight to my inventory, I find new and better suppliers every week, and I keep my stock under control so I can grow it and never run out of anything. It’s wonderful! (translated from Spanish)',
+      },
+    }))
+  : PROJECTS_ES;

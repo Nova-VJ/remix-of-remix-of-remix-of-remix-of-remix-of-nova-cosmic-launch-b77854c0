@@ -33,6 +33,7 @@ import {
   Download,
   PhoneCall
 } from 'lucide-react';
+import { L } from '@/i18n';
 
 type FlowState = 
   | 'welcome'
@@ -80,7 +81,7 @@ const VirtualAssistant = () => {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      addBotMessage('¡Hola! 👋 Soy Sara, tu asistente virtual de Nova Marketing Solutions.\n\nPuedo ayudarte a resolver dudas, ver servicios y precios, o hacer seguimiento de tu proyecto.');
+      addBotMessage(L('¡Hola! 👋 Soy Sara, tu asistente virtual de Nova Marketing Solutions.\n\nPuedo ayudarte a resolver dudas, ver servicios y precios, o hacer seguimiento de tu proyecto.', 'Hi! 👋 I\'m Sara, the virtual assistant at Nova Marketing Solutions.\n\nI can answer your questions, show you our services and pricing, or help you follow up on your project.'));
     }
   }, [isOpen]);
 
@@ -113,22 +114,22 @@ const VirtualAssistant = () => {
   const handleMainOption = (optionId: string) => {
     switch (optionId) {
       case 'ai-chat':
-        addUserMessage('Chat con Sara (IA)');
+        addUserMessage(L('Chat con Sara (IA)', 'Chat with Sara (AI)'));
         setFlowState('ai-chat');
         break;
       case 'faq':
-        addUserMessage('Preguntas frecuentes');
-        addBotMessage('Selecciona una categoría para ver las preguntas frecuentes:');
+        addUserMessage(L('Preguntas frecuentes', 'FAQ'));
+        addBotMessage(L('Selecciona una categoría para ver las preguntas frecuentes:', 'Choose a category to see the frequently asked questions:'));
         setFlowState('faq');
         break;
       case 'services':
-        addUserMessage('Ver servicios y precios');
-        addBotMessage('¿Qué tipo de servicio te interesa?');
+        addUserMessage(L('Ver servicios y precios', 'See services & pricing'));
+        addBotMessage(L('¿Qué tipo de servicio te interesa?', 'What kind of service are you interested in?'));
         setFlowState('services');
         break;
       case 'support':
-        addUserMessage('Soporte y mantenimiento');
-        addBotMessage('¿Cómo podemos ayudarte?');
+        addUserMessage(L('Soporte y mantenimiento', 'Support & maintenance'));
+        addBotMessage(L('¿Cómo podemos ayudarte?', 'How can we help you?'));
         setFlowState('support');
         break;
       case 'whatsapp':
@@ -136,24 +137,24 @@ const VirtualAssistant = () => {
         handleWhatsApp();
         break;
       case 'email':
-        addUserMessage('Enviar correo');
+        addUserMessage(L('Enviar correo', 'Send an email'));
         setFlowState('email');
         break;
       case 'agent':
-        addUserMessage('Hablar con un agente');
+        addUserMessage(L('Hablar con un agente', 'Talk to a person'));
         setFlowState('agent');
         break;
       case 'cybersecurity':
-        addUserMessage('Ciberseguridad / Pentesting');
+        addUserMessage(L('Ciberseguridad / Pentesting', 'Cybersecurity / Pentesting'));
         setSelectedService('cybersecurity');
         setFlowState('service-category');
         break;
       case 'voice-call':
-        addUserMessage('Llamar a Sara');
+        addUserMessage(L('Llamar a Sara', 'Call Sara'));
         setFlowState('voice-call');
         break;
       case 'install-app':
-        addUserMessage('Instalar App');
+        addUserMessage(L('Instalar App', 'Install the app'));
         navigate('/instalar-app');
         setIsOpen(false);
         break;
@@ -162,8 +163,8 @@ const VirtualAssistant = () => {
           navigate('/dashboard');
           setIsOpen(false);
         } else {
-          addUserMessage('Portal de cliente');
-          addBotMessage('Para acceder al portal de cliente, necesitas iniciar sesión o crear una cuenta.');
+          addUserMessage(L('Portal de cliente', 'Client portal'));
+          addBotMessage(L('Para acceder al portal de cliente, necesitas iniciar sesión o crear una cuenta.', 'To access the client portal, please log in or create an account.'));
           setFlowState('client-portal');
         }
         break;
@@ -171,7 +172,7 @@ const VirtualAssistant = () => {
   };
 
   const handleWhatsApp = (customMessage?: string) => {
-    const message = customMessage || 'Hola Nova, quiero información sobre vuestros servicios.';
+    const message = customMessage || L('Hola Nova, quiero información sobre vuestros servicios.', 'Hi Nova, I\'d like information about your services.');
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -197,7 +198,7 @@ const VirtualAssistant = () => {
 
   const handleRequestQuote = (packName: string) => {
     setQuoteServiceType(packName);
-    addBotMessage('¡Perfecto! Completa este formulario y te enviaremos un presupuesto personalizado.');
+    addBotMessage(L('¡Perfecto! Completa este formulario y te enviaremos un presupuesto personalizado.', 'Great! Fill in this form and we\'ll send you a personalized quote.'));
     setFlowState('quote');
   };
 
@@ -236,41 +237,41 @@ const VirtualAssistant = () => {
   };
 
   const handleFormComplete = () => {
-    addBotMessage('¡Gracias! 🙌 Nuestro equipo te contactará en breve. ¿Hay algo más en lo que pueda ayudarte?');
+    addBotMessage(L('¡Gracias! 🙌 Nuestro equipo te contactará en breve. ¿Hay algo más en lo que pueda ayudarte?', 'Thank you! 🙌 Our team will contact you shortly. Is there anything else I can help you with?'));
     setFlowState('welcome');
   };
 
   const handleFormCancel = () => {
-    addBotMessage('Sin problema. ¿Hay algo más en lo que pueda ayudarte?');
+    addBotMessage(L('Sin problema. ¿Hay algo más en lo que pueda ayudarte?', 'No problem. Is there anything else I can help you with?'));
     setFlowState('welcome');
   };
 
   // 'ai-chat' is rendered as the highlighted card above these
   const quickOptions: ChatOption[] = [
-    { id: 'services', label: 'Servicios y precios', icon: <Briefcase className="w-4 h-4" /> },
-    { id: 'faq', label: 'Preguntas frecuentes', icon: <HelpCircle className="w-4 h-4" /> },
+    { id: 'services', label: L('Servicios y precios', 'Services & pricing'), icon: <Briefcase className="w-4 h-4" /> },
+    { id: 'faq', label: L('Preguntas frecuentes', 'FAQ'), icon: <HelpCircle className="w-4 h-4" /> },
     { id: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle className="w-4 h-4" /> },
-    { id: 'agent', label: 'Hablar con un agente', icon: <Phone className="w-4 h-4" /> },
+    { id: 'agent', label: L('Hablar con un agente', 'Talk to a person'), icon: <Phone className="w-4 h-4" /> },
   ];
 
   const moreOptions: ChatOption[] = [
     // { id: 'voice-call', label: 'Llamar a Sara 🎙️', icon: <PhoneCall className="w-4 h-4" /> },
-    { id: 'support', label: 'Soporte y mantenimiento', icon: <Wrench className="w-4 h-4" /> },
-    { id: 'email', label: 'Enviar correo', icon: <Mail className="w-4 h-4" /> },
-    { id: 'cybersecurity', label: 'Ciberseguridad / Pentesting', icon: <Shield className="w-4 h-4" /> },
-    { id: 'install-app', label: 'Instalar App', icon: <Download className="w-4 h-4" /> },
+    { id: 'support', label: L('Soporte y mantenimiento', 'Support & maintenance'), icon: <Wrench className="w-4 h-4" /> },
+    { id: 'email', label: L('Enviar correo', 'Send an email'), icon: <Mail className="w-4 h-4" /> },
+    { id: 'cybersecurity', label: L('Ciberseguridad / Pentesting', 'Cybersecurity / Pentesting'), icon: <Shield className="w-4 h-4" /> },
+    { id: 'install-app', label: L('Instalar App', 'Install the app'), icon: <Download className="w-4 h-4" /> },
   ];
 
   if (user) {
-    moreOptions.unshift({ id: 'client-portal', label: 'Mi Portal', icon: <User className="w-4 h-4" /> });
+    moreOptions.unshift({ id: 'client-portal', label: L('Mi Portal', 'My Portal'), icon: <User className="w-4 h-4" /> });
   }
 
   const serviceOptions: ChatOption[] = [
-    { id: 'web', label: 'Páginas Web', icon: <Globe className="w-4 h-4" /> },
-    { id: 'apps', label: 'Aplicaciones Móviles', icon: <Smartphone className="w-4 h-4" /> },
-    { id: 'social', label: 'Redes Sociales', icon: <Share2 className="w-4 h-4" /> },
+    { id: 'web', label: L('Páginas Web', 'Websites'), icon: <Globe className="w-4 h-4" /> },
+    { id: 'apps', label: L('Aplicaciones Móviles', 'Mobile Apps'), icon: <Smartphone className="w-4 h-4" /> },
+    { id: 'social', label: L('Redes Sociales', 'Social Media'), icon: <Share2 className="w-4 h-4" /> },
     { id: 'branding', label: 'Branding', icon: <Palette className="w-4 h-4" /> },
-    { id: 'cybersecurity', label: 'Ciberseguridad', icon: <Shield className="w-4 h-4" /> },
+    { id: 'cybersecurity', label: L('Ciberseguridad', 'Cybersecurity'), icon: <Shield className="w-4 h-4" /> },
   ];
 
   const faqOptions: ChatOption[] = Object.entries(FAQ_CATEGORIES).map(([key, cat]) => ({
@@ -279,9 +280,9 @@ const VirtualAssistant = () => {
   }));
 
   const supportOptions: ChatOption[] = [
-    { id: 'ticket', label: 'Crear ticket de soporte' },
-    { id: 'maintenance', label: 'Consultar mantenimiento' },
-    { id: 'whatsapp', label: 'WhatsApp directo' },
+    { id: 'ticket', label: L('Crear ticket de soporte', 'Create a support ticket') },
+    { id: 'maintenance', label: L('Consultar mantenimiento', 'Check maintenance') },
+    { id: 'whatsapp', label: L('WhatsApp directo', 'WhatsApp us') },
   ];
 
   const renderContent = () => {
@@ -299,8 +300,8 @@ const VirtualAssistant = () => {
                 <MessageCircleMore className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold">Habla con Sara</span>
-                <span className="block text-xs text-white/80">Resuelve tus dudas y recibe un presupuesto orientativo al momento</span>
+                <span className="block text-sm font-semibold">{L('Habla con Sara', 'Chat with Sara')}</span>
+                <span className="block text-xs text-white/80">{L('Resuelve tus dudas y recibe un presupuesto orientativo al momento', 'Get your questions answered and an instant estimate')}</span>
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 opacity-80 transition-transform group-hover:translate-x-0.5" />
             </button>
@@ -308,7 +309,7 @@ const VirtualAssistant = () => {
             <ChatOptions options={quickOptions} onSelect={handleMainOption} columns={2} />
 
             <div>
-              <p className="mb-1 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Más opciones</p>
+              <p className="mb-1 px-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{L('Más opciones', 'More options')}</p>
               <ChatOptions options={moreOptions} onSelect={handleMainOption} />
             </div>
           </div>
@@ -324,7 +325,7 @@ const VirtualAssistant = () => {
               className="h-8 px-2 text-xs"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
-              Volver
+              {L('Volver', 'Back')}
             </Button>
             <ChatOptions 
               options={faqOptions} 
@@ -352,7 +353,7 @@ const VirtualAssistant = () => {
               className="h-8 px-2 text-xs"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
-              Volver
+              {L('Volver', 'Back')}
             </Button>
             <ChatOptions 
               options={serviceOptions} 
@@ -395,7 +396,7 @@ const VirtualAssistant = () => {
               className="h-8 px-2 text-xs"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
-              Volver
+              {L('Volver', 'Back')}
             </Button>
             <ChatOptions 
               options={supportOptions} 
@@ -403,9 +404,9 @@ const VirtualAssistant = () => {
                 if (id === 'ticket') {
                   setFlowState('ticket');
                 } else if (id === 'whatsapp') {
-                  handleWhatsApp('Hola Nova, necesito soporte técnico.');
+                  handleWhatsApp(L('Hola Nova, necesito soporte técnico.', 'Hi Nova, I need technical support.'));
                 } else {
-                  addBotMessage('Para consultar el estado de tu mantenimiento, accede a tu portal de cliente o contacta con nosotros.');
+                  addBotMessage(L('Para consultar el estado de tu mantenimiento, accede a tu portal de cliente o contacta con nosotros.', 'To check your maintenance status, open your client portal or contact us.'));
                 }
               }}
             />
@@ -455,17 +456,17 @@ const VirtualAssistant = () => {
               className="h-8 px-2 text-xs"
             >
               <ArrowLeft className="w-3 h-3 mr-1" />
-              Volver
+              {L('Volver', 'Back')}
             </Button>
             <div className="text-center space-y-3">
               <User className="w-12 h-12 mx-auto text-muted-foreground" />
-              <p className="text-sm">Accede a tu portal para ver:</p>
+              <p className="text-sm">{L('Accede a tu portal para ver:', 'Open your portal to see:')}</p>
               <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Estado de tu proyecto</li>
-                <li>• Calendario de mantenimientos</li>
-                <li>• Tickets de soporte</li>
-                <li>• Entregables y descargas</li>
-                <li>• Sistema de referidos</li>
+                <li>{L('• Estado de tu proyecto', '• Your project status')}</li>
+                <li>{L('• Calendario de mantenimientos', '• Maintenance schedule')}</li>
+                <li>{L('• Tickets de soporte', '• Support tickets')}</li>
+                <li>{L('• Entregables y descargas', '• Deliverables and downloads')}</li>
+                <li>{L('• Sistema de referidos', '• Referral program')}</li>
               </ul>
               <div className="flex gap-2">
                 <Button 
@@ -475,7 +476,7 @@ const VirtualAssistant = () => {
                   }}
                   className="flex-1"
                 >
-                  Iniciar sesión
+                  {L('Iniciar sesión', 'Log in')}
                 </Button>
                 <Button 
                   variant="outline"
@@ -485,7 +486,7 @@ const VirtualAssistant = () => {
                   }}
                   className="flex-1"
                 >
-                  Crear cuenta
+                  {L('Crear cuenta', 'Create account')}
                 </Button>
               </div>
             </div>
@@ -508,7 +509,7 @@ const VirtualAssistant = () => {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Chat con Sara, asistente virtual de NOVA"
+          aria-label={L('Chat con Sara, asistente virtual de NOVA', 'Chat with Sara, NOVA\'s virtual assistant')}
           className="fixed bottom-40 md:bottom-24 right-4 z-50 w-[380px] sm:w-[400px] max-w-[calc(100vw-2rem)] bg-background/95 backdrop-blur-xl border border-border/60 rounded-3xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.55)] overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 flex flex-col"
           style={{ maxHeight: 'min(620px, calc(100dvh - 10rem))' }}
         >
@@ -525,12 +526,12 @@ const VirtualAssistant = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-[15px] font-semibold leading-tight">Sara</h3>
-                <p className="text-xs text-white/80">Asistente de NOVA · En línea</p>
+                <p className="text-xs text-white/80">{L('Asistente de NOVA · En línea', 'NOVA assistant · Online')}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                aria-label="Cerrar chat"
+                aria-label={L('Cerrar chat', 'Close chat')}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-white/90 transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
                 <X className="h-5 w-5" />

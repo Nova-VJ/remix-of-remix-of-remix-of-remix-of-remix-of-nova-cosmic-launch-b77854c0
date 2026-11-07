@@ -2,14 +2,15 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Lightbulb } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { FOTOS_VERSION, SECTOR_DEMOS } from '@/data/demos';
+import { L } from '@/i18n';
 
 const DemosSection = () => (
   <section id="demos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
     <div className="mx-auto max-w-6xl">
       <SectionHeader
-        eyebrow="Demos por sector"
-        title="¿Cómo quedaría tu negocio?"
-        subtitle="Elige tu sector y prueba una web de ejemplo: reserva online, asistente de chat, app en Google Play y App Store, y el panel para gestionarlo todo."
+        eyebrow={L('Demos por sector', 'Demos by industry')}
+        title={L('¿Cómo quedaría tu negocio?', 'What would your business look like?')}
+        subtitle={L('Elige tu sector y prueba una web de ejemplo: reserva online, asistente de chat, app en Google Play y App Store, y el panel para gestionarlo todo.', 'Pick your industry and try a sample website: online booking, chat assistant, an app on Google Play and the App Store, and the dashboard to manage it all.')}
       />
 
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
@@ -34,7 +35,7 @@ const DemosSection = () => (
               </span>
               <span className="relative text-base font-bold leading-tight sm:text-lg">{sector}</span>
               <span className="relative mt-1 inline-flex items-center gap-1 text-sm font-medium text-white/85 group-hover:text-white">
-                Ver demo
+                {L('Ver demo', 'View demo')}
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </a>
@@ -48,9 +49,9 @@ const DemosSection = () => (
             <span className="mb-auto flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg" style={{ backgroundImage: 'var(--gradient-purple)' }}>
               <Lightbulb className="h-5 w-5" aria-hidden="true" />
             </span>
-            <span className="text-base font-bold leading-tight text-foreground sm:text-lg">¿No ves tu sector?</span>
+            <span className="text-base font-bold leading-tight text-foreground sm:text-lg">{L('¿No ves tu sector?', 'Don’t see your industry?')}</span>
             <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary">
-              Cuéntanos tu proyecto
+              {L('Cuéntanos tu proyecto', 'Tell us about your project')}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </span>
           </Link>
@@ -58,9 +59,9 @@ const DemosSection = () => (
       </ul>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Son negocios inventados para enseñarte el resultado; las fotos de ambiente están creadas con IA.{' '}
+        {L('Son negocios inventados para enseñarte el resultado; las fotos de ambiente están creadas con IA.', 'These are fictional businesses built to show you the result; the photos are AI-generated. The demo sites are in Spanish for now.')}{' '}
         <a href="/demos/" target="_blank" rel="noopener" className="font-medium text-primary underline-offset-4 hover:underline">
-          Ver todas las demos
+          {L('Ver todas las demos', 'See all demos')}
         </a>
       </p>
     </div>

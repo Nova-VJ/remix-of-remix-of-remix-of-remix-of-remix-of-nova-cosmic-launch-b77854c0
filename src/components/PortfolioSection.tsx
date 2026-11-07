@@ -5,6 +5,7 @@ import DemoVideo from '@/components/DemoVideo';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '@/data/portfolio';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { cn } from '@/lib/utils';
+import { L } from '@/i18n';
 
 const MediaFrame = ({ project }: { project: PortfolioProject }) => {
   const media = project.video ? (
@@ -102,9 +103,9 @@ const PortfolioSection = () => {
     <section id="proyectos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
-          eyebrow="Proyectos"
-          title="Software real, funcionando"
-          subtitle="Herramientas que usamos nosotros mismos, sistemas a medida para negocios y también proyectos personales. Si lo puedes imaginar, lo diseñamos y lo construimos."
+          eyebrow={L('Proyectos', 'Projects')}
+          title={L('Software real, funcionando', 'Real software, up and running')}
+          subtitle={L('Herramientas que usamos nosotros mismos, sistemas a medida para negocios y también proyectos personales. Si lo puedes imaginar, lo diseñamos y lo construimos.', 'Tools we use ourselves, custom systems for businesses and personal projects too. If you can imagine it, we design it and build it.')}
         />
 
         <div className="space-y-20 md:space-y-28">
@@ -117,26 +118,27 @@ const PortfolioSection = () => {
         <div className="mt-20 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10">
           <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-10">
             <div>
-              <p className="eyebrow">Nuestra trayectoria</p>
-              <h3 className="mt-3 text-2xl font-bold leading-tight text-foreground md:text-3xl">Decenas de páginas web y clientes satisfechos</h3>
+              <p className="eyebrow">{L('Nuestra trayectoria', 'Our track record')}</p>
+              <h3 className="mt-3 text-2xl font-bold leading-tight text-foreground md:text-3xl">{L('Decenas de páginas web y clientes satisfechos', 'Dozens of websites and happy clients')}</h3>
               <p className="mt-4 leading-relaxed text-muted-foreground">
-                Muchas de las webs que hemos hecho se crearon hace años. Desde entonces, nuestros estándares de diseño y despliegue han evolucionado al
-                ritmo de la industria, tanto en diseño como en estructura: webs más rápidas, pensadas primero para el móvil y preparadas para Google.
-                Los proyectos de esta página son el reflejo de cómo trabajamos hoy.
+                {L(
+                  'Muchas de las webs que hemos hecho se crearon hace años. Desde entonces, nuestros estándares de diseño y despliegue han evolucionado al ritmo de la industria, tanto en diseño como en estructura: webs más rápidas, pensadas primero para el móvil y preparadas para Google. Los proyectos de esta página son el reflejo de cómo trabajamos hoy.',
+                  'Many of the websites we have built were created years ago. Since then, our design and deployment standards have evolved with the industry, in both design and structure: faster sites, built mobile-first and ready for Google. The projects on this page reflect how we work today.'
+                )}
               </p>
             </div>
             <div className="rounded-2xl bg-accent/50 p-6">
               <span className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-lg" style={{ backgroundImage: 'var(--gradient-purple)' }}>
                 <Sparkles className="h-5 w-5" aria-hidden="true" />
               </span>
-              <p className="mt-4 font-semibold text-foreground">¿Tu web ya tiene unos años?</p>
-              <p className="mt-1 text-sm text-muted-foreground">Le damos un cambio de imagen y la ponemos al día. Te decimos qué mejorar, sin compromiso.</p>
+              <p className="mt-4 font-semibold text-foreground">{L('¿Tu web ya tiene unos años?', 'Is your website a few years old?')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{L('Le damos un cambio de imagen y la ponemos al día. Te decimos qué mejorar, sin compromiso.', 'We give it a fresh look and bring it up to date. We’ll tell you what to improve, no strings attached.')}</p>
               <button
                 type="button"
                 onClick={() => navigate('/?openBriefing=true')}
                 className="btn-glow-sm mt-5 inline-flex items-center gap-2 whitespace-nowrap text-primary-foreground"
               >
-                Moderniza tu web
+                {L('Moderniza tu web', 'Modernize your website')}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
@@ -150,8 +152,8 @@ const PortfolioSection = () => {
               <Lightbulb className="h-6 w-6" />
             </span>
             <div>
-              <h3 className="text-lg font-bold text-foreground">¿Tienes una idea propia?</h3>
-              <p className="mt-1 text-muted-foreground">Una app, una herramienta interna, un juego… Cuéntanosla y te decimos cómo hacerla realidad.</p>
+              <h3 className="text-lg font-bold text-foreground">{L('¿Tienes una idea propia?', 'Have an idea of your own?')}</h3>
+              <p className="mt-1 text-muted-foreground">{L('Una app, una herramienta interna, un juego… Cuéntanosla y te decimos cómo hacerla realidad.', 'An app, an internal tool, a game… Tell us about it and we’ll show you how to make it real.')}</p>
             </div>
           </div>
           <button
@@ -159,7 +161,7 @@ const PortfolioSection = () => {
             onClick={() => navigate('/?openBriefing=true')}
             className="btn-glow-sm inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-primary-foreground"
           >
-            Cuéntanos tu idea
+            {L('Cuéntanos tu idea', 'Tell us your idea')}
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>

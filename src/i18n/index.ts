@@ -34,13 +34,16 @@ export const dictionaries: Record<Locale, TranslationSchema> = {
   en,
 };
 
+/** Inline text by locale: L('español', 'English') */
+export const L = <T,>(es: T, en: T): T => (isEn ? en : es);
+
 export const t: TranslationSchema = dictionaries[locale];
 
 export const formatCurrency = (amount: number): string => {
   if (isEn) {
     return `$${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount)}`;
   }
-  return `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(amount)}€`;
+  return `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(amount)} €`;
 };
 
 export const formatPriceWithPeriod = (amount: number, isMonthly?: boolean): string => {

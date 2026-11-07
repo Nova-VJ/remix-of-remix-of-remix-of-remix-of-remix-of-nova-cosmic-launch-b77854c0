@@ -17,6 +17,7 @@ import { useCart } from '@/contexts/CartContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { L } from '@/i18n';
 
 interface BriefingFormModalProps {
   open: boolean;
@@ -25,7 +26,9 @@ interface BriefingFormModalProps {
   fromCart?: boolean;
 }
 
-const FORMSPREE_URL = 'https://formspree.io/f/mojvgloz';
+// Each site sends its form to its own inbox. Formspree decides the destination address:
+// Spain → form mojvgloz; USA → the form linked to info@novasolutionsmkt.com (VITE_FORMSPREE_URL_EN).
+const FORMSPREE_URL = L('https://formspree.io/f/mojvgloz', import.meta.env.VITE_FORMSPREE_URL_EN || 'https://formspree.io/f/mojvgloz');
 
 // Helper to generate readable summary
 const generateSummary = (data: BriefingFormData): string => {
@@ -336,6 +339,7 @@ const BriefingFormModal = ({
       
       // Add summary as first field for readability
       submitData.append('resumen_formulario', resumen);
+      submitData.append('enviado_desde', window.location.hostname);
       
       // Add all form fields
       Object.entries(formData).forEach(([key, value]) => {

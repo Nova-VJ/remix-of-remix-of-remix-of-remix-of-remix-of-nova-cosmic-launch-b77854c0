@@ -564,6 +564,7 @@ export const SERVICES_DATA = {
   }
 };
 
-export const WHATSAPP_NUMBER = '34659343822';
-export const CONTACT_EMAIL = 'info@solutionsnova.es';
+// Locale-aware (Spain / USA): see src/config/env.ts
+export { WHATSAPP_NUMBER, CONTACT_EMAIL } from '@/config/env';
+
 export const CALENDLY_LINK = 'https://calendly.com/solutionsnova';

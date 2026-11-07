@@ -132,7 +132,7 @@ const AuditPopup = () => {
               <Button
                 onClick={handleEmail}
                 variant="outline"
-                className="flex-1 border-white/20 text-white hover:bg-white/10 font-semibold text-sm"
+                className="flex-1 border-white/30 bg-white/5 text-white hover:bg-white/15 hover:text-white font-semibold text-sm"
               >
                 <Mail className="w-4 h-4 mr-2" />
                 {t.auditPopup.emailBtn}

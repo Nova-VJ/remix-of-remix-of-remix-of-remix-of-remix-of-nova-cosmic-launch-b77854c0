@@ -11,7 +11,7 @@ export const es: TranslationSchema = {
     whatsappUrl: 'https://wa.me/34659343822',
     currency: 'EUR',
     currencySymbol: '€',
-    agencyLocation: 'Valladolid, España',
+    agencyLocation: 'Valladolid',
   },
   nav: {
     planWeb: 'Plan Web',
@@ -163,9 +163,9 @@ export const es: TranslationSchema = {
   },
   services: {
     eyebrow: 'Servicios',
-    title: 'Soluciones pensadas para dar resultados',
+    title: 'Todo lo que tu negocio necesita para crecer online',
     subtitle:
-      'Cada servicio resuelve un problema concreto de tu negocio: conseguir visitas, convertirlas en clientes o ahorrar tiempo.',
+      'Elige un servicio o combínalos. Los precios son orientativos: analizamos tu proyecto y te enviamos el presupuesto final sin compromiso.',
     startingFrom: 'desde ',
     perMonth: '/mes',
     oneTimePayment: 'pago único',
@@ -252,7 +252,7 @@ export const es: TranslationSchema = {
     recommended: 'Recomendado',
     includesTitle: 'Incluye:',
     bonusesTitle: 'Bonificaciones incluidas:',
-    addToQuote: 'Añadir a mi presupuesto',
+    addToQuote: 'Elegir este paquete',
     addedToQuote: 'Añadido a tu presupuesto',
     pro: {
       name: 'Paquete Pro',

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Bot, Check, Globe, Mail, MessageCircle, Palette, ShieldCheck, Sparkles, Star, Wrench } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
-import { useTranslation } from '@/i18n';
+import { useTranslation, L } from '@/i18n';
 import { WHATSAPP_URL } from '@/config/env';
 
 const INCLUDE_ICONS = [Globe, Bot, Palette, Mail, ShieldCheck, Wrench];
@@ -186,6 +186,13 @@ const SubscriptionSection = () => {
                     </li>
                   ))}
                 </ol>
+
+                <p className="mt-10 text-xs leading-relaxed text-white/45">
+                  {L(
+                    'Primero evaluamos tu proyecto, sin compromiso; por eso el Plan Web se pide por el formulario o por WhatsApp, no desde el presupuesto online. El cambio mensual no es acumulable. El código NOVA20 no se aplica a la suscripción.',
+                    'We review your project first, with no commitment, which is why the Website Plan is requested through the form or WhatsApp, not the online quote. The monthly change does not roll over. The NOVA20 code does not apply to the subscription.'
+                  )}
+                </p>
               </div>
             </div>
           </div>
