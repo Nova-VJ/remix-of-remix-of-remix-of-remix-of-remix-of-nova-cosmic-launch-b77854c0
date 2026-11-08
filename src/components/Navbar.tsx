@@ -14,7 +14,7 @@ type NavItem =
   | { label: string; to: string; novaIcon?: boolean };
 
 const Navbar = () => {
-  const { t } = useTranslation();
+  const { t, isEn } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -28,6 +28,7 @@ const Navbar = () => {
     { label: t.nav.planWeb, section: 'plan-web' },
     { label: t.nav.services, section: 'servicios' },
     { label: t.nav.pricing, section: 'paquetes' },
+    { label: isEn ? 'Benefits' : 'Ventajas', to: isEn ? '/growth-benefits' : '/beneficios-empresas' },
     { label: t.nav.projects, section: 'proyectos' },
     { label: t.nav.demos, section: 'demos' },
     { label: t.nav.caseStudies, to: '/casos-exito' },

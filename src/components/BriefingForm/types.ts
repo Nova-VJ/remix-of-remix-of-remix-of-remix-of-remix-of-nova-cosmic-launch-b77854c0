@@ -1,3 +1,5 @@
+import { L } from '@/i18n';
+
 export interface FormData {
   // Hidden fields
   source: string;
@@ -134,7 +136,7 @@ export interface FormData {
 }
 
 export const initialFormData: FormData = {
-  source: 'solutionsnova.es',
+  source: L('solutionsnova.es', 'novasolutionsmkt.com'),
   page_url: '',
   cart_services: '',
   contacto_nombre: '',
@@ -255,8 +257,8 @@ export type ServiceType = 'branding' | 'web' | 'apps' | 'rrss' | 'content';
 
 export const SERVICE_NAMES: Record<ServiceType, string> = {
   branding: 'Branding',
-  web: 'Páginas Web',
-  apps: 'Aplicaciones',
-  rrss: 'Redes Sociales',
-  content: 'Elaboración de Contenido',
+  web: L('Páginas Web', 'Websites'),
+  apps: L('Aplicaciones', 'Mobile Apps'),
+  rrss: L('Redes Sociales', 'Social Media'),
+  content: L('Elaboración de Contenido', 'Content Creation'),
 };

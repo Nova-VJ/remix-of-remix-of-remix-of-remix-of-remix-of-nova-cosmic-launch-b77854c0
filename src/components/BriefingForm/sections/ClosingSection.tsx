@@ -3,6 +3,7 @@ import { FormData } from '../types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
+import { L } from '@/i18n';
 
 interface ClosingSectionProps {
   data: FormData;
@@ -13,14 +14,21 @@ const ClosingSection = ({ data, onChange }: ClosingSectionProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-foreground">¡Casi terminamos!</h3>
-        <p className="text-sm text-muted-foreground">Una última pregunta</p>
+        <h3 className="text-lg font-semibold text-foreground">
+          {L('¡Casi terminamos!', 'Almost Done!')}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {L('Una última pregunta', 'One final detail before submitting')}
+        </p>
       </div>
 
       <QuestionField
-        label="¿Algo importante que debamos saber?"
+        label={L('¿Algo importante que debamos saber?', 'Any special notes, requirements or context?')}
         name="cierre_nota"
-        options={['Nada más', 'Tengo restricciones', 'Tengo referencias', 'Necesito guía total']}
+        options={L(
+          ['Nada más', 'Tengo restricciones', 'Tengo referencias', 'Necesito guía total'],
+          ['Nothing else, all covered', 'Specific technical constraints', 'I have reference links to share', 'I need comprehensive strategic advice']
+        )}
         value={data.cierre_nota}
         otroValue={data.cierre_nota_otro}
         onChange={(name, value) => onChange(name, value)}
@@ -40,14 +48,14 @@ const ClosingSection = ({ data, onChange }: ClosingSectionProps) => {
               htmlFor="privacidad"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Acepto la política de privacidad *
+              {L('Acepto la política de privacidad *', 'I accept the privacy policy *')}
             </Label>
             <p className="text-xs text-muted-foreground">
-              He leído y acepto la{' '}
+              {L('He leído y acepto la ', 'I have read and agree to the ')}
               <Link to="/politica-de-privacidad" className="text-primary hover:underline" target="_blank">
-                política de privacidad
+                {L('política de privacidad', 'privacy policy')}
               </Link>{' '}
-              y el tratamiento de mis datos.
+              {L('y el tratamiento de mis datos.', 'and the processing of my contact information.')}
             </p>
           </div>
         </div>

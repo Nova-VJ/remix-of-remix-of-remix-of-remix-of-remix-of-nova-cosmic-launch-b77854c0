@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import saraAvatar from '@/assets/sara-avatar.webp';
+import { L, isEn } from '@/i18n';
 
 // ─── Step definitions per platform ───────────────────────────────────────────
 
@@ -15,45 +16,58 @@ interface TutorialStep {
   title: string;
   description: string;
   icon: React.ReactNode;
-  // Where Sara's card should appear: 'center' | 'top-right' | 'mid-right' | 'bottom-center'
   position: 'center' | 'top-right' | 'mid-right' | 'bottom-center';
-  // Optional pointer direction shown as an animated arrow
   pointer?: 'up' | 'left' | 'none';
 }
 
-const STEPS: Record<'android' | 'ios' | 'pc', TutorialStep[]> = {
+const getTutorialSteps = (): Record<'android' | 'ios' | 'pc', TutorialStep[]> => ({
   android: [
     {
-      title: '¡Hola! Soy Sara 👋',
-      description: 'Voy a guiarte para instalar la app de Nova en tu dispositivo Android. Es muy sencillo, solo sigue mis indicaciones.',
+      title: L('¡Hola! Soy Sara 👋', 'Hi! I’m Sara 👋'),
+      description: L(
+        'Voy a guiarte para instalar la app de Nova en tu dispositivo Android. Es muy sencillo, solo sigue mis indicaciones.',
+        'I’ll guide you through installing the NOVA app on your Android device. It’s super simple, just follow along.'
+      ),
       icon: <Smartphone className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Abre Google Chrome',
-      description: 'Asegúrate de estar usando Google Chrome. Si usas otro navegador, ábrelo en Chrome para continuar.',
+      title: L('Abre Google Chrome', 'Open Google Chrome'),
+      description: L(
+        'Asegúrate de estar usando Google Chrome. Si usas otro navegador, ábrelo en Chrome para continuar.',
+        'Make sure you are using Google Chrome. If you are in another browser, switch to Chrome to continue.'
+      ),
       icon: <Chrome className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Toca los tres puntos ⋮',
-      description: 'Mira la esquina superior derecha de tu pantalla. Ahí verás el menú con tres puntos verticales. ¡Tócalos!',
+      title: L('Toca los tres puntos ⋮', 'Tap the three dots ⋮'),
+      description: L(
+        'Mira la esquina superior derecha de tu pantalla. Ahí verás el menú con tres puntos verticales. ¡Tócalos!',
+        'Look at the top-right corner of your screen. Tap the three vertical dots menu.'
+      ),
       icon: <Share className="w-5 h-5 text-primary" />,
       position: 'top-right',
       pointer: 'up',
     },
     {
-      title: 'Selecciona "Instalar app"',
-      description: 'En el menú que aparece, busca "Añadir a pantalla de inicio" o "Instalar app" y tócalo.',
+      title: L('Selecciona "Instalar app"', 'Select "Install app"'),
+      description: L(
+        'En el menú que aparece, busca "Añadir a pantalla de inicio" o "Instalar app" y tócalo.',
+        'In the dropdown menu, tap "Add to Home screen" or "Install app".'
+      ),
       icon: <Plus className="w-5 h-5 text-primary" />,
       position: 'mid-right',
       pointer: 'left',
     },
     {
-      title: '¡Instalada! 🎉',
-      description: 'Nova ya aparece como app en tu pantalla de inicio. Tócala como cualquier otra app. ¡Ya puedes cerrar este tutorial!',
+      title: L('¡Instalada! 🎉', 'Installed! 🎉'),
+      description: L(
+        'Nova ya aparece como app en tu pantalla de inicio. Tócala como cualquier otra app. ¡Ya puedes cerrar este tutorial!',
+        'NOVA is now saved on your home screen like a native app. You can now close this guide!'
+      ),
       icon: <CheckCircle className="w-5 h-5 text-primary" />,
       position: 'bottom-center',
       pointer: 'none',
@@ -61,36 +75,51 @@ const STEPS: Record<'android' | 'ios' | 'pc', TutorialStep[]> = {
   ],
   ios: [
     {
-      title: '¡Hola! Soy Sara 👋',
-      description: 'Voy a guiarte para instalar la app de Nova en tu iPhone o iPad. Necesitarás usar Safari.',
+      title: L('¡Hola! Soy Sara 👋', 'Hi! I’m Sara 👋'),
+      description: L(
+        'Voy a guiarte para instalar la app de Nova en tu iPhone o iPad. Necesitarás usar Safari.',
+        'I’ll walk you through adding NOVA to your iPhone or iPad home screen. You will need to use Safari.'
+      ),
       icon: <Apple className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Abre en Safari',
-      description: 'En iOS, solo Safari permite instalar apps PWA. Si estás en Chrome u otro navegador, cópiala en Safari.',
+      title: L('Abre en Safari', 'Open in Safari'),
+      description: L(
+        'En iOS, solo Safari permite instalar apps PWA. Si estás en Chrome u otro navegador, cópiala en Safari.',
+        'On iOS, only Safari supports web app installation. If you are in Chrome, copy and open the link in Safari.'
+      ),
       icon: <Apple className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Toca el ícono Compartir',
-      description: 'Mira la barra inferior de Safari. Verás un cuadrado con una flecha hacia arriba (□↑). ¡Tócalo!',
+      title: L('Toca el ícono Compartir', 'Tap the Share Button'),
+      description: L(
+        'Mira la barra inferior de Safari. Verás un cuadrado con una flecha hacia arriba (□↑). ¡Tócalo!',
+        'Look at the bottom toolbar in Safari. Tap the Share icon (square with upward arrow).'
+      ),
       icon: <Share className="w-5 h-5 text-primary" />,
       position: 'bottom-center',
       pointer: 'none',
     },
     {
-      title: '"Añadir a pantalla de inicio"',
-      description: 'En el menú que se despliega, desliza hacia abajo y toca "Añadir a pantalla de inicio".',
+      title: L('"Añadir a pantalla de inicio"', '"Add to Home Screen"'),
+      description: L(
+        'En el menú que se despliega, desliza hacia abajo y toca "Añadir a pantalla de inicio".',
+        'In the share sheet, scroll down and tap "Add to Home Screen".'
+      ),
       icon: <Plus className="w-5 h-5 text-primary" />,
       position: 'mid-right',
       pointer: 'left',
     },
     {
-      title: '¡Instalada! 🎉',
-      description: 'Nova ya aparece en tu pantalla de inicio como cualquier app. ¡Perfecto, ya puedes cerrar este tutorial!',
+      title: L('¡Instalada! 🎉', 'Installed! 🎉'),
+      description: L(
+        'Nova ya aparece en tu pantalla de inicio como cualquier app. ¡Perfecto, ya puedes cerrar este tutorial!',
+        'NOVA now lives on your home screen with its own icon. You are all set!'
+      ),
       icon: <CheckCircle className="w-5 h-5 text-primary" />,
       position: 'bottom-center',
       pointer: 'none',
@@ -98,42 +127,57 @@ const STEPS: Record<'android' | 'ios' | 'pc', TutorialStep[]> = {
   ],
   pc: [
     {
-      title: '¡Hola! Soy Sara 👋',
-      description: 'Voy a guiarte para instalar la app de Nova en tu ordenador. Funciona en Chrome y Edge.',
+      title: L('¡Hola! Soy Sara 👋', 'Hi! I’m Sara 👋'),
+      description: L(
+        'Voy a guiarte para instalar la app de Nova en tu ordenador. Funciona en Chrome y Edge.',
+        'I’ll guide you to install NOVA on your computer desktop. Works best in Chrome and Edge.'
+      ),
       icon: <Monitor className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Usa Chrome o Edge',
-      description: 'Asegúrate de usar Google Chrome o Microsoft Edge. En Firefox y Safari para Mac no está disponible esta función.',
+      title: L('Usa Chrome o Edge', 'Use Chrome or Edge'),
+      description: L(
+        'Asegúrate de usar Google Chrome o Microsoft Edge. En Firefox y Safari para Mac no está disponible esta función.',
+        'Make sure you are browsing in Google Chrome or Microsoft Edge for native PWA installation.'
+      ),
       icon: <Chrome className="w-5 h-5 text-primary" />,
       position: 'center',
       pointer: 'none',
     },
     {
-      title: 'Busca el ícono ⊕ en la barra',
-      description: 'Mira la esquina superior derecha de la barra de direcciones. Verás un pequeño ícono de instalación (⊕ o una pantalla con flecha). ¡Haz clic en él!',
+      title: L('Busca el ícono ⊕ en la barra', 'Click the ⊕ Icon in Address Bar'),
+      description: L(
+        'Mira la esquina superior derecha de la barra de direcciones. Verás un pequeño ícono de instalación (⊕ o una pantalla con flecha). ¡Haz clic en él!',
+        'Look at the right side of your browser address bar. Click the small install icon (⊕ or computer display).'
+      ),
       icon: <Download className="w-5 h-5 text-primary" />,
       position: 'top-right',
       pointer: 'up',
     },
     {
-      title: 'Confirma la instalación',
-      description: 'Aparecerá un diálogo preguntando si quieres instalar la app. Haz clic en "Instalar" para confirmar.',
+      title: L('Confirma la instalación', 'Confirm Installation'),
+      description: L(
+        'Aparecerá un diálogo preguntando si quieres instalar la app. Haz clic en "Instalar" para confirmar.',
+        'A browser popup will ask if you want to install the app. Click "Install" to confirm.'
+      ),
       icon: <Plus className="w-5 h-5 text-primary" />,
       position: 'mid-right',
       pointer: 'left',
     },
     {
-      title: '¡Instalada! 🎉',
-      description: 'Nova se ha añadido como app de escritorio con su propio icono. La encontrarás en tu menú de aplicaciones. ¡Listo!',
+      title: L('¡Instalada! 🎉', 'Installed! 🎉'),
+      description: L(
+        'Nova se ha añadido como app de escritorio con su propio icono. La encontrarás en tu menú de aplicaciones. ¡Listo!',
+        'NOVA is installed as a standalone desktop app. You will find it in your applications menu!'
+      ),
       icon: <CheckCircle className="w-5 h-5 text-primary" />,
       position: 'bottom-center',
       pointer: 'none',
     },
   ],
-};
+});
 
 // ─── Position classes map ─────────────────────────────────────────────────────
 
@@ -161,75 +205,52 @@ const SaraInstallTutorial = ({
     return () => clearTimeout(t);
   }, []);
 
-  const steps = STEPS[platform];
+  const steps = getTutorialSteps()[platform];
   const step = steps[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === steps.length - 1;
 
   const handleNext = () => {
     if (isLast) {
-      handleClose();
+      onClose();
     } else {
-      setCurrentStep(p => p + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handlePrev = () => {
-    if (!isFirst) setCurrentStep(p => p - 1);
+    if (!isFirst) setCurrentStep((prev) => prev - 1);
   };
 
   const handleClose = () => {
     setVisible(false);
-    setTimeout(onClose, 250);
+    setTimeout(onClose, 200);
   };
 
   const posClass = POSITION_CLASSES[step.position];
 
   return (
-    <div
-      className={`fixed inset-0 z-[200] transition-all duration-300 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-background/75 backdrop-blur-sm" onClick={handleClose} />
+    <div className="fixed inset-0 z-[200]">
+      {/* Dim backdrop */}
+      <div
+        onClick={handleClose}
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          visible ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
 
-      {/* Pointer arrow for top-right */}
-      {step.pointer === 'up' && step.position === 'top-right' && (
-        <div className="fixed top-14 right-6 z-[201] animate-bounce">
-          <div className="w-0 h-0 border-l-8 border-r-8 border-b-[16px] border-l-transparent border-r-transparent border-b-primary" />
-        </div>
-      )}
-
-      {/* Pointer arrow for mid-right */}
-      {step.pointer === 'left' && step.position === 'mid-right' && (
-        <div className="fixed top-1/2 right-[calc(var(--card-width,320px)+16px)] z-[201] animate-pulse"
-          style={{ transform: 'translateY(-50%) translateX(100%)' }}>
-          <div className="w-0 h-0 border-t-8 border-b-8 border-l-[16px] border-t-transparent border-b-transparent border-l-primary" />
-        </div>
-      )}
-
-      {/* Sara Card — dynamically positioned */}
+      {/* Sara Card */}
       <div
         className={`fixed z-[202] w-[90vw] max-w-xs transition-all duration-300 ${posClass} ${
           visible ? 'scale-100' : 'scale-95'
         }`}
       >
-        {/* Arrow indicator for top-right: show below the card pointing up-right */}
-        {step.pointer === 'up' && step.position === 'top-right' && (
-          <div className="flex justify-end pr-2 mb-1">
-            <span className="text-xs text-primary font-semibold animate-pulse">↑ Aquí</span>
-          </div>
-        )}
-        {step.pointer === 'left' && step.position === 'mid-right' && (
-          <div className="flex justify-end pr-2 mb-1">
-            <span className="text-xs text-primary font-semibold animate-pulse">→ Aquí</span>
-          </div>
-        )}
-
         <div className="rounded-2xl border border-primary/30 bg-card shadow-2xl p-5">
           {/* Close */}
           <button
             onClick={handleClose}
             className="absolute top-3 right-3 p-1 rounded-full hover:bg-muted transition-colors text-muted-foreground z-10"
+            aria-label={L('Cerrar', 'Close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -272,11 +293,11 @@ const SaraInstallTutorial = ({
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" onClick={handlePrev} disabled={isFirst} className="gap-1 text-xs h-8">
               <ArrowLeft className="w-3 h-3" />
-              Anterior
+              {L('Anterior', 'Previous')}
             </Button>
             <span className="text-xs text-muted-foreground">{currentStep + 1}/{steps.length}</span>
             <Button size="sm" onClick={handleNext} className="gap-1 text-xs h-8">
-              {isLast ? 'Cerrar' : 'Siguiente'}
+              {isLast ? L('Cerrar', 'Finish') : L('Siguiente', 'Next')}
               {!isLast && <ArrowRight className="w-3 h-3" />}
             </Button>
           </div>
@@ -331,24 +352,24 @@ const InstalarApp = () => {
   };
 
   const androidSteps = [
-    { icon: <Chrome className="w-5 h-5" />, title: 'Abre en Chrome', desc: 'Asegúrate de usar Google Chrome en tu Android.' },
-    { icon: <Share className="w-5 h-5" />, title: 'Menú de opciones', desc: 'Toca los tres puntos (⋮) en la esquina superior derecha.' },
-    { icon: <Plus className="w-5 h-5" />, title: 'Añadir a inicio', desc: 'Selecciona "Añadir a pantalla de inicio" o "Instalar app".' },
-    { icon: <CheckCircle className="w-5 h-5" />, title: '¡Listo!', desc: 'Nova aparecerá como una app nativa en tu pantalla de inicio.' },
+    { icon: <Chrome className="w-5 h-5" />, title: L('Abre en Chrome', 'Open in Chrome'), desc: L('Asegúrate de usar Google Chrome en tu Android.', 'Ensure you are browsing in Chrome on Android.') },
+    { icon: <Share className="w-5 h-5" />, title: L('Menú de opciones', 'Options Menu'), desc: L('Toca los tres puntos (⋮) en la esquina superior derecha.', 'Tap the three dots (⋮) in the top-right corner.') },
+    { icon: <Plus className="w-5 h-5" />, title: L('Añadir a inicio', 'Add to Home'), desc: L('Selecciona "Añadir a pantalla de inicio" o "Instalar app".', 'Select "Add to Home screen" or "Install app".') },
+    { icon: <CheckCircle className="w-5 h-5" />, title: L('¡Listo!', 'All Done!'), desc: L('Nova aparecerá como una app nativa en tu pantalla de inicio.', 'NOVA will live as an app icon on your home screen.') },
   ];
 
   const iosSteps = [
-    { icon: <Apple className="w-5 h-5" />, title: 'Abre en Safari', desc: 'Usa Safari para instalar apps PWA en iPhone/iPad.' },
-    { icon: <Share className="w-5 h-5" />, title: 'Botón Compartir', desc: 'Toca el ícono de compartir (cuadrado con flecha) en la barra inferior.' },
-    { icon: <Plus className="w-5 h-5" />, title: 'Añadir a inicio', desc: 'Desliza hacia abajo y selecciona "Añadir a pantalla de inicio".' },
-    { icon: <CheckCircle className="w-5 h-5" />, title: '¡Listo!', desc: 'La app de Nova aparece en tu pantalla de inicio como cualquier app.' },
+    { icon: <Apple className="w-5 h-5" />, title: L('Abre en Safari', 'Open in Safari'), desc: L('Usa Safari para instalar apps PWA en iPhone/iPad.', 'Use Safari to add PWAs on iPhone & iPad.') },
+    { icon: <Share className="w-5 h-5" />, title: L('Botón Compartir', 'Share Button'), desc: L('Toca el ícono de compartir (cuadrado con flecha) en la barra inferior.', 'Tap the share button (square with arrow) at the bottom.') },
+    { icon: <Plus className="w-5 h-5" />, title: L('Añadir a inicio', 'Add to Home Screen'), desc: L('Desliza hacia abajo y selecciona "Añadir a pantalla de inicio".', 'Scroll down and tap "Add to Home Screen".') },
+    { icon: <CheckCircle className="w-5 h-5" />, title: L('¡Listo!', 'All Done!'), desc: L('La app de Nova aparece en tu pantalla de inicio como cualquier app.', 'NOVA appears on your home screen ready to launch.') },
   ];
 
   const pcSteps = [
-    { icon: <Chrome className="w-5 h-5" />, title: 'Abre en Chrome / Edge', desc: 'Accede a la web desde Google Chrome o Microsoft Edge.' },
-    { icon: <Monitor className="w-5 h-5" />, title: 'Ícono de instalación', desc: 'Busca el ícono de instalar (⊕) en la barra de direcciones.' },
-    { icon: <Download className="w-5 h-5" />, title: 'Instalar aplicación', desc: 'Haz clic en "Instalar" en el diálogo que aparece.' },
-    { icon: <CheckCircle className="w-5 h-5" />, title: '¡Listo!', desc: 'Nova se añade como app de escritorio con acceso directo.' },
+    { icon: <Chrome className="w-5 h-5" />, title: L('Abre en Chrome / Edge', 'Open in Chrome / Edge'), desc: L('Accede a la web desde Google Chrome o Microsoft Edge.', 'Access the site from Google Chrome or Microsoft Edge.') },
+    { icon: <Monitor className="w-5 h-5" />, title: L('Ícono de instalación', 'Install Icon'), desc: L('Busca el ícono de instalar (⊕) en la barra de direcciones.', 'Click the install icon (⊕) in the browser address bar.') },
+    { icon: <Download className="w-5 h-5" />, title: L('Instalar aplicación', 'Install Application'), desc: L('Haz clic en "Instalar" en el diálogo que aparece.', 'Click "Install" in the confirmation popup.') },
+    { icon: <CheckCircle className="w-5 h-5" />, title: L('¡Listo!', 'All Done!'), desc: L('Nova se añade como app de escritorio con acceso directo.', 'NOVA opens in its own window as a desktop app.') },
   ];
 
   const stepsMap = { android: androidSteps, ios: iosSteps, pc: pcSteps };
@@ -360,21 +381,21 @@ const InstalarApp = () => {
       label: 'Android',
       sublabel: 'Google Chrome',
       icon: <Smartphone className="w-6 h-6" />,
-      badge: deferredPrompt && activeOS === 'android' ? 'Instalar directo' : 'Tutorial con Sara',
+      badge: deferredPrompt && activeOS === 'android' ? L('Instalar directo', 'Direct Install') : L('Tutorial con Sara', 'Interactive Guide'),
     },
     {
       id: 'ios' as const,
       label: 'iPhone / iPad',
       sublabel: 'Safari',
       icon: <Apple className="w-6 h-6" />,
-      badge: 'Tutorial con Sara',
+      badge: L('Tutorial con Sara', 'Interactive Guide'),
     },
     {
       id: 'pc' as const,
       label: 'PC / Mac',
-      sublabel: 'Chrome o Edge',
+      sublabel: 'Chrome / Edge',
       icon: <Monitor className="w-6 h-6" />,
-      badge: deferredPrompt && activeOS === 'pc' ? 'Instalar directo' : 'Tutorial con Sara',
+      badge: deferredPrompt && activeOS === 'pc' ? L('Instalar directo', 'Direct Install') : L('Tutorial con Sara', 'Interactive Guide'),
     },
   ];
 
@@ -395,17 +416,20 @@ const InstalarApp = () => {
           <div className="max-w-3xl mx-auto">
             <Badge variant="secondary" className="mb-4">App · PWA</Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Instala la app de{' '}
-              <span className="text-primary">Nova</span>
+              {L('Instala la app de', 'Install the App for')}{' '}
+              <span className="text-primary">NOVA</span>
             </h1>
             <p className="text-muted-foreground text-lg mb-8">
-              Accede a tu portal de cliente, recibe notificaciones y gestiona tu proyecto directamente desde tu móvil o PC. Sin App Store, sin pasos extra.
+              {L(
+                'Accede a tu portal de cliente, recibe notificaciones y gestiona tu proyecto directamente desde tu móvil o PC. Sin App Store, sin pasos extra.',
+                'Access your client dashboard, receive project updates, and message our team directly from your phone or desktop with zero app store friction.'
+              )}
             </p>
 
             {isInstalled && (
               <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-600 border border-green-500/30 rounded-full px-6 py-3">
                 <CheckCircle className="w-5 h-5" />
-                <span className="font-medium">¡App ya instalada!</span>
+                <span className="font-medium">{L('¡App ya instalada!', 'App already installed!')}</span>
               </div>
             )}
           </div>
@@ -415,7 +439,7 @@ const InstalarApp = () => {
         <section className="px-4 pb-10">
           <div className="max-w-3xl mx-auto">
             <p className="text-center text-sm text-muted-foreground mb-5">
-              Elige tu dispositivo y Sara te guiará paso a paso:
+              {L('Elige tu dispositivo y Sara te guiará paso a paso:', 'Select your device and Sara will guide you step by step:')}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {platformButtons.map((btn) => (
@@ -450,9 +474,9 @@ const InstalarApp = () => {
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
               {[
-                { icon: <Bell className="w-6 h-6 text-primary" />, title: 'Notificaciones', desc: 'Recibe alertas de tu proyecto, mensajes y actualizaciones en tiempo real.' },
-                { icon: <Smartphone className="w-6 h-6 text-primary" />, title: 'Acceso rápido', desc: 'Un toque desde tu pantalla de inicio. Sin abrir el navegador.' },
-                { icon: <CheckCircle className="w-6 h-6 text-primary" />, title: 'Sin App Store', desc: 'Instala directamente desde el navegador. Gratis y sin pasos extra.' },
+                { icon: <Bell className="w-6 h-6 text-primary" />, title: L('Notificaciones', 'Real-Time Alerts'), desc: L('Recibe alertas de tu proyecto, mensajes y actualizaciones en tiempo real.', 'Stay updated on project milestones and messages in real time.') },
+                { icon: <Smartphone className="w-6 h-6 text-primary" />, title: L('Acceso rápido', 'Instant Launch'), desc: L('Un toque desde tu pantalla de inicio. Sin abrir el navegador.', 'Launch straight from your home screen without opening a browser.') },
+                { icon: <CheckCircle className="w-6 h-6 text-primary" />, title: L('Sin App Store', 'Zero App Store Hassle'), desc: L('Instala directamente desde el navegador. Gratis y sin pasos extra.', 'Install directly from your web browser with zero download friction.') },
               ].map((b, i) => (
                 <Card key={i} className="text-center p-6 border-primary/20 bg-primary/5 hover:border-primary/40 transition-colors">
                   <div className="flex justify-center mb-3">
@@ -469,7 +493,7 @@ const InstalarApp = () => {
             {/* OS Selector */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-center">Guía de instalación paso a paso</CardTitle>
+                <CardTitle className="text-center">{L('Guía de instalación paso a paso', 'Step-by-Step Installation Guide')}</CardTitle>
                 <div className="flex justify-center gap-2 mt-2 flex-wrap">
                   {([
                     { id: 'android', label: 'Android', icon: <Smartphone className="w-4 h-4" /> },
@@ -497,7 +521,7 @@ const InstalarApp = () => {
                         <div className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center mb-3 flex-shrink-0">
                           {step.icon}
                         </div>
-                        <div className="text-xs font-bold text-primary mb-0.5">Paso {i + 1}</div>
+                        <div className="text-xs font-bold text-primary mb-0.5">{L('Paso', 'Step')} {i + 1}</div>
                         <h4 className="font-semibold text-sm mb-1">{step.title}</h4>
                         <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
                       </div>
@@ -510,32 +534,9 @@ const InstalarApp = () => {
 
                 {activeOS === 'ios' && (
                   <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-sm text-yellow-600 dark:text-yellow-400">
-                    <strong>Nota:</strong> En iPhone/iPad, la instalación solo funciona desde Safari. Chrome y otros navegadores no permiten instalar PWAs en iOS.
+                    <strong>{L('Nota:', 'Note:')}</strong> {L('En iPhone/iPad, la instalación solo funciona desde Safari. Chrome y otros navegadores no permiten instalar PWAs en iOS.', 'On iPhone & iPad, adding to home screen is supported via Safari. Chrome and third-party browsers on iOS do not support PWA installation.')}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Notifications info */}
-            <Card className="mt-6 bg-primary/5 border-primary/20">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Bell className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">¿Cómo funcionan las notificaciones?</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Una vez instalada la app e iniciada sesión, recibirás notificaciones automáticas cuando:
-                    </p>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> Tu proyecto avance a una nueva etapa</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> El equipo de Nova te envíe un mensaje</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> Tu presupuesto sea aprobado o actualizado</li>
-                      <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> Haya actualizaciones importantes en tu cuenta</li>
-                    </ul>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>

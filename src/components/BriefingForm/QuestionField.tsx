@@ -2,6 +2,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { L } from '@/i18n';
 
 interface QuestionFieldProps {
   label: string;
@@ -22,7 +23,7 @@ const QuestionField = ({
   onChange,
   useTextarea = false 
 }: QuestionFieldProps) => {
-  const isOtro = value === 'Otro';
+  const isOtro = value === 'Otro' || value === 'Other';
   const otroName = `${name}_otro`;
 
   return (
@@ -45,12 +46,12 @@ const QuestionField = ({
           </div>
         ))}
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="Otro" id={`${name}-otro`} />
+          <RadioGroupItem value={L('Otro', 'Other')} id={`${name}-otro`} />
           <Label 
             htmlFor={`${name}-otro`} 
             className="text-sm text-muted-foreground cursor-pointer"
           >
-            Otro (especifica)
+            {L('Otro (especifica)', 'Other (specify)')}
           </Label>
         </div>
       </RadioGroup>
@@ -61,7 +62,7 @@ const QuestionField = ({
             name={otroName}
             value={otroValue}
             onChange={(e) => onChange(otroName, e.target.value)}
-            placeholder="Especifica aquí..."
+            placeholder={L('Especifica aquí...', 'Please specify here...')}
             className="mt-2"
           />
         ) : (
@@ -69,7 +70,7 @@ const QuestionField = ({
             name={otroName}
             value={otroValue}
             onChange={(e) => onChange(otroName, e.target.value)}
-            placeholder="Especifica aquí..."
+            placeholder={L('Especifica aquí...', 'Please specify here...')}
             className="mt-2"
           />
         )

@@ -1,24 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BadgePercent, Bot, FileText, LayoutGrid, MonitorPlay, X } from 'lucide-react';
+import { ArrowRight, BadgePercent, Bot, FileText, LayoutGrid, MonitorPlay, Sparkles, X } from 'lucide-react';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
 import { scrollToSectionId } from '@/lib/scroll';
 import { cn } from '@/lib/utils';
-import { L } from '@/i18n';
+import { L, isEn } from '@/i18n';
 
 const DISMISSED_KEY = 'nova-guide-dismissed';
 const SNOOZE_DAYS = 14;
 const SHOW_AFTER_MS = 5000;
 
-type Choice = 'own' | 'services' | 'projects' | 'budget' | 'sara';
-
-const OPTIONS: { id: Choice; label: string; icon: React.ElementType; highlight?: boolean }[] = [
-  { id: 'own', label: L('Dejar de pagar comisiones a las apps', 'Stop paying commissions to delivery and booking apps'), icon: BadgePercent, highlight: true },
-  { id: 'services', label: L('Una web, app, marca o redes', 'A website, app, brand or social media'), icon: LayoutGrid },
-  { id: 'projects', label: L('Ver proyectos que hemos hecho', 'See projects we have built'), icon: MonitorPlay },
-  { id: 'budget', label: L('Pedir presupuesto ya', 'Get a free quote'), icon: FileText },
-  { id: 'sara', label: L('Preguntar a Sara', 'Ask Sara'), icon: Bot },
-];
+type Choice = 'own' | 'services' | 'benefits' | 'projects' | 'budget' | 'sara';
 
 const recentlyDismissed = () => {
   try {
@@ -37,6 +29,15 @@ const recentlyDismissed = () => {
 const WelcomeGuide = () => {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+
+  const options: { id: Choice; label: string; icon: React.ElementType; highlight?: boolean }[] = useMemo(() => [
+    { id: 'own', label: L('Dejar de pagar comisiones a las apps', 'Stop paying commissions to delivery and booking apps'), icon: BadgePercent, highlight: true },
+    { id: 'benefits', label: L('Créditos y ventajas para tu negocio', 'Claim eligible ad credits & benefits'), icon: Sparkles },
+    { id: 'services', label: L('Una web, app, marca o redes', 'A website, app, brand or social media'), icon: LayoutGrid },
+    { id: 'projects', label: L('Ver proyectos que hemos hecho', 'See projects we have built'), icon: MonitorPlay },
+    { id: 'budget', label: L('Pedir presupuesto ya', 'Get a free quote'), icon: FileText },
+    { id: 'sara', label: L('Preguntar a Sara', 'Ask Sara'), icon: Bot },
+  ], []);
 
   useEffect(() => {
     if (recentlyDismissed()) return;
@@ -66,6 +67,9 @@ const WelcomeGuide = () => {
     switch (choice) {
       case 'own':
         scrollToSectionId('sistema-propio');
+        break;
+      case 'benefits':
+        navigate(isEn ? '/growth-benefits' : '/beneficios-empresas');
         break;
       case 'services':
         scrollToSectionId('servicios');
@@ -109,7 +113,7 @@ const WelcomeGuide = () => {
           </button>
         </div>
         <ul className="space-y-1 px-2 pb-2">
-          {OPTIONS.map((o) => (
+          {options.map((o) => (
             <li key={o.id}>
               <button
                 type="button"

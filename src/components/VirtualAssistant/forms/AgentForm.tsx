@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Clock, Phone } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { L, isEn } from '@/i18n';
 
 interface AgentFormProps {
   onComplete: () => void;
@@ -20,13 +21,14 @@ const AgentForm = ({ onComplete, onCancel }: AgentFormProps) => {
     phone: ''
   });
 
-  // Check if within business hours (L-V 10:00-18:00 Spain time)
+  // Business hours check
   const isWithinBusinessHours = () => {
     const now = new Date();
-    const spainTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
-    const day = spainTime.getDay();
-    const hour = spainTime.getHours();
-    return day >= 1 && day <= 5 && hour >= 10 && hour < 18;
+    const tz = isEn ? 'America/New_York' : 'Europe/Madrid';
+    const targetTime = new Date(now.toLocaleString('en-US', { timeZone: tz }));
+    const day = targetTime.getDay();
+    const hour = targetTime.getHours();
+    return day >= 1 && day <= 5 && hour >= 9 && hour < 18;
   };
 
   const withinHours = isWithinBusinessHours();
@@ -40,26 +42,26 @@ const AgentForm = ({ onComplete, onCancel }: AgentFormProps) => {
         ...formData,
         category: 'llamada',
         priority: 'alta',
-        subject: 'Solicitud de llamada',
+        subject: isEn ? 'Call Request (US)' : 'Solicitud de llamada',
         message: withinHours 
-          ? 'Cliente solicita hablar con un agente (dentro de horario)'
-          : 'Cliente solicita que le llamen (fuera de horario)',
+          ? (isEn ? 'Client requested to speak with an agent (during business hours)' : 'Cliente solicita hablar con un agente (dentro de horario)')
+          : (isEn ? 'Client requested a callback (after hours)' : 'Cliente solicita que le llamen (fuera de horario)'),
         status: 'open'
       }]);
 
       if (error) throw error;
 
       toast({
-        title: withinHours ? "¡Recibido!" : "¡Solicitud registrada!",
+        title: withinHours ? L("¡Recibido!", "Request Received!") : L("¡Solicitud registrada!", "Request Registered!"),
         description: withinHours 
-          ? "Un agente te contactará en breve."
-          : "Te llamaremos en el próximo horario laboral (L-V 10:00-18:00)."
+          ? L("Un agente te contactará en breve.", "An advisor will reach out shortly.")
+          : L("Te llamaremos en el próximo horario laboral (L-V 10:00-18:00).", "We will contact you during our next business hours (Mon-Fri 9am-6pm EST).")
       });
       onComplete();
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "No se pudo enviar la solicitud. Inténtalo de nuevo.",
+        title: L("Error", "Error"),
+        description: L("No se pudo enviar la solicitud. Inténtalo de nuevo.", "Could not submit your request. Please try again."),
         variant: "destructive"
       });
     } finally {
@@ -73,26 +75,26 @@ const AgentForm = ({ onComplete, onCancel }: AgentFormProps) => {
         <Clock className="w-4 h-4" />
         <span className="text-xs">
           {withinHours 
-            ? 'Estamos disponibles ahora (L-V 10:00-18:00)'
-            : 'Fuera de horario. Te contactaremos el próximo día laboral.'}
+            ? L('Estamos disponibles ahora (L-V 10:00-18:00)', 'We are available now (Mon-Fri 9:00 AM - 6:00 PM EST)')
+            : L('Fuera de horario. Te contactaremos el próximo día laboral.', 'Currently outside business hours. We will reach out the next business day.')}
         </span>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <Label htmlFor="name" className="text-xs">Nombre *</Label>
+          <Label htmlFor="name" className="text-xs">{L('Nombre *', 'Full Name *')}</Label>
           <Input
             id="name"
             required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="h-9 text-sm"
-            placeholder="Tu nombre"
+            placeholder={L('Tu nombre', 'Your name')}
           />
         </div>
 
         <div>
-          <Label htmlFor="email" className="text-xs">Email *</Label>
+          <Label htmlFor="email" className="text-xs">{L('Email *', 'Email *')}</Label>
           <Input
             id="email"
             type="email"
@@ -100,29 +102,40 @@ const AgentForm = ({ onComplete, onCancel }: AgentFormProps) => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="h-9 text-sm"
-            placeholder="tu@email.com"
+            placeholder="you@company.com"
           />
         </div>
 
         <div>
-          <Label htmlFor="phone" className="text-xs">Teléfono *</Label>
+          <Label htmlFor="phone" className="text-xs">{L('Teléfono *', 'Phone Number *')}</Label>
           <Input
             id="phone"
+            type="tel"
             required
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             className="h-9 text-sm"
-            placeholder="+34 600 000 000"
+            placeholder={isEn ? "+1 (555) 000-0000" : "+34 600 000 000"}
           />
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
-            Cancelar
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onCancel}
+            className="flex-1 text-xs"
+          >
+            {L('Cancelar', 'Cancel')}
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="flex-1 h-9">
-            <Phone className="w-4 h-4 mr-2" />
-            {isSubmitting ? 'Enviando...' : withinHours ? 'Solicitar llamada' : 'Te llamamos'}
+          <Button
+            type="submit"
+            size="sm"
+            disabled={isSubmitting || !formData.name || !formData.email || !formData.phone}
+            className="flex-1 text-xs"
+          >
+            {isSubmitting ? L('Enviando...', 'Submitting...') : L('Solicitar llamada', 'Request Call')}
           </Button>
         </div>
       </form>

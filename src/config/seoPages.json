@@ -38,5 +38,13 @@
   "/politica-de-privacidad": {
     "title": "Política de Privacidad | NOVA Marketing Solutions",
     "description": "Consulta cómo tratamos tus datos personales. Política de privacidad conforme al RGPD de NOVA Marketing Solutions."
+  },
+  "/beneficios-empresas": {
+    "title": "NOVA Growth Benefits | Créditos y Ventajas para Empresas",
+    "description": "Descubre créditos publicitarios oficiales, herramientas gratuitas y programas tecnológicos para hacer crecer tu empresa con NOVA."
+  },
+  "/growth-benefits": {
+    "title": "NOVA Growth Benefits | Business Credits & Opportunities",
+    "description": "Unlock advertising credits, free tools, and startup programs with NOVA Marketing Solutions."
   }
 }

@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Lock, ArrowLeft, Eye, EyeOff, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { L } from '@/i18n';
 
-const passwordSchema = z.string().min(8, { message: "La contraseña debe tener al menos 8 caracteres" }).max(100);
+const passwordSchema = z.string().min(8, { message: L("La contraseña debe tener al menos 8 caracteres", "Password must be at least 8 characters") }).max(100);
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -22,16 +23,9 @@ const ResetPassword = () => {
   useEffect(() => {
     // Check if we have a valid session from the reset link
     const checkSession = async () => {
-      // Wait for Supabase to process the hash in the URL
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
       // Also listen for auth state change in case session is being established
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          // Session established from recovery link
-          setIsChecking(false);
-          setInvalidLink(false);
-        } else if (event === 'SIGNED_IN' && session) {
+        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
           setIsChecking(false);
           setInvalidLink(false);
         }
@@ -63,7 +57,7 @@ const ResetPassword = () => {
     }
 
     if (password !== confirmPassword) {
-      newErrors.confirm = "Las contraseñas no coinciden";
+      newErrors.confirm = L("Las contraseñas no coinciden", "Passwords do not match");
     }
 
     setErrors(newErrors);
@@ -80,7 +74,7 @@ const ResetPassword = () => {
       
       if (error) {
         toast({
-          title: "Error",
+          title: L("Error", "Error"),
           description: error.message,
           variant: "destructive"
         });
@@ -111,29 +105,32 @@ const ResetPassword = () => {
         <div className="p-6">
           <Link to="/auth" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Volver al login
+            {L('Volver al login', 'Back to Login')}
           </Link>
         </div>
 
         <div className="flex-1 flex items-center justify-center px-6 pb-12">
           <div className="w-full max-w-md">
             <div className="text-center mb-8">
-              <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
+              <img alt="NOVA Marketing Solutions" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
             </div>
 
             <div className="glass-card p-8 text-center">
               <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-foreground mb-2">
-                Enlace inválido o caducado
+                {L('Enlace inválido o caducado', 'Invalid or Expired Link')}
               </h2>
               <p className="text-muted-foreground text-sm mb-6">
-                El enlace de recuperación ha expirado o no es válido. Por favor, solicita uno nuevo.
+                {L(
+                  'El enlace de recuperación ha expirado o no es válido. Por favor, solicita uno nuevo.',
+                  'This password reset link has expired or is invalid. Please request a new link.'
+                )}
               </p>
               <Link 
                 to="/forgot-password" 
-                className="inline-block px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+                className="inline-block px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors text-sm"
               >
-                Solicitar nuevo enlace
+                {L('Solicitar nuevo enlace', 'Request New Link')}
               </Link>
             </div>
           </div>
@@ -147,19 +144,19 @@ const ResetPassword = () => {
       <div className="p-6">
         <Link to="/auth" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          Volver al login
+          {L('Volver al login', 'Back to Login')}
         </Link>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 pb-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
+            <img alt="NOVA Marketing Solutions" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
             <h1 className="text-2xl font-bold text-foreground">
-              Nueva contraseña
+              {L('Nueva contraseña', 'New Password')}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Introduce tu nueva contraseña
+            <p className="text-muted-foreground mt-2 text-sm">
+              {L('Introduce tu nueva contraseña', 'Enter your new secure password')}
             </p>
           </div>
 
@@ -167,17 +164,17 @@ const ResetPassword = () => {
             <div className="glass-card p-8 text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <p className="text-foreground font-medium mb-2">
-                ¡Contraseña actualizada!
+                {L('¡Contraseña actualizada!', 'Password Updated!')}
               </p>
               <p className="text-muted-foreground text-sm">
-                Redirigiendo al login...
+                {L('Redirigiendo al login...', 'Redirecting to login...')}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Nueva contraseña
+                  {L('Nueva contraseña', 'New Password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -202,7 +199,7 @@ const ResetPassword = () => {
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Confirmar contraseña
+                  {L('Confirmar contraseña', 'Confirm Password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -221,9 +218,9 @@ const ResetPassword = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
-                {isSubmitting ? 'Guardando...' : 'Guardar contraseña'}
+                {isSubmitting ? L('Guardando...', 'Saving...') : L('Guardar contraseña', 'Save New Password')}
               </button>
             </form>
           )}

@@ -48,7 +48,7 @@ export const en: TranslationSchema = {
     planPillEnd: ', all included.',
     ctaQuote: 'Get a Free Quote',
     ctaWhatsapp: 'Chat on WhatsApp',
-    trustAgencia: 'US-Based Digital Agency',
+    trustAgencia: 'Serving businesses across the US',
     trustResponse: '24-Hour Response Time',
     trustNoCommitment: 'No-Obligation Estimate',
     mockupBusiness: 'yourbusiness.com',

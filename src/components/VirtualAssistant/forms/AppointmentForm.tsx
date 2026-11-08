@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { CALENDLY_LINK } from '@/data/chatFlowData';
 import { ExternalLink } from 'lucide-react';
+import { L, isEn } from '@/i18n';
 
 interface AppointmentFormProps {
   onComplete: () => void;
@@ -39,20 +40,29 @@ const AppointmentForm = ({ onComplete, onCancel }: AppointmentFormProps) => {
       if (error) throw error;
 
       toast({
-        title: "¡Cita solicitada!",
-        description: "Te contactaremos para confirmar fecha y hora."
+        title: L("¡Cita solicitada!", "Appointment Requested!"),
+        description: L("Te contactaremos para confirmar fecha y hora.", "We will contact you to confirm the date and time.")
       });
       onComplete();
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "No se pudo solicitar la cita. Inténtalo de nuevo.",
+        title: L("Error", "Error"),
+        description: L("No se pudo solicitar la cita. Inténtalo de nuevo.", "Could not request appointment. Please try again."),
         variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const topics = [
+    { id: 'Web', label: L('Web', 'Websites') },
+    { id: 'App', label: L('App', 'Mobile Apps') },
+    { id: 'Redes', label: L('Redes', 'Social / Ads') },
+    { id: 'Branding', label: 'Branding' },
+    { id: 'Ciberseguridad', label: L('Ciberseguridad', 'Cybersecurity') },
+    { id: 'Growth Benefits', label: L('Ventajas y Créditos', 'Growth Benefits') }
+  ];
 
   return (
     <div className="p-2 space-y-4">
@@ -62,7 +72,7 @@ const AppointmentForm = ({ onComplete, onCancel }: AppointmentFormProps) => {
         variant="default"
       >
         <ExternalLink className="w-4 h-4 mr-2" />
-        Reservar en Calendly
+        {L('Reservar en Calendly', 'Book on Calendly')}
       </Button>
 
       <div className="relative">
@@ -71,26 +81,26 @@ const AppointmentForm = ({ onComplete, onCancel }: AppointmentFormProps) => {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            O solicita una cita
+            {L('O solicita una cita', 'Or request a callback')}
           </span>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <Label htmlFor="name" className="text-xs">Nombre *</Label>
+          <Label htmlFor="name" className="text-xs">{L('Nombre *', 'Full Name *')}</Label>
           <Input
             id="name"
             required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="h-9 text-sm"
-            placeholder="Tu nombre"
+            placeholder={L('Tu nombre', 'Your name')}
           />
         </div>
 
         <div>
-          <Label htmlFor="email" className="text-xs">Email *</Label>
+          <Label htmlFor="email" className="text-xs">{L('Email *', 'Email *')}</Label>
           <Input
             id="email"
             type="email"
@@ -98,45 +108,45 @@ const AppointmentForm = ({ onComplete, onCancel }: AppointmentFormProps) => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="h-9 text-sm"
-            placeholder="tu@email.com"
+            placeholder="you@company.com"
           />
         </div>
 
         <div>
-          <Label htmlFor="phone" className="text-xs">WhatsApp</Label>
+          <Label htmlFor="phone" className="text-xs">{L('WhatsApp / Teléfono', 'WhatsApp / Phone')}</Label>
           <Input
             id="phone"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             className="h-9 text-sm"
-            placeholder="+34 600 000 000"
+            placeholder={isEn ? "+1 (555) 000-0000" : "+34 600 000 000"}
           />
         </div>
 
         <div>
-          <Label className="text-xs">Tema *</Label>
+          <Label className="text-xs">{L('Tema *', 'Topic *')}</Label>
           <div className="grid grid-cols-2 gap-1 mt-1">
-            {['Web', 'App', 'Redes', 'Branding', 'Ciberseguridad'].map((topic) => (
+            {topics.map((t) => (
               <Button
-                key={topic}
+                key={t.id}
                 type="button"
-                variant={formData.topic === topic ? 'default' : 'outline'}
+                variant={formData.topic === t.id ? 'default' : 'outline'}
                 size="sm"
                 className="h-8 text-xs"
-                onClick={() => setFormData({ ...formData, topic })}
+                onClick={() => setFormData({ ...formData, topic: t.id })}
               >
-                {topic}
+                {t.label}
               </Button>
             ))}
           </div>
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
-            Cancelar
+          <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9 text-xs">
+            {L('Cancelar', 'Cancel')}
           </Button>
-          <Button type="submit" disabled={isSubmitting || !formData.topic} className="flex-1 h-9">
-            {isSubmitting ? 'Enviando...' : 'Solicitar cita'}
+          <Button type="submit" disabled={isSubmitting || !formData.topic || !formData.name || !formData.email} className="flex-1 h-9 text-xs">
+            {isSubmitting ? L('Enviando...', 'Submitting...') : L('Solicitar cita', 'Request Call')}
           </Button>
         </div>
       </form>

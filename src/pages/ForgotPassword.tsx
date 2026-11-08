@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { z } from 'zod';
 import { SITE_URL } from '@/config/env';
+import { L } from '@/i18n';
 
-const emailSchema = z.string().email({ message: "Email inválido" }).max(255);
+const emailSchema = z.string().email({ message: L("Email inválido", "Invalid email address") }).max(255);
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ const ForgotPassword = () => {
         redirectTo: `${SITE_URL}/reset-password`,
       });
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       // Show generic message regardless of error
       setSubmitted(true);
     } finally {
@@ -42,19 +43,19 @@ const ForgotPassword = () => {
       <div className="p-6">
         <Link to="/auth" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          Volver al login
+          {L('Volver al login', 'Back to Login')}
         </Link>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 pb-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <img alt="Solutions Nova" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
+            <img alt="NOVA Marketing Solutions" className="h-12 w-auto mx-auto mb-4" src="/images/logo-nova.png" />
             <h1 className="text-2xl font-bold text-foreground">
-              Recuperar contraseña
+              {L('Recuperar contraseña', 'Reset Password')}
             </h1>
-            <p className="text-muted-foreground mt-2">
-              Te enviaremos un enlace para restablecer tu contraseña
+            <p className="text-muted-foreground mt-2 text-sm">
+              {L('Te enviaremos un enlace para restablecer tu contraseña', 'We will send you a link to reset your password')}
             </p>
           </div>
 
@@ -62,16 +63,19 @@ const ForgotPassword = () => {
             <div className="glass-card p-8 text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <p className="text-foreground font-medium mb-2">
-                ¡Enlace enviado!
+                {L('¡Enlace enviado!', 'Link Sent!')}
               </p>
               <p className="text-muted-foreground text-sm">
-                Si el email existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.
+                {L(
+                  'Si el email existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
+                  'If the email is registered in our system, you will receive a password reset link shortly.'
+                )}
               </p>
               <Link 
                 to="/auth" 
-                className="inline-block mt-6 text-primary hover:underline"
+                className="inline-block mt-6 text-primary hover:underline text-sm font-medium"
               >
-                Volver al login
+                {L('Volver al login', 'Back to Login')}
               </Link>
             </div>
           ) : (
@@ -87,7 +91,7 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 border border-border/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                    placeholder="tu@email.com"
+                    placeholder="you@company.com"
                     required
                   />
                 </div>
@@ -97,9 +101,9 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
-                {isSubmitting ? 'Enviando...' : 'Enviar enlace'}
+                {isSubmitting ? L('Enviando...', 'Sending...') : L('Enviar enlace', 'Send Reset Link')}
               </button>
             </form>
           )}

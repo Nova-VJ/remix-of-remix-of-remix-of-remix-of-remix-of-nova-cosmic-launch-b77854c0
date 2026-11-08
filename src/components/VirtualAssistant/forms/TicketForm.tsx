@@ -6,30 +6,32 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { L, isEn } from '@/i18n';
 
 interface TicketFormProps {
   onComplete: () => void;
   onCancel: () => void;
 }
 
-const CATEGORIES = [
-  { id: 'bug', label: 'Bug / Error' },
-  { id: 'cambio', label: 'Cambio' },
-  { id: 'consulta', label: 'Consulta' },
-  { id: 'soporte', label: 'Soporte' }
-];
-
-const PRIORITIES = [
-  { id: 'baja', label: 'Baja' },
-  { id: 'normal', label: 'Normal' },
-  { id: 'alta', label: 'Alta' },
-  { id: 'urgente', label: 'Urgente' }
-];
-
 const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const categories = [
+    { id: 'bug', label: L('Bug / Error', 'Bug / Issue') },
+    { id: 'cambio', label: L('Cambio', 'Change Request') },
+    { id: 'consulta', label: L('Consulta', 'General Question') },
+    { id: 'soporte', label: L('Soporte', 'Technical Support') }
+  ];
+
+  const priorities = [
+    { id: 'baja', label: L('Baja', 'Low') },
+    { id: 'normal', label: L('Normal', 'Medium') },
+    { id: 'alta', label: L('Alta', 'High') },
+    { id: 'urgente', label: L('Urgente', 'Urgent') }
+  ];
+
   const [formData, setFormData] = useState({
     name: '',
     email: user?.email || '',
@@ -54,14 +56,14 @@ const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
       if (error) throw error;
 
       toast({
-        title: "¡Ticket creado!",
-        description: "Te responderemos lo antes posible."
+        title: L("¡Ticket creado!", "Ticket Created!"),
+        description: L("Te responderemos lo antes posible.", "Our support team will reply as soon as possible.")
       });
       onComplete();
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "No se pudo crear el ticket. Inténtalo de nuevo.",
+        title: L("Error", "Error"),
+        description: L("No se pudo crear el ticket. Inténtalo de nuevo.", "Could not create ticket. Please try again."),
         variant: "destructive"
       });
     } finally {
@@ -74,19 +76,19 @@ const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
       {!user && (
         <>
           <div>
-            <Label htmlFor="name" className="text-xs">Nombre *</Label>
+            <Label htmlFor="name" className="text-xs">{L('Nombre *', 'Full Name *')}</Label>
             <Input
               id="name"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="h-9 text-sm"
-              placeholder="Tu nombre"
+              placeholder={L('Tu nombre', 'Your name')}
             />
           </div>
 
           <div>
-            <Label htmlFor="email" className="text-xs">Email *</Label>
+            <Label htmlFor="email" className="text-xs">{L('Email *', 'Email *')}</Label>
             <Input
               id="email"
               type="email"
@@ -94,27 +96,27 @@ const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="h-9 text-sm"
-              placeholder="tu@email.com"
+              placeholder="you@company.com"
             />
           </div>
 
           <div>
-            <Label htmlFor="phone" className="text-xs">Teléfono</Label>
+            <Label htmlFor="phone" className="text-xs">{L('Teléfono', 'Phone Number')}</Label>
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="h-9 text-sm"
-              placeholder="+34 600 000 000"
+              placeholder={isEn ? "+1 (555) 000-0000" : "+34 600 000 000"}
             />
           </div>
         </>
       )}
 
       <div>
-        <Label className="text-xs">Categoría *</Label>
+        <Label className="text-xs">{L('Categoría *', 'Category *')}</Label>
         <div className="grid grid-cols-2 gap-1 mt-1">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <Button
               key={cat.id}
               type="button"
@@ -130,9 +132,9 @@ const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
       </div>
 
       <div>
-        <Label className="text-xs">Prioridad</Label>
+        <Label className="text-xs">{L('Prioridad', 'Priority')}</Label>
         <div className="grid grid-cols-4 gap-1 mt-1">
-          {PRIORITIES.map((pri) => (
+          {priorities.map((pri) => (
             <Button
               key={pri.id}
               type="button"
@@ -148,35 +150,35 @@ const TicketForm = ({ onComplete, onCancel }: TicketFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="subject" className="text-xs">Asunto *</Label>
+        <Label htmlFor="subject" className="text-xs">{L('Asunto *', 'Subject *')}</Label>
         <Input
           id="subject"
           required
           value={formData.subject}
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Describe brevemente el problema"
+          placeholder={L('Describe brevemente el problema', 'Brief summary of the issue')}
         />
       </div>
 
       <div>
-        <Label htmlFor="message" className="text-xs">Descripción *</Label>
+        <Label htmlFor="message" className="text-xs">{L('Descripción *', 'Description *')}</Label>
         <Textarea
           id="message"
           required
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
           className="text-sm min-h-[80px]"
-          placeholder="Explica el problema con detalle..."
+          placeholder={L('Explica el problema con detalle...', 'Explain the issue in detail...')}
         />
       </div>
 
       <div className="flex gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
-          Cancelar
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9 text-xs">
+          {L('Cancelar', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isSubmitting || !formData.category} className="flex-1 h-9">
-          {isSubmitting ? 'Creando...' : 'Crear ticket'}
+        <Button type="submit" disabled={isSubmitting || !formData.category} className="flex-1 h-9 text-xs">
+          {isSubmitting ? L('Creando...', 'Creating...') : L('Crear ticket', 'Submit Ticket')}
         </Button>
       </div>
     </form>

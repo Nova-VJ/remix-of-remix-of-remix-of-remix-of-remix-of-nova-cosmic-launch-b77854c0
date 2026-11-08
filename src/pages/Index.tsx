@@ -12,6 +12,7 @@ import SoftwareBand from '@/components/SoftwareBand';
 import DemosSection from '@/components/DemosSection';
 import OwnSystemSection from '@/components/OwnSystemSection';
 import PackagesSection from '@/components/PackagesSection';
+import GrowthBenefitsSection from '@/components/GrowthBenefitsSection';
 import ProcessSection from '@/components/ProcessSection';
 import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
@@ -65,6 +66,7 @@ const Index = () => {
         <PortfolioSection />
         <DemosSection />
         <PackagesSection />
+        <GrowthBenefitsSection />
         <ProcessSection />
         <ComparisonSection />
         <ResultsSection />

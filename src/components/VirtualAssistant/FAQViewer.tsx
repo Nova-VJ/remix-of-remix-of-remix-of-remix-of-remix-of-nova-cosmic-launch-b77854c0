@@ -3,6 +3,7 @@ import { FAQ_CATEGORIES } from '@/data/chatFlowData';
 import { ArrowLeft, ChevronDown, ChevronUp, MessageCircle, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { WHATSAPP_NUMBER } from '@/data/chatFlowData';
+import { L } from '@/i18n';
 
 interface FAQViewerProps {
   categoryKey?: string;
@@ -14,7 +15,9 @@ const FAQViewer = ({ categoryKey, onBack, onAgent }: FAQViewerProps) => {
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent('Hola Nova, tengo una pregunta.');
+    const message = encodeURIComponent(
+      L('Hola Nova, tengo una pregunta sobre vuestros servicios.', 'Hi Nova, I have a question about your services.')
+    );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
@@ -29,10 +32,10 @@ const FAQViewer = ({ categoryKey, onBack, onAgent }: FAQViewerProps) => {
           className="h-8 px-2 text-xs"
         >
           <ArrowLeft className="w-3 h-3 mr-1" />
-          Volver
+          {L('Volver', 'Back')}
         </Button>
 
-        <p className="text-sm font-medium">Selecciona una categoría:</p>
+        <p className="text-sm font-medium">{L('Selecciona una categoría:', 'Choose a category:')}</p>
 
         <div className="space-y-1">
           {Object.entries(FAQ_CATEGORIES).map(([key, category]) => (
@@ -64,7 +67,7 @@ const FAQViewer = ({ categoryKey, onBack, onAgent }: FAQViewerProps) => {
         className="h-8 px-2 text-xs"
       >
         <ArrowLeft className="w-3 h-3 mr-1" />
-        Volver
+        {L('Volver', 'Back')}
       </Button>
 
       <p className="text-sm font-medium">{category.label}</p>
@@ -81,38 +84,39 @@ const FAQViewer = ({ categoryKey, onBack, onAgent }: FAQViewerProps) => {
             >
               <span className="text-xs font-medium pr-2">{faq.q}</span>
               {expandedQuestion === idx ? (
-                <ChevronUp className="w-4 h-4 flex-shrink-0" />
+                <ChevronUp className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
               ) : (
-                <ChevronDown className="w-4 h-4 flex-shrink-0" />
+                <ChevronDown className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
               )}
             </button>
             {expandedQuestion === idx && (
               <div className="px-3 pb-3 pt-0">
-                <p className="text-xs text-muted-foreground">{faq.a}</p>
-                <div className="flex gap-2 mt-3">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={onAgent}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <Phone className="w-3 h-3 mr-1" />
-                    Agente
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={handleWhatsApp}
-                    className="h-7 text-xs flex-1"
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                    WhatsApp
-                  </Button>
-                </div>
+                <p className="text-xs text-muted-foreground whitespace-pre-wrap">{faq.a}</p>
               </div>
             )}
           </div>
         ))}
+      </div>
+
+      <div className="pt-2 border-t border-border/50 flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleWhatsApp}
+          className="flex-1 text-xs h-8"
+        >
+          <MessageCircle className="w-3 h-3 mr-1" />
+          WhatsApp
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAgent}
+          className="flex-1 text-xs h-8"
+        >
+          <Phone className="w-3 h-3 mr-1" />
+          {L('Hablar con un agente', 'Talk to a Person')}
+        </Button>
       </div>
     </div>
   );

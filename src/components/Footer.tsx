@@ -42,6 +42,7 @@ const Footer = () => {
               <li><button type="button" onClick={() => goToSection('servicios')} className={linkClass}>{t.hero.chips.apps.label}</button></li>
               <li><button type="button" onClick={() => goToSection('servicios')} className={linkClass}>{t.hero.chips.branding.label}</button></li>
               <li><button type="button" onClick={() => goToSection('paquetes')} className={linkClass}>{t.nav.pricing}</button></li>
+              <li><Link to={isEn ? "/growth-benefits" : "/beneficios-empresas"} className={linkClass}>{isEn ? "Growth Benefits & Credits" : "Beneficios y Créditos"}</Link></li>
             </ul>
           </div>
 

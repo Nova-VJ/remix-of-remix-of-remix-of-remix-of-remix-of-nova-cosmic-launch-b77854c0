@@ -2,6 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SERVICE_NAMES, ServiceType } from '../types';
 import { Palette, Globe, Smartphone, Share2, FileEdit } from 'lucide-react';
+import { L } from '@/i18n';
 
 interface ServiceSelectorProps {
   selected: string[];
@@ -29,8 +30,12 @@ const ServiceSelector = ({ selected, onChange, preselected = [] }: ServiceSelect
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-foreground">¿Qué servicios te interesan?</h3>
-        <p className="text-sm text-muted-foreground">Selecciona uno o varios</p>
+        <h3 className="text-lg font-semibold text-foreground">
+          {L('¿Qué servicios te interesan?', 'Which services are you interested in?')}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {L('Selecciona uno o varios', 'Select one or more')}
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -69,7 +74,7 @@ const ServiceSelector = ({ selected, onChange, preselected = [] }: ServiceSelect
                 {SERVICE_NAMES[key]}
               </Label>
               {isPreselected && (
-                <span className="text-xs text-primary">En tu carrito</span>
+                <span className="text-xs text-primary">{L('En tu carrito', 'In your cart')}</span>
               )}
             </div>
           );

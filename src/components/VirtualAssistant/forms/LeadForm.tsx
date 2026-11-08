@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { L, isEn } from '@/i18n';
 
 interface LeadFormProps {
   serviceType?: string;
@@ -12,7 +13,7 @@ interface LeadFormProps {
   onCancel: () => void;
 }
 
-const BUDGET_RANGES = [
+const BUDGET_RANGES_ES = [
   '< 500 €',
   '500 – 1.000 €',
   '1.000 – 2.500 €',
@@ -20,9 +21,19 @@ const BUDGET_RANGES = [
   '> 5.000 €'
 ];
 
+const BUDGET_RANGES_EN = [
+  '< $500',
+  '$500 – $1,000',
+  '$1,000 – $2,500',
+  '$2,500 – $5,000',
+  '> $5,000'
+];
+
 const LeadForm = ({ serviceType, onComplete, onCancel }: LeadFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const budgetRanges = isEn ? BUDGET_RANGES_EN : BUDGET_RANGES_ES;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,20 +53,20 @@ const LeadForm = ({ serviceType, onComplete, onCancel }: LeadFormProps) => {
     try {
       const { error } = await supabase.from('leads').insert([{
         ...formData,
-        source: 'chat'
+        source: isEn ? 'chat_us' : 'chat'
       }]);
 
       if (error) throw error;
 
       toast({
-        title: "¡Gracias! 🙌",
-        description: "Nuestro equipo te contactará en breve."
+        title: L("¡Gracias! 🙌", "Thank You! 🙌"),
+        description: L("Nuestro equipo te contactará en breve.", "Our team will contact you shortly.")
       });
       onComplete();
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "No se pudo enviar el formulario. Inténtalo de nuevo.",
+        title: L("Error", "Error"),
+        description: L("No se pudo enviar el formulario. Inténtalo de nuevo.", "Could not submit form. Please try again."),
         variant: "destructive"
       });
     } finally {
@@ -66,19 +77,19 @@ const LeadForm = ({ serviceType, onComplete, onCancel }: LeadFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-3 p-2">
       <div>
-        <Label htmlFor="name" className="text-xs">Nombre *</Label>
+        <Label htmlFor="name" className="text-xs">{L('Nombre *', 'Full Name *')}</Label>
         <Input
           id="name"
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Tu nombre"
+          placeholder={L('Tu nombre', 'Your name')}
         />
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-xs">Email *</Label>
+        <Label htmlFor="email" className="text-xs">{L('Email *', 'Email *')}</Label>
         <Input
           id="email"
           type="email"
@@ -86,72 +97,54 @@ const LeadForm = ({ serviceType, onComplete, onCancel }: LeadFormProps) => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="h-9 text-sm"
-          placeholder="tu@email.com"
+          placeholder="you@company.com"
         />
       </div>
 
       <div>
-        <Label htmlFor="phone" className="text-xs">WhatsApp (opcional)</Label>
+        <Label htmlFor="phone" className="text-xs">{L('Teléfono / WhatsApp (opcional)', 'Phone / WhatsApp (optional)')}</Label>
         <Input
           id="phone"
           value={formData.phone}
           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
           className="h-9 text-sm"
-          placeholder="+34 600 000 000"
+          placeholder={isEn ? "+1 (555) 000-0000" : "+34 600 000 000"}
         />
       </div>
 
       <div>
-        <Label className="text-xs">Servicio de interés *</Label>
-        <div className="grid grid-cols-2 gap-1 mt-1">
-          {['Web', 'App', 'Redes', 'Branding', 'Ciberseguridad'].map((service) => (
-            <Button
-              key={service}
-              type="button"
-              variant={formData.service_type === service ? 'default' : 'outline'}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setFormData({ ...formData, service_type: service })}
-            >
-              {service}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="business" className="text-xs">Tipo de negocio</Label>
+        <Label htmlFor="business_type" className="text-xs">{L('Tipo de negocio / Sector', 'Business Type / Industry')}</Label>
         <Input
-          id="business"
+          id="business_type"
           value={formData.business_type}
           onChange={(e) => setFormData({ ...formData, business_type: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Ej: Restaurante, Tienda online..."
+          placeholder={L('Ej: Clínica dental, Restaurante, E-commerce...', 'e.g. Dental clinic, E-commerce, SaaS, Contractor...')}
         />
       </div>
 
       <div>
-        <Label htmlFor="goal" className="text-xs">Objetivo principal</Label>
+        <Label htmlFor="goal" className="text-xs">{L('Objetivo principal', 'Primary Goal')}</Label>
         <Input
           id="goal"
           value={formData.goal}
           onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Ej: Vender más, captar leads..."
+          placeholder={L('Ej: Conseguir más clientes, vender online...', 'e.g. Generate inbound leads, sell online, automate operations...')}
         />
       </div>
 
       <div>
-        <Label className="text-xs">Presupuesto estimado</Label>
-        <div className="grid grid-cols-2 gap-1 mt-1">
-          {BUDGET_RANGES.map((range) => (
+        <Label className="text-xs">{L('Presupuesto aproximado', 'Approximate Budget')}</Label>
+        <div className="grid grid-cols-2 gap-1.5 mt-1">
+          {budgetRanges.map((range) => (
             <Button
               key={range}
               type="button"
               variant={formData.budget_range === range ? 'default' : 'outline'}
               size="sm"
-              className="h-7 text-xs"
               onClick={() => setFormData({ ...formData, budget_range: range })}
+              className="text-xs h-8"
             >
               {range}
             </Button>
@@ -160,40 +153,56 @@ const LeadForm = ({ serviceType, onComplete, onCancel }: LeadFormProps) => {
       </div>
 
       <div>
-        <Label className="text-xs">Urgencia</Label>
+        <Label className="text-xs">{L('¿Cuándo lo necesitas?', 'Timeline / Urgency')}</Label>
         <div className="flex gap-2 mt-1">
-          {['normal', 'urgente'].map((urg) => (
+          {[
+            { id: 'urgent', label: L('Urgente', 'Urgent') },
+            { id: 'normal', label: L('1-2 meses', '1-2 months') },
+            { id: 'flexible', label: L('Flexible', 'Flexible') }
+          ].map((item) => (
             <Button
-              key={urg}
+              key={item.id}
               type="button"
-              variant={formData.urgency === urg ? 'default' : 'outline'}
+              variant={formData.urgency === item.id ? 'default' : 'outline'}
               size="sm"
-              className="h-8 text-xs flex-1 capitalize"
-              onClick={() => setFormData({ ...formData, urgency: urg })}
+              onClick={() => setFormData({ ...formData, urgency: item.id })}
+              className="flex-1 text-xs h-8"
             >
-              {urg}
+              {item.label}
             </Button>
           ))}
         </div>
       </div>
 
       <div>
-        <Label htmlFor="message" className="text-xs">Mensaje (opcional)</Label>
+        <Label htmlFor="message" className="text-xs">{L('Cuéntanos más sobre el proyecto', 'Tell us more about your project')}</Label>
         <Textarea
           id="message"
+          rows={3}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="text-sm min-h-[60px]"
-          placeholder="Cuéntanos más sobre tu proyecto..."
+          className="text-sm resize-none"
+          placeholder={L('Detalles, ideas, funcionalidades necesarias...', 'Details, core requirements, integrations needed...')}
         />
       </div>
 
       <div className="flex gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
-          Cancelar
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onCancel}
+          className="flex-1 text-xs"
+        >
+          {L('Cancelar', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="flex-1 h-9">
-          {isSubmitting ? 'Enviando...' : 'Enviar'}
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSubmitting || !formData.name || !formData.email}
+          className="flex-1 text-xs"
+        >
+          {isSubmitting ? L('Enviando...', 'Submitting...') : L('Enviar solicitud', 'Submit Request')}
         </Button>
       </div>
     </form>

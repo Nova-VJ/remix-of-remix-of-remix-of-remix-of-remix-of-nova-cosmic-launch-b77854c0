@@ -11,14 +11,30 @@ export const getLocale = (): Locale => {
     return envLocale;
   }
 
-  // 2. Browser runtime fallback by domain (in case served on novasolutionsmkt.com without env set)
-  if (typeof window !== 'undefined' && window.location?.hostname) {
-    const host = window.location.hostname.toLowerCase();
-    if (host.includes('novasolutionsmkt.com')) {
-      return 'en';
+  // 2. Browser runtime fallback by domain & query param
+  if (typeof window !== 'undefined') {
+    // Explicit query param override ?lang=en or ?lang=es
+    if (window.location?.search) {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('lang') || params.get('locale');
+      if (q === 'en' || q === 'es') {
+        return q;
+      }
     }
-    if (host.includes('solutionsnova.es')) {
-      return 'es';
+
+    if (window.location?.hostname) {
+      const host = window.location.hostname.toLowerCase();
+      // US domain or Cloudflare pages deployment for US
+      if (
+        host.includes('novasolutionsmkt.com') ||
+        host.includes('77851234') ||
+        host.includes('novasolutions')
+      ) {
+        return 'en';
+      }
+      if (host.includes('solutionsnova.es')) {
+        return 'es';
+      }
     }
   }
 

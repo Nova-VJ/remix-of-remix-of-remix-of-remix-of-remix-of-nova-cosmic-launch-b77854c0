@@ -1,5 +1,7 @@
-// FAQ Categories and Responses
-export const FAQ_CATEGORIES = {
+import { isEn } from '@/i18n';
+
+// FAQ Categories and Responses - Spanish
+const FAQ_CATEGORIES_ES = {
   services: {
     label: 'Sobre nuestros servicios',
     questions: [
@@ -99,104 +101,26 @@ export const FAQ_CATEGORIES = {
         a: 'Un plan para mantener tu web segura, actualizada y rápida: actualizaciones, backups, revisión de errores y soporte.'
       },
       {
-        q: '¿Qué incluye el mantenimiento de apps?',
-        a: 'Corrección de bugs, actualizaciones de librerías, compatibilidad con nuevas versiones de iOS/Android y soporte ante cambios de tiendas.'
-      },
-      {
         q: '¿Es obligatorio contratar mantenimiento?',
-        a: 'No es obligatorio, pero es recomendable para evitar fallos por actualizaciones y mantener seguridad/estabilidad.'
+        a: 'No. La web se entrega funcionando. El mantenimiento es opcional pero muy recomendable para evitar problemas de seguridad y caídas.'
       },
       {
-        q: '¿Cada cuánto se hace el mantenimiento?',
-        a: 'Normalmente mensual. En proyectos grandes puede ser quincenal; en webs sencillas puede ser trimestral.'
+        q: '¿Qué incluye el soporte?',
+        a: 'Resolución de incidencias, dudas, cambios menores de contenido y supervisión técnica según el plan contratado.'
       },
       {
-        q: '¿Qué pasa si no tengo mantenimiento?',
-        a: 'Puede haber riesgos: vulnerabilidades, incompatibilidades, errores tras actualizaciones o caída de rendimiento. Siempre puedes contratarlo después.'
+        q: '¿Cómo pido ayuda si algo falla?',
+        a: 'Puedes abrir un ticket desde el portal de cliente, escribir a soporte o contactar por WhatsApp para urgencias.'
       },
       {
-        q: '¿Puedo contratar mantenimiento más adelante?',
-        a: 'Sí. Primero hacemos una revisión del estado actual y proponemos el plan adecuado.'
-      },
-      {
-        q: '¿Cómo solicito soporte o cambios?',
-        a: 'Desde el chat puedes abrir un ticket indicando tipo (bug/cambio/consulta), prioridad y descripción.'
-      }
-    ]
-  },
-  apps: {
-    label: 'Apps móviles',
-    questions: [
-      {
-        q: '¿Desarrolláis para Android y iOS?',
-        a: 'Sí. Podemos hacer app para una plataforma o ambas. Lo definimos según tu objetivo, presupuesto y urgencia.'
-      },
-      {
-        q: '¿Publicáis la app en App Store y Play Store?',
-        a: 'Sí, te guiamos y gestionamos el proceso técnico. Las cuentas de desarrollador son del cliente (Apple/Google).'
-      },
-      {
-        q: '¿La app será mía?',
-        a: 'Sí. El proyecto es tuyo: entregamos el producto y accesos acordados.'
-      },
-      {
-        q: '¿Incluye backend y panel de administración?',
-        a: 'Si lo necesitas, sí. Muchas apps requieren servidor y panel admin para gestionar usuarios, contenido, pedidos, etc.'
-      },
-      {
-        q: '¿Puedo añadir nuevas funciones más adelante?',
-        a: 'Sí. Lo ideal es empezar con un MVP y añadir módulos por fases.'
-      },
-      {
-        q: '¿Mi app necesita mantenimiento?',
-        a: 'Sí, especialmente si usa librerías, APIs o está en tiendas. iOS/Android cambian y hay que mantener compatibilidad.'
-      },
-      {
-        q: '¿Puedo lanzar primero una versión simple (MVP)?',
-        a: 'Sí. Es la forma más rápida y eficiente: lanzar, validar y mejorar con datos reales.'
-      }
-    ]
-  },
-  webs: {
-    label: 'Webs y e-commerce',
-    questions: [
-      {
-        q: '¿La web será rápida y optimizada para SEO?',
-        a: 'Sí. Hacemos estructura técnica, velocidad y base SEO: rendimiento, metas, estructura, indexación y buenas prácticas.'
-      },
-      {
-        q: '¿Incluye dominio y hosting?',
-        a: 'Podemos gestionarlo o usar el tuyo. Normalmente dominio/hosting se pagan aparte porque dependen del proveedor.'
-      },
-      {
-        q: '¿Podré editar la web yo mismo?',
-        a: 'Sí, si trabajamos con CMS o panel editable. Si es web a medida, también podemos crear un panel admin simple.'
-      },
-      {
-        q: '¿Incluye tienda online y pagos?',
-        a: 'Sí, si es e-commerce. Podemos integrar pago con tarjetas de crédito, Stripe/PayPal y configurar envíos/impuestos según el caso.'
-      },
-      {
-        q: '¿La web es responsive (móvil)?',
-        a: 'Sí, siempre adaptada a móvil y tablet.'
-      },
-      {
-        q: '¿Qué pasa si quiero cambios después?',
-        a: 'Puedes solicitar cambios por ticket o en plan mensual. Los cambios grandes se presupuestan por alcance.'
-      },
-      {
-        q: '¿Podéis migrar mi web actual?',
-        a: 'Sí. Revisamos tu web y hacemos migración con cuidado para no perder SEO ni contenido.'
+        q: '¿Hacéis copias de seguridad?',
+        a: 'Sí, en los planes con mantenimiento incluimos backups periódicos para restaurar la web si fuese necesario.'
       }
     ]
   },
   social: {
-    label: 'Redes sociales y marketing',
+    label: 'Redes sociales y contenido',
     questions: [
-      {
-        q: '¿Qué incluye el community management?',
-        a: 'Planificación, publicación, interacción básica y reportes. El contenido puede ser incluido según plan.'
-      },
       {
         q: '¿Creáis contenido o solo gestionáis?',
         a: 'Ambas opciones: solo gestión o gestión + creación de contenido (posts, reels, stories).'
@@ -337,8 +261,269 @@ export const FAQ_CATEGORIES = {
   }
 };
 
-// Services and Packages Data
-export const SERVICES_DATA = {
+// FAQ Categories and Responses - US English
+const FAQ_CATEGORIES_EN = {
+  services: {
+    label: 'About Our Services',
+    questions: [
+      {
+        q: 'What services does NOVA offer?',
+        a: 'At NOVA, we design and build digital growth systems: conversion-focused websites, custom mobile and web applications, social media content and paid ads, brand identity, and cybersecurity/pentesting. Everything is engineered for speed, clean UX, and measurable business results.'
+      },
+      {
+        q: 'Do you work with startups, small businesses, and enterprises?',
+        a: 'Yes. We adapt the scope to your business stage: from an initial landing page to validate an offer, to scalable custom software with continuous support and enterprise security.'
+      },
+      {
+        q: 'Can I hire just one specific service?',
+        a: 'Absolutely. You can hire us strictly for UI/UX design, custom development, maintenance, paid ad management, branding, or security auditing. We can also optimize or rebuild existing systems.'
+      },
+      {
+        q: 'Do you work with clients across the United States?',
+        a: 'Yes. We operate 100% digitally with seamless video calls, sprint-based milestones, and real-time project portal tracking.'
+      },
+      {
+        q: 'Do you offer monthly retainer plans or fixed-scope projects?',
+        a: 'Both. We deliver fixed-scope turnkey projects (with defined delivery milestones) as well as monthly subscriptions (website maintenance, ad management, continuous improvements, and security).'
+      }
+    ]
+  },
+  pricing: {
+    label: 'Pricing & Estimates',
+    questions: [
+      {
+        q: 'How much does a custom website cost?',
+        a: 'It depends on your scope (landing page, corporate website, or full e-commerce) and features. We provide a transparent range and a fixed quote following a quick 5-minute project briefing.'
+      },
+      {
+        q: 'How much does a mobile app cost?',
+        a: 'Pricing depends on functionality (authentication, payment processing, real-time sync, geolocation, admin portals). We frequently start with an MVP to validate quickly and scale in phases.'
+      },
+      {
+        q: 'How much do social media and ad management plans cost?',
+        a: 'Plans range from core content management to full-funnel paid advertising (Meta/TikTok/Google Ads) with custom creative production. Retainers are tailored to your target volume and conversion goals.'
+      },
+      {
+        q: 'How much does cybersecurity / pentesting cost?',
+        a: 'Pricing depends on attack surface and scope (web app, mobile app, API endpoints). We provide express security audits as well as comprehensive penetration tests with verified re-testing.'
+      },
+      {
+        q: 'Are your quotes fixed or estimated?',
+        a: 'We provide an upfront ballpark estimate, and once deliverables and technical scope are agreed upon, we lock in a clear fixed quote with no surprise fees.'
+      },
+      {
+        q: 'Do you offer custom scopes?',
+        a: 'Always. Every business has distinct priorities (sales, inbound leads, brand authority, or compliance), and every proposal is customized accordingly.'
+      },
+      {
+        q: 'Are there any third-party costs to keep in mind?',
+        a: 'Typically, third-party infrastructure is separate: domain registration, cloud hosting, third-party API keys, Apple/Google developer accounts ($99/year or $25 one-time), and direct ad spend. In cybersecurity, scope expansions are quoted prior to work.'
+      },
+      {
+        q: 'Can I pay in milestones?',
+        a: 'Yes. For fixed-scope projects we standardly work on milestone-based payments: kickoff deposit, milestone review, and final delivery prior to launch.'
+      }
+    ]
+  },
+  timelines: {
+    label: 'Timelines & Process',
+    questions: [
+      {
+        q: 'How long does a website take to build?',
+        a: 'Landing pages are typically live in 1–2 weeks, standard business websites in 2–4 weeks, and advanced platforms or e-commerce stores in 4–8 weeks.'
+      },
+      {
+        q: 'How long does a mobile app take?',
+        a: 'An MVP usually takes 4–8 weeks. Feature-rich cross-platform applications typically run 8–16+ weeks depending on backend integrations and revision cycles.'
+      },
+      {
+        q: 'When does work begin after quote acceptance?',
+        a: 'Work kicks off immediately upon initial milestone confirmation and receipt of project onboarding materials (brand assets, copy guidelines, or account access).'
+      },
+      {
+        q: 'Can you handle urgent rush turnarounds?',
+        a: 'Yes, expedited priority sprints are available subject to team bandwidth. We establish a clear MVP scope to launch critical functionality fast.'
+      },
+      {
+        q: 'What does your step-by-step process look like?',
+        a: '1) Brief & Strategy → 2) Proposal & Agreement → 3) UI/UX Design → 4) Agile Development → 5) QA Testing & Review → 6) Live Launch → 7) Ongoing Support.'
+      },
+      {
+        q: 'Can I see live progress before delivery?',
+        a: 'Yes. We provide interactive staging preview links at each milestone so you can test features before going live.'
+      }
+    ]
+  },
+  maintenance: {
+    label: 'Maintenance & Support',
+    questions: [
+      {
+        q: 'What is web maintenance?',
+        a: 'A dedicated plan ensuring your platform remains fast, secure, and up to date: automated backups, security patching, library upgrades, uptime monitoring, and priority technical support.'
+      },
+      {
+        q: 'Is maintenance mandatory?',
+        a: 'No. All completed projects are handed over fully functional. Maintenance is optional but strongly recommended to safeguard against downtime and security exploits.'
+      },
+      {
+        q: 'What does technical support include?',
+        a: 'Bug fixes, minor content revisions, technical troubleshooting, and priority assistance according to your selected plan.'
+      },
+      {
+        q: 'How do I request support if an issue occurs?',
+        a: 'You can submit a ticket directly through your client dashboard, email our dedicated support desk, or reach us via WhatsApp/phone for urgent matters.'
+      },
+      {
+        q: 'Do you manage backups?',
+        a: 'Yes. All active maintenance plans include regular automated backups with instant disaster-recovery rollback capabilities.'
+      }
+    ]
+  },
+  social: {
+    label: 'Social Media & Paid Ads',
+    questions: [
+      {
+        q: 'Do you produce content or only manage publishing?',
+        a: 'Both options are available: pure management and community engagement, or end-to-end creative production (reels, short-form video, motion graphics, and copy).'
+      },
+      {
+        q: 'Do you run paid advertising campaigns?',
+        a: 'Yes. We configure, test, and optimize conversion campaigns across Meta Ads, TikTok Ads, and Google Ads with comprehensive ROAS tracking.'
+      },
+      {
+        q: 'Which platforms do you focus on?',
+        a: 'Instagram, TikTok, Facebook, LinkedIn, and YouTube, chosen specifically based on where your high-intent buyers spend their time.'
+      },
+      {
+        q: 'Can I hire content creation separately?',
+        a: 'Yes. We offer recurring monthly creative packages (e.g. 8–16 videos/posts) as well as standalone campaign asset production.'
+      },
+      {
+        q: 'Do you provide performance reporting?',
+        a: 'Yes. Monthly reports track impressions, click-through rates, qualified conversions, customer acquisition cost (CAC), and return on ad spend.'
+      },
+      {
+        q: 'How soon can we expect results?',
+        a: 'Organic reach scales steadily over weeks and months. Paid campaigns deliver actionable traffic immediately, which we refine iteratively for peak conversion.'
+      }
+    ]
+  },
+  cybersecurity: {
+    label: 'Cybersecurity & Pentesting',
+    questions: [
+      {
+        q: 'What is penetration testing?',
+        a: 'Controlled security testing where ethical engineers simulate real-world attacks to identify and remediate vulnerabilities before bad actors can exploit them.'
+      },
+      {
+        q: 'What is evaluated in a pentest?',
+        a: 'Entry points, authentication and authorization flows, API exposures, cloud misconfigurations, and data handling vulnerabilities based on your agreed scope.'
+      },
+      {
+        q: 'What does the security deliverable look like?',
+        a: 'An executive summary for stakeholders plus an in-depth technical report with reproduction proofs, CVSS risk ratings, and prioritized remediation instructions.'
+      },
+      {
+        q: 'Do you provide remediation support?',
+        a: 'Yes. We provide actionable code and architecture recommendations and consult directly with your engineering team.'
+      },
+      {
+        q: 'Do you offer a re-test after patches are applied?',
+        a: 'Yes, included in our Pro and Premium audits: we re-assess identified vulnerabilities to certify that the risk has been eliminated.'
+      },
+      {
+        q: 'How long does a pentest take?',
+        a: 'Typically 1 to 4 weeks depending on the application surface, number of microservices, and testing depth.'
+      },
+      {
+        q: 'Do we sign legal authorizations?',
+        a: 'Yes. We define a strict Rules of Engagement (RoE) document and bilateral NDA to ensure all testing is fully authorized and controlled.'
+      },
+      {
+        q: 'Do you provide ongoing security monitoring?',
+        a: 'Yes, we provide recurring monthly vulnerability scanning and configuration reviews.'
+      }
+    ]
+  },
+  revisions: {
+    label: 'Revisions & Warranties',
+    questions: [
+      {
+        q: 'How many revisions are included?',
+        a: 'Every package defines structured revision rounds (typically 1–2 in starter scopes, expanded in Pro and custom plans) to ensure you love the final result.'
+      },
+      {
+        q: 'What counts as an out-of-scope change?',
+        a: 'Features or structural rewrites that were not part of the initial specification (e.g., brand-new modules, additional user roles, or new third-party integrations).'
+      },
+      {
+        q: 'Is there a warranty after project delivery?',
+        a: 'Yes. Every project includes a post-launch warranty window where any technical bug or deviation from specification is corrected at zero additional charge.'
+      },
+      {
+        q: 'What happens if something breaks after launch?',
+        a: 'If caused by an underlying bug within the warranty period, it is resolved immediately. If due to external factor changes (hosting, third-party API deprecations), it is covered under active maintenance or hourly support.'
+      },
+      {
+        q: 'How do I request scope expansions?',
+        a: 'Submit a ticket or ping your project manager. We provide a transparent scope and turnaround time estimate before writing a single line of code.'
+      }
+    ]
+  },
+  billing: {
+    label: 'Payments & Contracts',
+    questions: [
+      {
+        q: 'How are payments handled?',
+        a: 'Bank ACH/wire transfer, credit card via Stripe, or agreed digital invoicing. Fixed-scope projects are invoiced in milestone stages.'
+      },
+      {
+        q: 'Is full payment required upfront?',
+        a: 'No. Standard projects are split across defined milestones: kickoff deposit, functional deliverable review, and final launch.'
+      },
+      {
+        q: 'Can I pay in stages?',
+        a: 'Yes. Milestone-based billing aligns payment with tangible, reviewed project progress.'
+      },
+      {
+        q: 'Is there a long-term commitment?',
+        a: 'Fixed projects have no recurring commitments. Monthly retainer services can be canceled with standard 30-day notice.'
+      },
+      {
+        q: 'What happens if I pause or cancel a recurring service?',
+        a: 'You retain full ownership of all assets delivered to date, and recurring billing terminates per plan terms.'
+      }
+    ]
+  },
+  security: {
+    label: 'Ownership & Data Privacy',
+    questions: [
+      {
+        q: 'Do I own the final code and digital assets?',
+        a: 'Yes 100%. Upon completion and final payment, complete intellectual property and source code ownership transfer to you.'
+      },
+      {
+        q: 'Will I have full administrative access to everything?',
+        a: 'Yes. We hand over credentials and admin rights to your domain, hosting, repository, analytics, and advertising accounts.'
+      },
+      {
+        q: 'Do you use secure source control repositories?',
+        a: 'Yes, all codebases are version-controlled with secure Git repositories and automated deployment pipelines.'
+      },
+      {
+        q: 'How do you safeguard client data?',
+        a: 'We implement industry best practices: role-based access controls, encrypted secret vaults, and strict confidentiality protocols.'
+      },
+      {
+        q: 'Do your platforms comply with privacy regulations?',
+        a: 'Yes. We architect for US privacy standards, CCPA, and GDPR requirements with proper cookie consent and data governance.'
+      }
+    ]
+  }
+};
+
+// Services and Packages Data - Spanish
+const SERVICES_DATA_ES = {
   web: {
     title: 'Páginas Web',
     packs: [
@@ -564,7 +749,238 @@ export const SERVICES_DATA = {
   }
 };
 
-// Locale-aware (Spain / USA): see src/config/env.ts
+// Services and Packages Data - US English
+const SERVICES_DATA_EN = {
+  web: {
+    title: 'Websites',
+    packs: [
+      {
+        id: 'web-basic',
+        name: 'Starter Web Pack',
+        title: 'Professional Starter Website',
+        copy: 'A clean, high-performance website designed to present your business and build trust.',
+        includes: [
+          'Up to 5 sections',
+          'Responsive mobile design',
+          'Contact & lead capture form',
+          'Core technical SEO foundation',
+          'Fast turnaround'
+        ],
+        timeline: '1–2 weeks',
+        price: 'From $400'
+      },
+      {
+        id: 'web-pro',
+        name: 'Pro Conversion Web Pack',
+        title: 'High-Converting Website',
+        copy: 'Engineered to attract visitors, communicate value, and convert them into paying clients.',
+        includes: [
+          '8–12 custom sections',
+          'Bespoke UI/UX design',
+          'Blog or product showcase',
+          'Optimized search & social tags',
+          'Analytics & conversion tracking'
+        ],
+        timeline: '3–4 weeks',
+        price: 'From $600'
+      },
+      {
+        id: 'web-premium',
+        name: 'Premium E-Commerce Pack',
+        title: 'Advanced Platform / E-Commerce',
+        copy: 'A complete custom platform built to sell, automate, and scale with high reliability.',
+        includes: [
+          'Full e-commerce or web platform',
+          'Online payment processing (Stripe/Apple Pay)',
+          'Automated customer workflows',
+          'Speed optimization & CDN',
+          'Built for continuous growth',
+          'First 100 products uploaded free'
+        ],
+        timeline: '4–8 weeks',
+        price: 'From $800'
+      }
+    ]
+  },
+  apps: {
+    title: 'Mobile Applications',
+    packs: [
+      {
+        id: 'app-basic',
+        name: 'App MVP Pack',
+        title: 'MVP Application',
+        copy: 'The fastest path to launch your product idea and validate customer demand.',
+        includes: [
+          '1 platform (iOS or Android)',
+          'Core essential features',
+          'Intuitive user experience',
+          'Scalable codebase architecture'
+        ],
+        timeline: '4–6 weeks',
+        price: 'From $1,700'
+      },
+      {
+        id: 'app-pro',
+        name: 'Pro App Pack',
+        title: 'Full-Featured Application',
+        copy: 'A complete, polished mobile application built for active daily users.',
+        includes: [
+          'User accounts & authentication',
+          'Cloud backend & database',
+          'Push notifications',
+          'Administrative web portal'
+        ],
+        timeline: '8–12 weeks',
+        price: 'From $3,000'
+      },
+      {
+        id: 'app-premium',
+        name: 'Enterprise App Pack',
+        title: 'Advanced Custom Platform',
+        copy: 'A resilient, scalable app built to grow user volume and monetize at scale.',
+        includes: [
+          'iOS + Android cross-platform',
+          'In-app purchases, maps, or real-time sync',
+          'Enterprise cloud architecture',
+          'Post-launch priority support'
+        ],
+        timeline: '12–20 weeks',
+        price: 'From $5,000'
+      }
+    ]
+  },
+  social: {
+    title: 'Social Media & Growth',
+    packs: [
+      {
+        id: 'social-basic',
+        name: 'Starter Social Pack',
+        title: 'Social Media Management',
+        copy: 'Consistent, polished brand presence across your primary social channels.',
+        includes: [
+          '1 social channel management',
+          'Monthly content calendar',
+          'Community engagement & responses',
+          'Monthly performance report'
+        ],
+        price: 'From $500/mo'
+      },
+      {
+        id: 'social-plus',
+        name: 'Accelerated Growth Pack',
+        title: 'Content + Paid Ads Engine',
+        copy: 'Full-funnel organic strategy combined with high-ROAS paid advertising.',
+        includes: [
+          'Multi-channel management',
+          'Original creative assets & short-form video',
+          'Monthly recording & production sprint',
+          'Pre & post-production editing',
+          'Meta & TikTok Ads campaign management',
+          'Continuous conversion optimization'
+        ],
+        price: 'From $900/mo',
+        note: 'First month introductory rate: $500. Brand identity package quoted separately.'
+      }
+    ]
+  },
+  branding: {
+    title: 'Brand Identity',
+    packs: [
+      {
+        id: 'branding-basic',
+        name: 'Starter Branding Pack',
+        title: 'Essential Brand Identity',
+        copy: 'Clear, modern visual identity to launch your business with confidence.',
+        includes: [
+          'Primary & secondary logo variations',
+          'Defined color palette & tokens',
+          'Typography system'
+        ],
+        price: 'From $200'
+      },
+      {
+        id: 'branding-pro',
+        name: 'Premium Branding Pack',
+        title: 'Complete Brand System',
+        copy: 'A cohesive, memorable brand identity built to command market authority.',
+        includes: [
+          'Complete brand identity system',
+          'Comprehensive brand guidelines manual',
+          'Digital templates & social assets',
+          'Corporate stationery & print assets'
+        ],
+        price: 'Custom quote (by scope)'
+      }
+    ]
+  },
+  cybersecurity: {
+    title: 'Cybersecurity & Pentesting',
+    packs: [
+      {
+        id: 'ciber-basic',
+        name: 'Security Audit Pack',
+        title: 'Express Security Audit',
+        copy: 'Pinpoint critical risks and attack surface vulnerabilities to harden your systems quickly.',
+        includes: [
+          'Attack surface and configuration review',
+          'Web and app security best-practices audit',
+          'Prioritized vulnerability checklist',
+          'Executive and technical summary report'
+        ],
+        timeline: '3–5 days',
+        price: 'From $900'
+      },
+      {
+        id: 'ciber-pro',
+        name: 'Pro Pentest Pack',
+        title: 'Web & App Penetration Testing',
+        copy: 'Ethical intrusion testing to discover vulnerabilities before malicious actors do.',
+        includes: [
+          'Defined Rules of Engagement & scope',
+          'Thorough manual and automated testing',
+          'Evidence documentation & severity scoring',
+          'Remediation guide & technical walkthrough',
+          'Executive presentation briefing'
+        ],
+        timeline: '1–2 weeks',
+        price: 'From $2,500'
+      },
+      {
+        id: 'ciber-premium',
+        name: 'Advanced Pentest + Re-Test',
+        title: 'Comprehensive Audit & Verification',
+        copy: 'Deep security testing, business-impact prioritization, and post-patch re-testing.',
+        includes: [
+          'Advanced multi-tier penetration testing',
+          'Real-world business impact analysis',
+          'Step-by-step remediation roadmap',
+          'Full re-test to verify patched vulnerabilities',
+          'Updated final certification report'
+        ],
+        timeline: '2–4 weeks',
+        price: 'From $5,000'
+      },
+      {
+        id: 'ciber-monthly',
+        name: 'Monthly Security Guard',
+        title: 'Continuous Vulnerability Monitoring',
+        copy: 'Ongoing surveillance and recurring scans to minimize security risk over time.',
+        includes: [
+          'Recurring monthly vulnerability scanning',
+          'Continuous security advisories',
+          'Change-control security reviews'
+        ],
+        price: 'From $300/mo'
+      }
+    ]
+  }
+};
+
+// Export locale-aware objects
+export const FAQ_CATEGORIES = isEn ? FAQ_CATEGORIES_EN : FAQ_CATEGORIES_ES;
+export const SERVICES_DATA = isEn ? SERVICES_DATA_EN : SERVICES_DATA_ES;
+
+// Locale-aware contact credentials (see src/config/env.ts)
 export { WHATSAPP_NUMBER, CONTACT_EMAIL } from '@/config/env';
 
 export const CALENDLY_LINK = 'https://calendly.com/solutionsnova';

@@ -3,6 +3,7 @@ import Linkify from 'linkify-react';
 import { ExternalLink, MessageCircle } from 'lucide-react';
 import { FORM_URL, WHATSAPP_URL } from '@/config/env';
 import saraAvatar from '@/assets/sara-avatar.webp';
+import { L, isEn } from '@/i18n';
 
 interface ChatMessageProps {
   message: string;
@@ -51,7 +52,7 @@ const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => {
           className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-[#25D366] text-white font-medium text-xs hover:bg-[#20BD5A] transition-colors no-underline"
         >
           <MessageCircle className="w-3.5 h-3.5" />
-          Abrir WhatsApp
+          {L('Abrir WhatsApp', 'Open WhatsApp')}
         </a>
       );
     }
@@ -64,7 +65,7 @@ const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => {
           className="inline-flex items-center gap-1 px-3 py-1.5 mt-1 rounded-lg bg-primary text-primary-foreground font-medium text-xs hover:bg-primary/90 transition-colors no-underline"
         >
           <ExternalLink className="w-3.5 h-3.5" />
-          Abrir formulario
+          {L('Abrir formulario', 'Open Form')}
         </a>
       );
     }
@@ -115,7 +116,7 @@ const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => {
         </div>
         {timestamp && (
           <span className={cn("mt-1 block text-[10px] opacity-60", !isBot && "text-right")}>
-            {timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+            {timestamp.toLocaleTimeString(isEn ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
       </div>

@@ -36,6 +36,7 @@ const DeferredCookieConsent = () => {
   );
 };
 const InstalarApp = lazy(() => import("./pages/InstalarApp"));
+const GrowthBenefits = lazy(() => import("./pages/GrowthBenefits"));
 
 const App = () => (
   <AuthProvider>
@@ -61,6 +62,8 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/instalar-app" element={<InstalarApp />} />
+            <Route path="/growth-benefits" element={<GrowthBenefits />} />
+            <Route path="/beneficios-empresas" element={<GrowthBenefits />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

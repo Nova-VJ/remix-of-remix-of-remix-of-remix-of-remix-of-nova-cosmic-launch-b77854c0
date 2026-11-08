@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { UserPlus, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { L } from '@/i18n';
 
 interface ContactSectionProps {
   data: FormData;
@@ -51,8 +52,12 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-foreground">Datos de contacto</h3>
-        <p className="text-sm text-muted-foreground">Para poder enviarte el presupuesto</p>
+        <h3 className="text-lg font-semibold text-foreground">
+          {L('Datos de contacto', 'Contact Information')}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {L('Para poder enviarte el presupuesto', 'So we can send you your custom proposal')}
+        </p>
       </div>
 
       {/* Button to fill from profile or account prompt */}
@@ -69,7 +74,7 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           ) : (
             <User className="w-4 h-4" />
           )}
-          Rellenar con datos de tu perfil
+          {L('Rellenar con datos de tu perfil', 'Autofill from your profile')}
         </Button>
       ) : (
         /* Account prompt for non-logged users */
@@ -77,15 +82,15 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
           <UserPlus className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-sm text-foreground font-medium">
-              ¿Sabías que puedes crear una cuenta?
+              {L('¿Sabías que puedes crear una cuenta?', 'Did you know you can create an account?')}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Así solo tendrás que rellenar los datos del contacto una vez.{' '}
+              {L('Así solo tendrás que rellenar los datos del contacto una vez. ', 'Save time and access your client portal anytime. ')}
               <Link 
                 to="/auth?redirect=briefing" 
                 className="text-primary hover:underline"
               >
-                Crear cuenta
+                {L('Crear cuenta', 'Sign up')}
               </Link>
             </p>
           </div>
@@ -94,20 +99,20 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
 
       <div className="grid gap-4">
         <div className="space-y-2">
-          <Label htmlFor="contacto_nombre">Nombre *</Label>
+          <Label htmlFor="contacto_nombre">{L('Nombre *', 'Full Name *')}</Label>
           <Input
             id="contacto_nombre"
             autoComplete="name"
             name="contacto_nombre"
             value={data.contacto_nombre}
             onChange={(e) => onChange('contacto_nombre', e.target.value)}
-            placeholder="Tu nombre"
+            placeholder={L('Tu nombre', 'Your name')}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_email">Email *</Label>
+          <Label htmlFor="contacto_email">{L('Email *', 'Email Address *')}</Label>
           <Input
             id="contacto_email"
             autoComplete="email"
@@ -115,13 +120,13 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
             type="email"
             value={data.contacto_email}
             onChange={(e) => onChange('contacto_email', e.target.value)}
-            placeholder="tu@email.com"
+            placeholder="you@company.com"
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_telefono">Teléfono</Label>
+          <Label htmlFor="contacto_telefono">{L('Teléfono', 'Phone Number')}</Label>
           <Input
             id="contacto_telefono"
             autoComplete="tel"
@@ -129,36 +134,36 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
             type="tel"
             value={data.contacto_telefono}
             onChange={(e) => onChange('contacto_telefono', e.target.value)}
-            placeholder="+34 600 000 000"
+            placeholder={L('+34 600 000 000', '+1 (555) 000-0000')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_negocio">Nombre del negocio *</Label>
+          <Label htmlFor="contacto_negocio">{L('Nombre del negocio *', 'Business Name *')}</Label>
           <Input
             id="contacto_negocio"
             autoComplete="organization"
             name="contacto_negocio"
             value={data.contacto_negocio}
             onChange={(e) => onChange('contacto_negocio', e.target.value)}
-            placeholder="Tu empresa o proyecto"
+            placeholder={L('Tu empresa o proyecto', 'Your business or brand')}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_sector">Sector</Label>
+          <Label htmlFor="contacto_sector">{L('Sector', 'Industry / Sector')}</Label>
           <Input
             id="contacto_sector"
             name="contacto_sector"
             value={data.contacto_sector}
             onChange={(e) => onChange('contacto_sector', e.target.value)}
-            placeholder="Ej: Hostelería, Tecnología, Moda..."
+            placeholder={L('Ej: Hostelería, Tecnología, Moda...', 'e.g., Hospitality, E-commerce, Tech, Services...')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_web">Web actual (si tienes)</Label>
+          <Label htmlFor="contacto_web">{L('Web actual (si tienes)', 'Current Website (if any)')}</Label>
           <Input
             id="contacto_web"
             autoComplete="url"
@@ -171,24 +176,24 @@ const ContactSection = ({ data, onChange }: ContactSectionProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_rrss">Redes sociales actuales</Label>
+          <Label htmlFor="contacto_rrss">{L('Redes sociales actuales', 'Current Social Media Profiles')}</Label>
           <Input
             id="contacto_rrss"
             name="contacto_rrss"
             value={data.contacto_rrss || ''}
             onChange={(e) => onChange('contacto_rrss', e.target.value)}
-            placeholder="Ej: @tunegocio en Instagram, Facebook..."
+            placeholder={L('Ej: @tunegocio en Instagram, Facebook...', 'e.g., @yourbrand on Instagram, LinkedIn...')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contacto_app">App actual (si tienes)</Label>
+          <Label htmlFor="contacto_app">{L('App actual (si tienes)', 'Current Mobile App (if any)')}</Label>
           <Input
             id="contacto_app"
             name="contacto_app"
             value={data.contacto_app || ''}
             onChange={(e) => onChange('contacto_app', e.target.value)}
-            placeholder="Ej: Nombre de tu app o link a tienda"
+            placeholder={L('Ej: Nombre de tu app o link a tienda', 'e.g., App name or App Store link')}
           />
         </div>
       </div>

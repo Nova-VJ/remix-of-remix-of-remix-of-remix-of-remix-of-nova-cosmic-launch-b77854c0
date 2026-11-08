@@ -5,19 +5,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { L } from '@/i18n';
 
 interface EmailFormProps {
   onComplete: () => void;
   onCancel: () => void;
 }
-
-const CATEGORIES = [
-  { id: 'ventas', label: 'Ventas' },
-  { id: 'soporte', label: 'Soporte' },
-  { id: 'presupuesto', label: 'Presupuesto' },
-  { id: 'ciberseguridad', label: 'Ciberseguridad' },
-  { id: 'otro', label: 'Otro' }
-];
 
 const EmailForm = ({ onComplete, onCancel }: EmailFormProps) => {
   const { toast } = useToast();
@@ -26,8 +19,7 @@ const EmailForm = ({ onComplete, onCancel }: EmailFormProps) => {
     name: '',
     email: '',
     subject: '',
-    message: '',
-    category: ''
+    message: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,14 +32,14 @@ const EmailForm = ({ onComplete, onCancel }: EmailFormProps) => {
       if (error) throw error;
 
       toast({
-        title: "¡Mensaje enviado!",
-        description: "Te responderemos lo antes posible."
+        title: L("¡Mensaje enviado!", "Message Sent!"),
+        description: L("Te responderemos a la mayor brevedad posible.", "We will reply to your email as soon as possible.")
       });
       onComplete();
-    } catch (error) {
+    } catch {
       toast({
-        title: "Error",
-        description: "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+        title: L("Error", "Error"),
+        description: L("No se pudo enviar el mensaje. Inténtalo de nuevo.", "Could not send message. Please try again."),
         variant: "destructive"
       });
     } finally {
@@ -58,19 +50,19 @@ const EmailForm = ({ onComplete, onCancel }: EmailFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-3 p-2">
       <div>
-        <Label htmlFor="name" className="text-xs">Nombre *</Label>
+        <Label htmlFor="name" className="text-xs">{L('Nombre *', 'Full Name *')}</Label>
         <Input
           id="name"
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Tu nombre"
+          placeholder={L('Tu nombre', 'Your name')}
         />
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-xs">Email *</Label>
+        <Label htmlFor="email" className="text-xs">{L('Email *', 'Email *')}</Label>
         <Input
           id="email"
           type="email"
@@ -78,58 +70,52 @@ const EmailForm = ({ onComplete, onCancel }: EmailFormProps) => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="h-9 text-sm"
-          placeholder="tu@email.com"
+          placeholder="you@company.com"
         />
       </div>
 
       <div>
-        <Label className="text-xs">Asunto *</Label>
-        <div className="grid grid-cols-3 gap-1 mt-1">
-          {CATEGORIES.map((cat) => (
-            <Button
-              key={cat.id}
-              type="button"
-              variant={formData.category === cat.id ? 'default' : 'outline'}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setFormData({ ...formData, category: cat.id })}
-            >
-              {cat.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="subject" className="text-xs">Título del mensaje *</Label>
+        <Label htmlFor="subject" className="text-xs">{L('Asunto *', 'Subject *')}</Label>
         <Input
           id="subject"
           required
           value={formData.subject}
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
           className="h-9 text-sm"
-          placeholder="Asunto de tu mensaje"
+          placeholder={L('¿De qué trata tu consulta?', 'What is your inquiry about?')}
         />
       </div>
 
       <div>
-        <Label htmlFor="message" className="text-xs">Mensaje *</Label>
+        <Label htmlFor="message" className="text-xs">{L('Mensaje *', 'Message *')}</Label>
         <Textarea
           id="message"
           required
+          rows={3}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="text-sm min-h-[80px]"
-          placeholder="Cuéntanos en qué podemos ayudarte..."
+          className="text-sm resize-none"
+          placeholder={L('Escribe tu mensaje aquí...', 'Write your message here...')}
         />
       </div>
 
       <div className="flex gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 h-9">
-          Cancelar
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onCancel}
+          className="flex-1 text-xs"
+        >
+          {L('Cancelar', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isSubmitting || !formData.category} className="flex-1 h-9">
-          {isSubmitting ? 'Enviando...' : 'Enviar'}
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSubmitting || !formData.name || !formData.email || !formData.message}
+          className="flex-1 text-xs"
+        >
+          {isSubmitting ? L('Enviando...', 'Sending...') : L('Enviar correo', 'Send Email')}
         </Button>
       </div>
     </form>
