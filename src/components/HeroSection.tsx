@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import metodoNovaIcon from '@/assets/metodo-nova-icon.webp';
-import { ArrowRight, MessageCircle, MapPin, Clock, ShieldCheck, Globe, Smartphone, Palette, Share2, TrendingUp, Star } from 'lucide-react';
-import { useTranslation } from '@/i18n';
+import { ArrowRight, MessageCircle, MapPin, Clock, ShieldCheck, Globe, Smartphone, Palette, Share2, TrendingUp, Star, Sparkles } from 'lucide-react';
+import { useTranslation, L } from '@/i18n';
 import { WHATSAPP_URL } from '@/config/env';
 
 // Decorative website mock-up drawn with CSS/SVG: no image to download
@@ -177,6 +177,31 @@ const HeroSection = () => {
               <ArrowRight className="h-4 w-4" />
             </span>
           </a>
+
+          {/* NOVA Benefit Finder Diagnostic CTA */}
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('nova:open-finder'))}
+            className="group mt-3 flex max-w-xl w-full items-center justify-between rounded-xl border border-primary/25 bg-primary/5 px-4 py-2.5 text-left text-xs font-medium text-foreground transition-all hover:border-primary/50 hover:bg-primary/10"
+          >
+            <span className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+              </span>
+              <span>
+                <strong className="font-semibold text-primary">
+                  {L('NOVA Benefit Finder:', 'NOVA Benefit Finder:')}
+                </strong>{' '}
+                {L(
+                  'Comprueba en 1 min si calificas a créditos de Google/TikTok y herramientas gratis.',
+                  'Find out in 1 min if you qualify for Google/TikTok ad credits & free tools.'
+                )}
+              </span>
+            </span>
+            <span className="hidden sm:inline-flex items-center text-primary font-semibold text-[11px] shrink-0 ml-2">
+              {L('Hacer diagnóstico →', 'Start Diagnostic →')}
+            </span>
+          </button>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button

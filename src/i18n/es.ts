@@ -159,7 +159,7 @@ export const es: TranslationSchema = {
     description:
       'Desarrollamos software, aplicaciones y sistemas de inteligencia artificial que ayudan a las empresas a vender más, ahorrar tiempo y controlar sus operaciones.',
     ctaConsultation: 'Solicitar asesoramiento',
-    ctaDemo: 'Ver demostración',
+    ctaDemo: 'Ver muestras de proyectos',
   },
   services: {
     eyebrow: 'Servicios',

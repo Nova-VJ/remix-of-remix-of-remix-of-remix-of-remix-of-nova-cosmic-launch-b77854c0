@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Lightbulb } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import { FOTOS_VERSION, SECTOR_DEMOS } from '@/data/demos';
-import { L } from '@/i18n';
+import { L, isEn } from '@/i18n';
 
 const DemosSection = () => (
   <section id="demos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
@@ -17,7 +17,7 @@ const DemosSection = () => (
         {SECTOR_DEMOS.map(({ carpeta, sector, icon: Icon }) => (
           <li key={carpeta}>
             <a
-              href={`/demos/${carpeta}/`}
+              href={`/demos/${carpeta}/${isEn ? '?lang=en' : ''}`}
               target="_blank"
               rel="noopener"
               className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl border border-border bg-neutral-900 p-4 lg:aspect-[16/9] text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -35,7 +35,7 @@ const DemosSection = () => (
               </span>
               <span className="relative text-base font-bold leading-tight sm:text-lg">{sector}</span>
               <span className="relative mt-1 inline-flex items-center gap-1 text-sm font-medium text-white/85 group-hover:text-white">
-                {L('Ver demo', 'View demo')}
+                {L('Ver demo', 'View showcase')}
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
               </span>
             </a>
@@ -59,9 +59,12 @@ const DemosSection = () => (
       </ul>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        {L('Son negocios inventados para enseñarte el resultado; las fotos de ambiente están creadas con IA.', 'These are fictional businesses built to show you the result; the photos are AI-generated. The demo sites are in Spanish for now.')}{' '}
-        <a href="/demos/" target="_blank" rel="noopener" className="font-medium text-primary underline-offset-4 hover:underline">
-          {L('Ver todas las demos', 'See all demos')}
+        {L(
+          'Son negocios inventados para enseñarte el resultado; las fotos de ambiente están creadas con IA.',
+          'Sample showcases built to illustrate real system capabilities (online booking, automated notifications, AI chat); photos are AI-generated.'
+        )}{' '}
+        <a href={`/demos/${isEn ? '?lang=en' : ''}`} target="_blank" rel="noopener" className="font-medium text-primary underline-offset-4 hover:underline">
+          {L('Ver todas las demos', 'See all showcases')}
         </a>
       </p>
     </div>

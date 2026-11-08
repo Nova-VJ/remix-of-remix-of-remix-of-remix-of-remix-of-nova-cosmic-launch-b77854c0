@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { scrollToSectionId } from '@/lib/scroll';
 import SEOHead from '@/components/SEOHead';
@@ -13,6 +13,7 @@ import DemosSection from '@/components/DemosSection';
 import OwnSystemSection from '@/components/OwnSystemSection';
 import PackagesSection from '@/components/PackagesSection';
 import GrowthBenefitsSection from '@/components/GrowthBenefitsSection';
+import BenefitFinderModal from '@/components/BenefitFinderModal';
 import ProcessSection from '@/components/ProcessSection';
 import ComparisonSection from '@/components/ComparisonSection';
 import ResultsSection from '@/components/ResultsSection';
@@ -32,6 +33,8 @@ import Footer from '@/components/Footer';
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const shouldOpenBriefing = searchParams.get('openBriefing') === 'true';
+  const shouldOpenFinder = searchParams.get('openFinder') === 'true';
+  const [finderOpen, setFinderOpen] = useState(false);
   const idle = useIdle();
   const { hash } = useLocation();
 
@@ -44,13 +47,19 @@ const Index = () => {
   }, [hash]);
   useSpotlight();
 
-  // Clear the openBriefing param after it's been read
+  // Clear the openBriefing / openFinder params after they have been read
   useEffect(() => {
-    if (shouldOpenBriefing) {
-      // Remove the param from URL without refresh
+    if (shouldOpenBriefing || shouldOpenFinder) {
+      if (shouldOpenFinder) setFinderOpen(true);
       setSearchParams({}, { replace: true });
     }
-  }, [shouldOpenBriefing, setSearchParams]);
+  }, [shouldOpenBriefing, shouldOpenFinder, setSearchParams]);
+
+  useEffect(() => {
+    const handler = () => setFinderOpen(true);
+    window.addEventListener('nova:open-finder', handler);
+    return () => window.removeEventListener('nova:open-finder', handler);
+  }, []);
 
   return (
     <>
@@ -74,6 +83,7 @@ const Index = () => {
         <ContactSection autoOpenBriefing={shouldOpenBriefing} />
         <Footer />
         <StickyMobileCTA />
+        <BenefitFinderModal open={finderOpen} onOpenChange={setFinderOpen} />
         {idle && (
           <Suspense fallback={null}>
             <ShoppingCart />

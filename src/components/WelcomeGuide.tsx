@@ -69,7 +69,7 @@ const WelcomeGuide = () => {
         scrollToSectionId('sistema-propio');
         break;
       case 'benefits':
-        navigate(isEn ? '/growth-benefits' : '/beneficios-empresas');
+        window.dispatchEvent(new CustomEvent('nova:open-finder'));
         break;
       case 'services':
         scrollToSectionId('servicios');

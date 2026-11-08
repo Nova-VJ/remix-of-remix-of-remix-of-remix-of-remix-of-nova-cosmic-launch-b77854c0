@@ -159,7 +159,7 @@ export const en: TranslationSchema = {
     description:
       'We develop custom software, mobile apps, and artificial intelligence solutions that empower companies to close more sales, eliminate manual tasks, and maintain complete operational control.',
     ctaConsultation: 'Request a Free Consultation',
-    ctaDemo: 'Watch Interactive Demo',
+    ctaDemo: 'View Project Showcases',
   },
   services: {
     eyebrow: 'Services',

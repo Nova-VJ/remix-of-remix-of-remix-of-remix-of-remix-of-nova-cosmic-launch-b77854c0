@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Sparkles, DollarSign, Wrench, Rocket, ShoppingBag, HeartHandshake, ShieldCheck, ExternalLink, ArrowRight, CheckCircle2, ChevronDown, ChevronUp, Search, Filter } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,11 +11,25 @@ import { GROWTH_BENEFITS, BenefitCategory, BenefitCountry } from '@/data/growthB
 import BenefitFinderModal from '@/components/BenefitFinderModal';
 
 const GrowthBenefits = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [finderOpen, setFinderOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<BenefitCategory | 'all'>('all');
   const [countryFilter, setCountryFilter] = useState<BenefitCountry | 'ALL'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get('openFinder') === 'true') {
+      setFinderOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    const handler = () => setFinderOpen(true);
+    window.addEventListener('nova:open-finder', handler);
+    return () => window.removeEventListener('nova:open-finder', handler);
+  }, []);
 
   const categories: { id: BenefitCategory | 'all'; label: string; icon: React.ElementType }[] = [
     { id: 'all', label: L('Todas las oportunidades', 'All Opportunities'), icon: Sparkles },
