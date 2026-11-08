@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useTranslation } from "@/i18n";
 
 // Images
 import YouTubeFacade from "@/components/YouTubeFacade";
@@ -142,6 +143,7 @@ function ReadingProgress() {
 }
 
 function StickyCTA() {
+  const { isEn } = useTranslation();
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 px-4">
       <motion.div
@@ -155,12 +157,12 @@ function StickyCTA() {
             <BookOpen className="h-4 w-4 text-foreground/85" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">¿Quieres tu propia historia de éxito?</p>
-            <p className="truncate text-xs text-foreground/65">Marca + web + estrategia para crecer.</p>
+            <p className="truncate text-sm font-semibold text-foreground">{isEn ? "Want your own success story?" : "¿Quieres tu propia historia de éxito?"}</p>
+            <p className="truncate text-xs text-foreground/65">{isEn ? "Brand + website + clear growth strategy." : "Marca + web + estrategia para crecer."}</p>
           </div>
         </div>
         <a href="#cta" className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-muted">
-          Empezar <ArrowRight className="h-4 w-4" />
+          {isEn ? "Get Started" : "Empezar"} <ArrowRight className="h-4 w-4" />
         </a>
       </motion.div>
     </div>
@@ -193,6 +195,7 @@ function TypingLine({ text, speed = 18, className = "" }: { text: string; speed?
 }
 
 function ScrollToTop({ show }: { show: boolean }) {
+  const { isEn } = useTranslation();
   return (
     <AnimatePresence>
       {show && (
@@ -205,7 +208,7 @@ function ScrollToTop({ show }: { show: boolean }) {
           className="fixed bottom-20 right-4 z-50 inline-flex items-center gap-2 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-sm font-semibold text-foreground backdrop-blur hover:bg-muted"
         >
           <ChevronUp className="h-4 w-4" />
-          Arriba
+          {isEn ? "Top" : "Arriba"}
         </motion.button>
       )}
     </AnimatePresence>
@@ -213,6 +216,7 @@ function ScrollToTop({ show }: { show: boolean }) {
 }
 
 function ReadingModeToggle({ readingMode, setReadingMode }: { readingMode: boolean; setReadingMode: (v: boolean) => void }) {
+  const { isEn } = useTranslation();
   return (
     <button
       onClick={() => setReadingMode(!readingMode)}
@@ -222,12 +226,13 @@ function ReadingModeToggle({ readingMode, setReadingMode }: { readingMode: boole
       )}
     >
       {readingMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      {readingMode ? "Salir" : "Lectura"}
+      {readingMode ? (isEn ? "Exit" : "Salir") : (isEn ? "Reader" : "Lectura")}
     </button>
   );
 }
 
 function MobileTOC({ open, onClose, sections, activeId, onJump }: { open: boolean; onClose: () => void; sections: { id: string; label: string; icon?: React.ElementType }[]; activeId: string; onJump: (id: string) => void }) {
+  const { isEn } = useTranslation();
   return (
     <AnimatePresence>
       {open && (
@@ -241,11 +246,11 @@ function MobileTOC({ open, onClose, sections, activeId, onJump }: { open: boolea
                     <ListOrdered className="h-4 w-4 text-foreground/85" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">Ir a sección</p>
-                    <p className="text-xs text-foreground/60">La sección activa se resalta</p>
+                    <p className="text-sm font-semibold text-foreground">{isEn ? "Jump to section" : "Ir a sección"}</p>
+                    <p className="text-xs text-foreground/60">{isEn ? "The active section is highlighted" : "La sección activa se resalta"}</p>
                   </div>
                 </div>
-                <button onClick={onClose} className="rounded-xl border border-border/50 bg-muted/50 p-2 text-foreground/80 hover:bg-muted" aria-label="Cerrar">
+                <button onClick={onClose} className="rounded-xl border border-border/50 bg-muted/50 p-2 text-foreground/80 hover:bg-muted" aria-label={isEn ? "Close" : "Cerrar"}>
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -292,12 +297,38 @@ function VideoEmbed({ url, title, description }: { url: string; title: string; d
 }
 
 function VerticalTimeline() {
+  const { isEn } = useTranslation();
   const milestones = [
-    { year: "1960", title: "Orígenes humildes", desc: "Tom y James Monaghan compran DomiNick's por $900.", icon: Building },
-    { year: "1965", title: "Nace Domino's Pizza", desc: "Renombran la marca. Enfoque en entrega rápida.", icon: Flag },
-    { year: "2008", title: "Punto de inflexión", desc: "Crisis de imagen. Deciden apostar por lo digital.", icon: AlertTriangle },
-    { year: "Hoy", title: "Líder digital", desc: "90%+ ventas digitales. 76.3% desde la app.", icon: Smartphone },
-    { year: "Global", title: "Expansión", desc: "+14.000 restaurantes en 89 países.", icon: Globe },
+    {
+      year: "1960",
+      title: isEn ? "Humble Beginnings" : "Orígenes humildes",
+      desc: isEn ? "Tom & James Monaghan buy DomiNick's for $900." : "Tom y James Monaghan compran DomiNick's por $900.",
+      icon: Building,
+    },
+    {
+      year: "1965",
+      title: isEn ? "Domino's Pizza is Born" : "Nace Domino's Pizza",
+      desc: isEn ? "Brand renames. Relentless focus on delivery speed." : "Renombran la marca. Enfoque en entrega rápida.",
+      icon: Flag,
+    },
+    {
+      year: "2008",
+      title: isEn ? "Turning Point" : "Punto de inflexión",
+      desc: isEn ? "Brand crisis. Domino's pivots to a tech-first company." : "Crisis de imagen. Deciden apostar por lo digital.",
+      icon: AlertTriangle,
+    },
+    {
+      year: isEn ? "Today" : "Hoy",
+      title: isEn ? "Digital Leader" : "Líder digital",
+      desc: isEn ? "90%+ digital sales. 76.3% via mobile app." : "90%+ ventas digitales. 76.3% desde la app.",
+      icon: Smartphone,
+    },
+    {
+      year: "Global",
+      title: isEn ? "Global Expansion" : "Expansión",
+      desc: isEn ? "+14,000 locations across 89 countries." : "+14.000 restaurantes en 89 países.",
+      icon: Globe,
+    },
   ];
 
   return (
@@ -329,6 +360,7 @@ function VerticalTimeline() {
 /* -------------------- Page -------------------- */
 
 export default function CasoDominos() {
+  const { isEn } = useTranslation();
   const [showSticky, setShowSticky] = useState(true);
   const [showTop, setShowTop] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
@@ -336,17 +368,17 @@ export default function CasoDominos() {
   const [tocOpen, setTocOpen] = useState(false);
 
   const sections = useMemo(() => [
-    { id: "hero", label: "Portada", icon: House },
-    { id: "origenes", label: "Orígenes", icon: Building },
-    { id: "decisiones", label: "Decisiones clave", icon: Lightbulb },
-    { id: "idea", label: "La idea", icon: Brain },
-    { id: "estrategia", label: "Estrategia", icon: Target },
-    { id: "resultados", label: "Resultados", icon: TrendingUp },
-    { id: "timeline", label: "Momentos clave", icon: Clock },
+    { id: "hero", label: isEn ? "Overview" : "Portada", icon: House },
+    { id: "origenes", label: isEn ? "Origins" : "Orígenes", icon: Building },
+    { id: "decisiones", label: isEn ? "Key Decisions" : "Decisiones clave", icon: Lightbulb },
+    { id: "idea", label: isEn ? "The Big Idea" : "La idea", icon: Brain },
+    { id: "estrategia", label: isEn ? "Strategy" : "Estrategia", icon: Target },
+    { id: "resultados", label: isEn ? "Results" : "Resultados", icon: TrendingUp },
+    { id: "timeline", label: isEn ? "Milestones" : "Momentos clave", icon: Clock },
     { id: "playbook", label: "Playbook", icon: Zap },
-    { id: "conclusion", label: "Conclusión", icon: Trophy },
-    { id: "cta", label: "CTA final", icon: ArrowRight },
-  ], []);
+    { id: "conclusion", label: isEn ? "Conclusion" : "Conclusión", icon: Trophy },
+    { id: "cta", label: isEn ? "Next Steps" : "CTA final", icon: ArrowRight },
+  ], [isEn]);
 
   const jumpTo = (id: string) => {
     const el = document.getElementById(id);
@@ -405,17 +437,17 @@ export default function CasoDominos() {
       <div className="fixed inset-x-0 top-2 z-[55] px-3" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 rounded-2xl border border-border/50 bg-background/80 p-2 backdrop-blur">
           <div className="flex items-center gap-2">
-            <Link to="/casos-exito" aria-label="Volver a casos de éxito" className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted">
+            <Link to="/casos-exito" aria-label={isEn ? "Back to Case Studies" : "Volver a casos de éxito"} className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted">
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <button onClick={() => setTocOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted">
               <Menu className="h-4 w-4" />
-              Secciones
+              {isEn ? "Sections" : "Secciones"}
             </button>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:block text-xs text-foreground/70">
-              En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
+              {isEn ? "In: " : "En: "}<span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
             <ThemeToggle />
@@ -428,41 +460,53 @@ export default function CasoDominos() {
         <motion.header id="hero" variants={stagger} initial="hidden" animate="show" className="space-y-6">
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 overflow-hidden">
             <img src={dominosImage} alt="Domino's Pizza presentación" className="w-full h-auto" />
-            <p className="text-sm text-foreground/60 p-3 text-center">Domino's: "15 Ways to Get Your Slice" - Múltiples canales digitales de venta</p>
+            <p className="text-sm text-foreground/60 p-3 text-center">{isEn ? 'Domino\'s: "15 Ways to Get Your Slice" - Omnichannel digital sales engine' : 'Domino\'s: "15 Ways to Get Your Slice" - Múltiples canales digitales de venta'}</p>
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-2">
-            <Chip icon={BadgeCheck}>Caso real</Chip>
-            <Chip icon={TrendingUp}>Transformación digital</Chip>
-            <Chip icon={Brain}>Sistema escalable</Chip>
+            <Chip icon={BadgeCheck}>{isEn ? "Real Case" : "Caso real"}</Chip>
+            <Chip icon={TrendingUp}>{isEn ? "Digital Transformation" : "Transformación digital"}</Chip>
+            <Chip icon={Brain}>{isEn ? "Scalable System" : "Sistema escalable"}</Chip>
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-3xl font-semibold leading-tight sm:text-4xl">
-            Presencia no es igual a escalar un sistema.
+            {isEn ? "Online presence is not the same as scaling a system." : "Presencia no es igual a escalar un sistema."}
           </motion.h1>
-          <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize)}>Caso: Domino's Pizza</motion.p>
+          <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize)}>{isEn ? "Case Study: Domino's Pizza" : "Caso: Domino's Pizza"}</motion.p>
 
           <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3">
-            <StatCard label="Ventas digitales" value="90%+" icon={Smartphone} />
-            <StatCard label="Pedidos app" value="76.3%" icon={TrendingUp} />
-            <StatCard label="Restaurantes" value="+14.000" icon={Globe} />
+            <StatCard label={isEn ? "Digital Sales" : "Ventas digitales"} value="90%+" icon={Smartphone} />
+            <StatCard label={isEn ? "App Orders" : "Pedidos app"} value="76.3%" icon={TrendingUp} />
+            <StatCard label={isEn ? "Locations" : "Restaurantes"} value={isEn ? "+14,000" : "+14.000"} icon={Globe} />
           </motion.div>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/70">Idea central</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "Core Takeaway" : "Idea central"}</p>
             <div className="mt-2">
-              <TypingLine text="Domino's no ganó por hacer mejor pizza. Ganó por hacer más fácil comprarla." speed={18} className="text-base sm:text-lg" />
+              <TypingLine text={isEn ? "Domino's didn't win by making better pizza. They won by making it effortless to order." : "Domino's no ganó por hacer mejor pizza. Ganó por hacer más fácil comprarla."} speed={18} className="text-base sm:text-lg" />
             </div>
           </motion.div>
         </motion.header>
 
         {/* ORÍGENES */}
         <motion.section id="origenes" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">🧩 Orígenes humildes (1960)</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "🧩 Humble Beginnings (1960)" : "🧩 Orígenes humildes (1960)"}
+          </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>Esta historia no empieza con tecnología ni millones.<br/>Empieza con dos hermanos y una pequeña pizzería.</p>
-            <p>En 1960, <span className="font-semibold text-foreground">Tom y James Monaghan</span>, sin dinero ni experiencia, compraron una pequeña pizzería llamada DomiNick's en Ypsilanti, Michigan, por <span className="font-semibold text-foreground">900 dólares</span>.</p>
-            <p>Tom creció con dificultades: su padre murió joven y él y su hermano pasaron parte de su infancia en un orfanato.<br/>No tenían capital, ni contactos, ni respaldo.<br/>Tenían <span className="font-semibold text-foreground">determinación</span>.</p>
+            {isEn ? (
+              <>
+                <p>This story doesn't start with cutting-edge tech or millions in venture capital.<br/>It begins with two brothers and a tiny pizzeria.</p>
+                <p>In 1960, <span className="font-semibold text-foreground">Tom and James Monaghan</span>, with no capital or experience, bought a small pizzeria called DomiNick's in Ypsilanti, Michigan, for <span className="font-semibold text-foreground">$900</span>.</p>
+                <p>Tom grew up through steep adversity: his father passed away when he was young, and he and his brother spent part of their childhood in an orphanage.<br/>They had no capital, no connections, and no safety net.<br/>They had <span className="font-semibold text-foreground">determination</span>.</p>
+              </>
+            ) : (
+              <>
+                <p>Esta historia no empieza con tecnología ni millones.<br/>Empieza con dos hermanos y una pequeña pizzería.</p>
+                <p>En 1960, <span className="font-semibold text-foreground">Tom y James Monaghan</span>, sin dinero ni experiencia, compraron una pequeña pizzería llamada DomiNick's en Ypsilanti, Michigan, por <span className="font-semibold text-foreground">900 dólares</span>.</p>
+                <p>Tom creció con dificultades: su padre murió joven y él y su hermano pasaron parte de su infancia en un orfanato.<br/>No tenían capital, ni contactos, ni respaldo.<br/>Tenían <span className="font-semibold text-foreground">determinación</span>.</p>
+              </>
+            )}
           </motion.div>
 
           {/* Historic photos */}
@@ -478,124 +522,213 @@ export default function CasoDominos() {
 
         {/* DECISIONES */}
         <motion.section id="decisiones" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">🧠 Primeros pasos y decisiones clave</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "🧠 Early Moves and Critical Pivots" : "🧠 Primeros pasos y decisiones clave"}
+          </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>El negocio no fue un éxito inmediato.<br/>Las ventas eran justas.<br/>El margen era mínimo.</p>
-            <p>James decidió salir del proyecto y vendió su parte a Tom a cambio del <span className="font-semibold text-foreground">Volkswagen Beetle</span> que usaban para repartir pizzas.</p>
-            <p>Tom simplificó la oferta, se centró en la <span className="font-semibold text-foreground">entrega a domicilio</span> y apuntó a los estudiantes universitarios cercanos.<br/>No intentó ser el mejor restaurante.<br/>Intentó ser el más <span className="font-semibold text-foreground">conveniente</span>.</p>
+            {isEn ? (
+              <>
+                <p>The business was not an overnight success.<br/>Sales were tight.<br/>Margins were razor-thin.</p>
+                <p>James decided to exit the business, selling his half back to Tom in exchange for the used <span className="font-semibold text-foreground">Volkswagen Beetle</span> they drove to deliver pizzas.</p>
+                <p>Tom simplified the menu, focused strictly on <span className="font-semibold text-foreground">home delivery</span>, and targeted nearby college campuses.<br/>He didn't try to become the fanciest restaurant.<br/>He strove to be the most <span className="font-semibold text-foreground">convenient</span>.</p>
+              </>
+            ) : (
+              <>
+                <p>El negocio no fue un éxito inmediato.<br/>Las ventas eran justas.<br/>El margen era mínimo.</p>
+                <p>James decidió salir del proyecto y vendió su parte a Tom a cambio del <span className="font-semibold text-foreground">Volkswagen Beetle</span> que usaban para repartir pizzas.</p>
+                <p>Tom simplificó la oferta, se centró en la <span className="font-semibold text-foreground">entrega a domicilio</span> y apuntó a los estudiantes universitarios cercanos.<br/>No intentó ser el mejor restaurante.<br/>Intentó ser el más <span className="font-semibold text-foreground">conveniente</span>.</p>
+              </>
+            )}
           </motion.div>
 
-          <Callout icon={Lightbulb} title="Nace Domino's Pizza (1965)" tone="success">
-            Tras varias decisiones estratégicas enfocadas en rapidez, consistencia y reparto eficiente, Tom renombró las tiendas como: <span className="font-semibold text-foreground">Domino's Pizza</span>
+          <Callout icon={Lightbulb} title={isEn ? "Domino's Pizza is Born (1965)" : "Nace Domino's Pizza (1965)"} tone="success">
+            {isEn ? (
+              <>After multiple strategic pivots centered on speed, consistency, and efficient delivery, Tom rebranded the stores as: <span className="font-semibold text-foreground">Domino's Pizza</span></>
+            ) : (
+              <>Tras varias decisiones estratégicas enfocadas en rapidez, consistencia y reparto eficiente, Tom renombró las tiendas como: <span className="font-semibold text-foreground">Domino's Pizza</span></>
+            )}
           </Callout>
         </motion.section>
 
         {/* LA IDEA */}
         <motion.section id="idea" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">💡 La idea que lo cambió todo</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "💡 The Insight That Changed Everything" : "💡 La idea que lo cambió todo"}
+          </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>En 2008, Domino's Pizza era una cadena de pizzerías con problemas de imagen y ventas estancadas.</p>
-            <p>Los dirigentes vieron una oportunidad de evolucionar y expandir el negocio haciendo una <span className="font-semibold text-foreground">propuesta clara digital</span>.</p>
+            {isEn ? (
+              <>
+                <p>In 2008, Domino's Pizza was facing public brand fatigue and flatlining sales.</p>
+                <p>Leadership identified the opportunity to transform and scale the company by making a <span className="font-semibold text-foreground">crystal-clear digital commitment</span>.</p>
+              </>
+            ) : (
+              <>
+                <p>En 2008, Domino's Pizza era una cadena de pizzerías con problemas de imagen y ventas estancadas.</p>
+                <p>Los dirigentes vieron una oportunidad de evolucionar y expandir el negocio haciendo una <span className="font-semibold text-foreground">propuesta clara digital</span>.</p>
+              </>
+            )}
           </motion.div>
 
           <motion.blockquote variants={fadeUp} className="border-l-4 border-primary/50 pl-4 italic text-foreground/80 text-lg">
-            "Cada compañía es una compañía tecnológica."
+            {isEn ? '"Every company is a technology company."' : '"Cada compañía es una compañía tecnológica."'}
           </motion.blockquote>
 
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            Domino's lo llevó aún más lejos. Ellos mismos se describen como:
+            {isEn ? "Domino's pushed that conviction even further, describing themselves as:" : "Domino's lo llevó aún más lejos. Ellos mismos se describen como:"}
           </motion.p>
 
-          <Callout icon={Brain} title="El verdadero insight" tone="info">
-            <span className="font-semibold text-foreground">"Una compañía de tecnología que hace pizzas."</span><br/><br/>
-            No lo dicen por postureo. Lo dicen porque construyeron un sistema que convierte una venta aislada en un <span className="font-semibold text-foreground">hábito</span>.
+          <Callout icon={Brain} title={isEn ? "The True Insight" : "El verdadero insight"} tone="info">
+            <span className="font-semibold text-foreground">{isEn ? '"A technology company that sells pizzas."' : '"Una compañía de tecnología que hace pizzas."'}</span><br/><br/>
+            {isEn ? (
+              <>They don't say this as a slogan. They say it because they built an omnichannel system that turns a one-off order into an automatic <span className="font-semibold text-foreground">habit</span>.</>
+            ) : (
+              <>No lo dicen por postureo. Lo dicen porque construyeron un sistema que convierte una venta aislada en un <span className="font-semibold text-foreground">hábito</span>.</>
+            )}
           </Callout>
 
           {/* Video */}
-          <VideoEmbed url="https://www.youtube.com/embed/gqJ9qB1DiQM" title="DomiDog el robot de Domino's" description="Innovación en entregas" />
+          <VideoEmbed url="https://www.youtube.com/embed/gqJ9qB1DiQM" title={isEn ? "DomiDog: Domino's Delivery Robot" : "DomiDog el robot de Domino's"} description={isEn ? "Delivery Innovation" : "Innovación en entregas"} />
         </motion.section>
 
         {/* ESTRATEGIA */}
         <motion.section id="estrategia" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">🎯 La estrategia: convertir el pedido en experiencia</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "🎯 The Strategy: Turning Ordering into an Experience" : "🎯 La estrategia: convertir el pedido en experiencia"}
+          </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>Domino's no "hizo una app".<br/>Hizo un <span className="font-semibold text-foreground">producto digital</span>.</p>
-            <p>El mercado de comida rápida es brutal. Hay opciones por todos lados. La pregunta no es "¿quién tiene mejor producto?" sino:</p>
+            {isEn ? (
+              <>
+                <p>Domino's didn't just "launch an app".<br/>They built a complete <span className="font-semibold text-foreground">digital product ecosystem</span>.</p>
+                <p>The food sector is intensely competitive. Choices are everywhere. The winning question is never "who has the best recipe?", but:</p>
+              </>
+            ) : (
+              <>
+                <p>Domino's no "hizo una app".<br/>Hizo un <span className="font-semibold text-foreground">producto digital</span>.</p>
+                <p>El mercado de comida rápida es brutal. Hay opciones por todos lados. La pregunta no es "¿quién tiene mejor producto?" sino:</p>
+              </>
+            )}
           </motion.div>
 
           <motion.ul variants={fadeUp} className={cn("space-y-2 text-foreground/75", textSize)}>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />¿Quién consigue que el cliente te elija otra vez?</li>
-            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />¿Quién hace que pedir sea tan sencillo que parezca automático?</li>
+            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />{isEn ? "Who makes the customer choose you a second and third time?" : "¿Quién consigue que el cliente te elija otra vez?"}</li>
+            <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />{isEn ? "Who makes reordering so effortless it feels second nature?" : "¿Quién hace que pedir sea tan sencillo que parezca automático?"}</li>
           </motion.ul>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5">
-            <p className="text-sm font-semibold text-foreground mb-3">Acciones clave:</p>
+            <p className="text-sm font-semibold text-foreground mb-3">{isEn ? "Key Strategic Pillars:" : "Acciones clave:"}</p>
             <div className="space-y-2">
-              {["Inversión sostenida en su ecosistema digital", "Menos pasos, más claridad", "Reordenar rápido", "Personalización basada en datos"].map((item, i) => (
+              {(isEn
+                ? ["Sustained investment in proprietary tech", "Fewer ordering steps, instant clarity", "1-click reorder from history", "Data-driven menu personalization"]
+                : ["Inversión sostenida en su ecosistema digital", "Menos pasos, más claridad", "Reordenar rápido", "Personalización basada en datos"]
+              ).map((item, i) => (
                 <div key={i} className="flex gap-2 text-foreground/75">
                   <Zap className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span className={textSize}>{item}</span>
                 </div>
               ))}
             </div>
-            <p className={cn("mt-4 text-foreground/75", textSize)}>No fue una acción puntual. Fue una <span className="font-semibold text-foreground">cultura</span>.</p>
+            <p className={cn("mt-4 text-foreground/75", textSize)}>
+              {isEn ? <>It was never a one-off campaign. It was a lasting <span className="font-semibold text-foreground">organizational culture</span>.</> : <>No fue una acción puntual. Fue una <span className="font-semibold text-foreground">cultura</span>.</>}
+            </p>
           </motion.div>
         </motion.section>
 
         {/* RESULTADOS */}
         <motion.section id="resultados" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">📊 Resultados (y por qué importan)</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "📊 Measurable Results (And Why They Matter)" : "📊 Resultados (y por qué importan)"}
+          </motion.h2>
           
           <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-2">
-            <StatCard label="Ventas digitales" value="90%+" icon={TrendingUp} />
-            <StatCard label="Pedidos desde app" value="76.3%" icon={Smartphone} />
+            <StatCard label={isEn ? "Digital Sales" : "Ventas digitales"} value="90%+" icon={TrendingUp} />
+            <StatCard label={isEn ? "Mobile App Orders" : "Pedidos desde app"} value="76.3%" icon={Smartphone} />
           </motion.div>
 
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            Lo importante no es el porcentaje. Es lo que representa: Domino's convirtió el canal digital en su <span className="font-semibold text-foreground">motor central de ventas y fidelización</span>.
+            {isEn ? (
+              <>The raw percentage isn't the biggest lesson. It's what it proves: Domino's turned their digital channel into their <span className="font-semibold text-foreground">primary engine for customer acquisition, sales, and loyalty</span>.</>
+            ) : (
+              <>Lo importante no es el porcentaje. Es lo que representa: Domino's convirtió el canal digital en su <span className="font-semibold text-foreground">motor central de ventas y fidelización</span>.</>
+            )}
           </motion.p>
 
-          <Callout icon={Heart} title="Por qué funcionó" tone="success">
-            Porque el cliente no compra solo por ganas: <span className="font-semibold text-foreground">compra por facilidad</span>.<br/><br/>
-            • Menos pasos = menos abandono<br/>
-            • La app crea hábito<br/>
-            • La mejora continua crea ventaja
+          <Callout icon={Heart} title={isEn ? "Why It Worked" : "Por qué funcionó"} tone="success">
+            {isEn ? (
+              <>Because customers don't buy on impulse alone: <span className="font-semibold text-foreground">they buy because it's effortless</span>.<br/><br/>
+              • Fewer checkout steps = higher completion rates<br/>
+              • The app creates an automatic routine<br/>
+              • Ongoing iteration creates an insurmountable competitive edge</>
+            ) : (
+              <>Porque el cliente no compra solo por ganas: <span className="font-semibold text-foreground">compra por facilidad</span>.<br/><br/>
+              • Menos pasos = menos abandono<br/>
+              • La app crea hábito<br/>
+              • La mejora continua crea ventaja</>
+            )}
           </Callout>
 
-          <Callout icon={AlertTriangle} title="Lo que esto revela" tone="warning">
-            Tu negocio no compite solo con otros negocios. Compites con:<br/><br/>
-            • la falta de tiempo<br/>
-            • la distracción<br/>
-            • la indecisión<br/>
-            • la fricción<br/><br/>
-            Y si tu sistema digital no guía al cliente como una autopista, <span className="font-semibold text-foreground">lo pierdes</span>.
+          <Callout icon={AlertTriangle} title={isEn ? "The Revealing Truth" : "Lo que esto revela"} tone="warning">
+            {isEn ? (
+              <>Your business doesn't compete only with industry peers. You compete with:<br/><br/>
+              • Customer time poverty<br/>
+              • Attention distraction<br/>
+              • Decision fatigue<br/>
+              • Transactional friction<br/><br/>
+              If your digital touchpoints don't guide prospects like a smooth highway, <span className="font-semibold text-foreground">you lose them</span>.</>
+            ) : (
+              <>Tu negocio no compite solo con otros negocios. Compites con:<br/><br/>
+              • la falta de tiempo<br/>
+              • la distracción<br/>
+              • la indecisión<br/>
+              • la fricción<br/><br/>
+              Y si tu sistema digital no guía al cliente como una autopista, <span className="font-semibold text-foreground">lo pierdes</span>.</>
+            )}
           </Callout>
         </motion.section>
 
         {/* TIMELINE */}
         <motion.section id="timeline" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">🧭 Momentos clave</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "🧭 Defining Milestones" : "🧭 Momentos clave"}
+          </motion.h2>
           <VerticalTimeline />
           
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            Durante años ofrecieron la promesa: <span className="font-semibold text-foreground">"Entrega en 30 minutos o es gratis"</span>. Más tarde se ajustó por temas de seguridad, pero ya habían logrado algo más importante: <span className="font-semibold text-foreground">dominar la experiencia de compra</span>.
+            {isEn ? (
+              <>For years, their bold brand promise was: <span className="font-semibold text-foreground">"Delivered in 30 minutes or it's free"</span>. While later adapted for driver safety, they had achieved something far more valuable: <span className="font-semibold text-foreground">owning the customer purchasing experience</span>.</>
+            ) : (
+              <>Durante años ofrecieron la promesa: <span className="font-semibold text-foreground">"Entrega en 30 minutos o es gratis"</span>. Más tarde se ajustó por temas de seguridad, pero ya habían logrado algo más importante: <span className="font-semibold text-foreground">dominar la experiencia de compra</span>.</>
+            )}
           </motion.p>
         </motion.section>
 
         {/* PLAYBOOK */}
         <motion.section id="playbook" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">📖 Playbook replicable</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "📖 Replicable Playbook" : "📖 Playbook replicable"}
+          </motion.h2>
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            No necesitas ser Domino's para aplicar el principio. Necesitas pensar como ellos: <span className="font-semibold text-foreground">reduce fricción, aumenta repetición</span>.
+            {isEn ? (
+              <>You don't need Domino's budget to apply this philosophy. You just need their focus: <span className="font-semibold text-foreground">remove friction, drive repeat engagement</span>.</>
+            ) : (
+              <>No necesitas ser Domino's para aplicar el principio. Necesitas pensar como ellos: <span className="font-semibold text-foreground">reduce fricción, aumenta repetición</span>.</>
+            )}
           </motion.p>
 
           <motion.div variants={fadeUp} className="space-y-3">
-            {[
-              { n: "1", t: "Definir 3 acciones core", d: "Contactar / pedir presupuesto • Pagar / reservar • Seguimiento" },
-              { n: "2", t: "Máximo 3 pasos", d: "Checkout o solicitud en máximo 3 pasos. Si se puede: 'repetir' en 1 clic" },
-              { n: "3", t: "Upsells inteligentes", d: "Sugerencias que suman, no que molestan" },
-              { n: "4", t: "Medición completa", d: "Desde el anuncio → hasta la conversión. Optimización quincenal" },
-            ].map((item) => (
+            {(isEn
+              ? [
+                  { n: "1", t: "Define 3 core customer actions", d: "Inquire / request quote • Pay / book • Ongoing follow-up" },
+                  { n: "2", t: "Max 3-step intake", d: "Checkout or inquiry in 3 steps or fewer. Enable 1-click reorder where possible." },
+                  { n: "3", t: "Smart, contextual upsells", d: "Add-ons that solve real problems rather than annoying the buyer." },
+                  { n: "4", t: "End-to-end attribution", d: "From initial ad touchpoint → conversion. Bi-weekly review cycles." },
+                ]
+              : [
+                  { n: "1", t: "Definir 3 acciones core", d: "Contactar / pedir presupuesto • Pagar / reservar • Seguimiento" },
+                  { n: "2", t: "Máximo 3 pasos", d: "Checkout o solicitud en máximo 3 pasos. Si se puede: 'repetir' en 1 clic" },
+                  { n: "3", t: "Upsells inteligentes", d: "Sugerencias que suman, no que molestan" },
+                  { n: "4", t: "Medición completa", d: "Desde el anuncio → hasta la conversión. Optimización quincenal" },
+                ]
+            ).map((item) => (
               <div key={item.n} className="flex gap-4 items-start rounded-2xl border border-border/50 bg-muted/30 p-4">
                 <span className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold flex-shrink-0">{item.n}</span>
                 <div>
@@ -609,22 +742,29 @@ export default function CasoDominos() {
 
         {/* CONCLUSIÓN */}
         <motion.section id="conclusion" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
-          <motion.h2 variants={fadeUp} className="text-xl font-semibold">🎯 Conclusión</motion.h2>
+          <motion.h2 variants={fadeUp} className="text-xl font-semibold">
+            {isEn ? "🎯 Conclusion" : "🎯 Conclusión"}
+          </motion.h2>
 
-          <Callout icon={AlertTriangle} title="La conclusión incómoda (pero real)" tone="warning">
-            Si hoy tu negocio depende de: recomendaciones, temporadas, "cuando tengo tiempo publico", y la suerte…<br/><br/>
-            Entonces no tienes un sistema. <span className="font-semibold text-foreground">Tienes presencia</span>.<br/>Y presencia sin sistema no escala.
+          <Callout icon={AlertTriangle} title={isEn ? "The Uncomfortable (Yet Honest) Truth" : "La conclusión incómoda (pero real)"} tone="warning">
+            {isEn ? (
+              <>If your business today relies on: word of mouth alone, seasons, "posting on social media when I find time", and good luck...<br/><br/>
+              Then you do not have a system. <span className="font-semibold text-foreground">You only have presence</span>.<br/>And presence without an engine cannot scale.</>
+            ) : (
+              <>Si hoy tu negocio depende de: recomendaciones, temporadas, "cuando tengo tiempo publico", y la suerte…<br/><br/>
+              Entonces no tienes un sistema. <span className="font-semibold text-foreground">Tienes presencia</span>.<br/>Y presencia sin sistema no escala.</>
+            )}
           </Callout>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-6 text-center">
-            <h3 className="text-xl font-bold text-foreground mb-4">El salto digital no es "tener una web"</h3>
-            <p className={cn("text-foreground/70 mb-4", textSize)}>Es tener un camino claro que haga esto:</p>
-            <p className="text-xl font-bold text-primary">Atraer → Convencer → Convertir → Repetir</p>
-            <p className="text-foreground/60 mt-4">Eso es lo que crea negocios estables.</p>
+            <h3 className="text-xl font-bold text-foreground mb-4">{isEn ? 'A digital leap isn\'t just "having a website"' : 'El salto digital no es "tener una web"'}</h3>
+            <p className={cn("text-foreground/70 mb-4", textSize)}>{isEn ? "It's establishing a clear roadmap that consistently executes:" : "Es tener un camino claro que haga esto:"}</p>
+            <p className="text-xl font-bold text-primary">{isEn ? "Attract → Persuade → Convert → Retain" : "Atraer → Convencer → Convertir → Repetir"}</p>
+            <p className="text-foreground/60 mt-4">{isEn ? "That is how resilient, scalable businesses are forged." : "Eso es lo que crea negocios estables."}</p>
           </motion.div>
 
-          <Callout icon={Trophy} title="Si Domino's demostró algo, es esto" tone="info">
-            <span className="font-semibold text-foreground">Cuando comprar es fácil, el cliente vuelve.</span><br/>Y cuando el cliente vuelve, el negocio crece.
+          <Callout icon={Trophy} title={isEn ? "What Domino's Proven Beyond Doubt" : "Si Domino's demostró algo, es esto"} tone="info">
+            <span className="font-semibold text-foreground">{isEn ? "When buying is frictionless, customers return." : "Cuando comprar es fácil, el cliente vuelve."}</span><br/>{isEn ? "And when customers return, business growth becomes predictable." : "Y cuando el cliente vuelve, el negocio crece."}
           </Callout>
         </motion.section>
 
@@ -633,18 +773,18 @@ export default function CasoDominos() {
           <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-border/50 bg-muted/30 p-7 backdrop-blur">
             <div className="flex flex-col gap-4">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wider text-foreground/70">🚀 Siguiente paso</p>
-                <h3 className="mt-2 text-xl font-semibold text-foreground">¿Quieres tu propia historia de éxito?</h3>
+                <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "🚀 Next Steps" : "🚀 Siguiente paso"}</p>
+                <h3 className="mt-2 text-xl font-semibold text-foreground">{isEn ? "Ready to write your own success story?" : "¿Quieres tu propia historia de éxito?"}</h3>
                 <p className={cn("mt-2 text-foreground/70", textSize, lineHeight)}>
-                  Te ayudamos a crear marca, presencia digital y estrategia clara para crecer.
+                  {isEn ? "We help you build your brand, digital platform, and a clear path to scalable revenue." : "Te ayudamos a crear marca, presencia digital y estrategia clara para crecer."}
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Link to="/#servicios" className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted">
-                  Ver servicios <ArrowRight className="h-4 w-4" />
+                <Link to={isEn ? "/services" : "/#servicios"} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted">
+                  {isEn ? "View Services" : "Ver servicios"} <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/#contacto" className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/90">
-                  Contactar <Send className="h-4 w-4" />
+                <Link to={isEn ? "/contact" : "/#contacto"} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/90">
+                  {isEn ? "Contact Us" : "Contactar"} <Send className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -654,9 +794,9 @@ export default function CasoDominos() {
       </main>
 
       {/* Floating quick action */}
-      <button onClick={() => setTocOpen(true)} className="fixed bottom-20 left-4 z-[58] inline-flex items-center gap-2 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-sm font-semibold text-foreground backdrop-blur hover:bg-muted lg:hidden" aria-label="Abrir secciones">
+      <button onClick={() => setTocOpen(true)} className="fixed bottom-20 left-4 z-[58] inline-flex items-center gap-2 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-sm font-semibold text-foreground backdrop-blur hover:bg-muted lg:hidden" aria-label={isEn ? "Open sections" : "Abrir secciones"}>
         <ListOrdered className="h-4 w-4" />
-        Secciones
+        {isEn ? "Sections" : "Secciones"}
       </button>
     </div>
     </>

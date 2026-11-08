@@ -137,7 +137,7 @@ const Navbar = () => {
     );
   };
 
-  const linkClass = "whitespace-nowrap text-sm font-medium text-foreground/70 hover:text-foreground transition-colors";
+  const linkClass = "whitespace-nowrap text-sm font-medium text-foreground/70 hover:text-foreground transition-colors shrink-0";
 
   const renderItem = (item: NavItem, mobile = false) => {
     const className = cn(linkClass, mobile && "block w-full py-2.5 text-left text-base");
@@ -208,26 +208,26 @@ const Navbar = () => {
           : "bg-transparent border-b border-transparent"
       )}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* On desktop the bar turns into a floating pill once the page scrolls */}
         <div
           className={cn(
             "flex items-center justify-between h-16 transition-all duration-300 lg:border lg:border-transparent",
             scrolled && !isOpen &&
-              "lg:mt-3 lg:h-14 lg:-mx-3 lg:rounded-2xl lg:border-border/70 lg:bg-background/80 lg:px-3 lg:shadow-[0_8px_30px_-12px_hsl(224_40%_12%/0.18)] lg:backdrop-blur-xl"
+              "lg:mt-3 lg:h-14 lg:-mx-3 lg:rounded-2xl lg:border-border/70 lg:bg-background/80 lg:px-4 lg:shadow-[0_8px_30px_-12px_hsl(224_40%_12%/0.18)] lg:backdrop-blur-xl"
           )}
         >
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2" aria-label="NOVA Marketing Solutions, inicio">
+          <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="NOVA Marketing Solutions, inicio">
             <img alt="NOVA Marketing Solutions" width={86} height={40} className="h-10 w-auto" src="/images/logo-nova-light.webp" />
           </Link>
 
           {/* Desktop menu */}
-          <div className="hidden xl:flex items-center gap-6">
+          <div className="hidden xl:flex items-center gap-3 2xl:gap-5 flex-nowrap">
             {NAV_ITEMS.map((item) => renderItem(item))}
           </div>
 
-          <div className="hidden xl:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3 shrink-0">
             {isAdmin && (
               <Link to="/admin" className="relative flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 <Shield className="w-4 h-4" />

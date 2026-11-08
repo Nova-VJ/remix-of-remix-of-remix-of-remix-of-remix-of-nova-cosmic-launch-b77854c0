@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useTranslation } from "@/i18n";
 
 // Images
 import YouTubeFacade from "@/components/YouTubeFacade";
@@ -158,6 +159,7 @@ function StatCard({
 }
 
 function Lesson({
+  isEn,
   index,
   title,
   icon: Icon,
@@ -169,6 +171,7 @@ function Lesson({
   icon: React.ElementType;
   bullets: string[];
   highlight: string;
+  isEn?: boolean;
 }) {
   return (
     <motion.div
@@ -184,7 +187,7 @@ function Lesson({
         <div className="flex-1 min-w-0">
           <p className="text-xs text-foreground/70">
             <span className="font-semibold text-foreground/80">{index}</span>{" "}
-            <span className="mx-2 text-foreground/25">•</span> Lección
+            <span className="mx-2 text-foreground/25">•</span> {isEn ? "Lesson" : "Lección"}
           </p>
           <h3 className="mt-1 text-base font-semibold text-foreground">{title}</h3>
           <ul className="mt-4 space-y-2 text-sm text-foreground/75">
@@ -196,7 +199,7 @@ function Lesson({
             ))}
           </ul>
           <div className="mt-4 rounded-xl border border-border/50 bg-background/50 p-4">
-            <p className="text-sm font-semibold text-foreground/90">Idea clave</p>
+            <p className="text-sm font-semibold text-foreground/90">{isEn ? "Core Takeaway" : "Idea clave"}</p>
             <p className="mt-1 text-sm text-foreground/75">{highlight}</p>
           </div>
         </div>
@@ -221,6 +224,7 @@ function ReadingProgress() {
 }
 
 function StickyCTA() {
+  const { isEn } = useTranslation();
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 px-4">
       <motion.div
@@ -235,10 +239,10 @@ function StickyCTA() {
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
-              ¿Quieres tu propia historia de éxito?
+              {isEn ? "Want your own success story?" : "¿Quieres tu propia historia de éxito?"}
             </p>
             <p className="truncate text-xs text-foreground/65">
-              Marca + web + estrategia para crecer.
+              {isEn ? "Brand + website + clear growth strategy." : "Marca + web + estrategia para crecer."}
             </p>
           </div>
         </div>
@@ -246,7 +250,7 @@ function StickyCTA() {
           href="#cta"
           className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
         >
-          Empezar <ArrowRight className="h-4 w-4" />
+          {isEn ? "Get Started" : "Empezar"} <ArrowRight className="h-4 w-4" />
         </a>
       </motion.div>
     </div>
@@ -295,6 +299,7 @@ function TypingLine({
 }
 
 function ScrollToTop({ show }: { show: boolean }) {
+  const { isEn } = useTranslation();
   return (
     <AnimatePresence>
       {show && (
@@ -307,7 +312,7 @@ function ScrollToTop({ show }: { show: boolean }) {
           className="fixed bottom-20 right-4 z-50 inline-flex items-center gap-2 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-sm font-semibold text-foreground backdrop-blur hover:bg-muted"
         >
           <ChevronUp className="h-4 w-4" />
-          Arriba
+          {isEn ? "Top" : "Arriba"}
         </motion.button>
       )}
     </AnimatePresence>
@@ -321,6 +326,7 @@ function ReadingModeToggle({
   readingMode: boolean;
   setReadingMode: (v: boolean) => void;
 }) {
+  const { isEn } = useTranslation();
   return (
     <button
       onClick={() => setReadingMode(!readingMode)}
@@ -332,7 +338,7 @@ function ReadingModeToggle({
       )}
     >
       {readingMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      {readingMode ? "Salir" : "Lectura"}
+      {readingMode ? (isEn ? "Exit" : "Salir") : (isEn ? "Reader" : "Lectura")}
     </button>
   );
 }
@@ -352,6 +358,7 @@ function MobileTOC({
   activeId: string;
   onJump: (id: string) => void;
 }) {
+  const { isEn } = useTranslation();
   return (
     <AnimatePresence>
       {open && (
@@ -378,14 +385,14 @@ function MobileTOC({
                     <ListOrdered className="h-4 w-4 text-foreground/85" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">Ir a sección</p>
-                    <p className="text-xs text-foreground/60">La sección activa se resalta</p>
+                    <p className="text-sm font-semibold text-foreground">{isEn ? "Jump to section" : "Ir a sección"}</p>
+                    <p className="text-xs text-foreground/60">{isEn ? "The active section is highlighted" : "La sección activa se resalta"}</p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
                   className="rounded-xl border border-border/50 bg-muted/50 p-2 text-foreground/80 hover:bg-muted"
-                  aria-label="Cerrar"
+                  aria-label={isEn ? "Close" : "Cerrar"}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -432,16 +439,24 @@ function MobileTOC({
 /* -------------------- content blocks -------------------- */
 
 function FlowTimeline() {
+  const { isEn } = useTranslation();
   const steps = useMemo(
-    () => [
+    () => (isEn ? [
+      { t: "Idea", d: "Spot a validated, underserved need.", i: Lightbulb },
+      { t: "Brand", d: "Define a bold identity & core promise.", i: Fingerprint },
+      { t: "Social Channels", d: "Consistent organic visibility & ads.", i: Globe },
+      { t: "Community", d: "Belonging, lifestyle & connection.", i: Heart },
+      { t: "Direct Sales", d: "High-converting messaging & checkout.", i: TrendingUp },
+      { t: "Scale", d: "Double down on proven flywheels.", i: Trophy },
+    ] : [
       { t: "Idea", d: "Detecta una oportunidad real.", i: Lightbulb },
       { t: "Marca", d: "Define identidad y promesa.", i: Fingerprint },
       { t: "Redes", d: "Visibilidad constante y contenido.", i: Globe },
       { t: "Comunidad", d: "Conexión + pertenencia.", i: Heart },
       { t: "Ventas", d: "Conversión con mensajes claros.", i: TrendingUp },
       { t: "Expansión", d: "Escala lo que ya funciona.", i: Trophy },
-    ],
-    []
+    ]),
+    [isEn]
   );
 
   return (
@@ -450,8 +465,8 @@ function FlowTimeline() {
       className="rounded-2xl border border-border/50 bg-muted/30 p-6 backdrop-blur"
     >
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold text-foreground">Flujo Hawkers</h3>
-        <Chip icon={Repeat}>Escalable</Chip>
+        <h3 className="text-base font-semibold text-foreground">{isEn ? "The Hawkers Growth Flywheel" : "Flujo Hawkers"}</h3>
+        <Chip icon={Repeat}>{isEn ? "Scalable" : "Escalable"}</Chip>
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {steps.map((s, idx) => (
@@ -478,7 +493,13 @@ function FlowTimeline() {
 }
 
 function TableBlock() {
-  const items = [
+  const { isEn } = useTranslation();
+  const items = isEn ? [
+    { k: "Product", v: "Affordable, on-trend, stylish sunglasses", i: Lightbulb },
+    { k: "Channel", v: "Instagram + targeted Facebook ads", i: Globe },
+    { k: "Audience", v: "Digital-native younger demographic", i: Heart },
+    { k: "Core Message", v: "Attitude, bold identity, tribe belonging", i: Megaphone },
+  ] : [
     { k: "Producto", v: "Gafas modernas, accesibles, con estilo", i: Lightbulb },
     { k: "Canal", v: "Instagram + anuncios", i: Globe },
     { k: "Público", v: "Jóvenes digitales", i: Heart },
@@ -491,7 +512,7 @@ function TableBlock() {
       className="rounded-2xl border border-border/50 bg-muted/30 p-6 backdrop-blur"
     >
       <h3 className="text-base font-semibold text-foreground">
-        Enfoque inicial (simple y efectivo)
+        {isEn ? "Foundational Strategy (Lean & High-Impact)" : "Enfoque inicial (simple y efectivo)"}
       </h3>
       <div className="mt-4 grid gap-3">
         {items.map((row, idx) => (
@@ -518,7 +539,14 @@ function TableBlock() {
 /* -------------------- Timeline Vertical -------------------- */
 
 function VerticalTimeline() {
-  const milestones = [
+  const { isEn } = useTranslation();
+  const milestones = isEn ? [
+    { year: "2013", title: "Launch", desc: "Digital-first brand born in Spain. Zero physical stores.", icon: Flag },
+    { year: "Early Days", title: "Online Validation", desc: "Proved direct-to-consumer e-commerce without distributors.", icon: Lightbulb },
+    { year: "2016", title: "Identity", desc: "High-impact emotional campaigns and strong community culture.", icon: Heart },
+    { year: "2016", title: "Reputational Crisis", desc: "Social media backlash. Key lesson in brand safety.", icon: AlertTriangle },
+    { year: "Scale", title: "Consolidation", desc: "Major athlete endorsements, global footprint, market authority.", icon: Trophy },
+  ] : [
     { year: "2013", title: "Nacimiento", desc: "Proyecto español, enfoque digital, cero tiendas físicas.", icon: Flag },
     { year: "Primeros pasos", title: "Validación online", desc: "Demostraron que se podía vender sin intermediarios.", icon: Lightbulb },
     { year: "2016", title: "Identidad", desc: "Campañas emocionales. Construcción de comunidad.", icon: Heart },
@@ -554,7 +582,7 @@ function VerticalTimeline() {
       <motion.div variants={fadeUp} className="mt-6 pl-12">
         <div className="rounded-xl border border-border/50 bg-background/50 px-4 py-3">
           <p className="text-sm font-semibold text-foreground/90">
-            <span className="text-primary">Aprende</span> → <span className="text-primary">Ajusta</span> → <span className="text-primary">Escala</span>
+            {isEn ? <><span className="text-primary">Learn</span> → <span className="text-primary">Iterate</span> → <span className="text-primary">Scale</span></> : <><span className="text-primary">Aprende</span> → <span className="text-primary">Ajusta</span> → <span className="text-primary">Escala</span></>}
           </p>
         </div>
       </motion.div>
@@ -594,14 +622,14 @@ function MessiGallery() {
     <motion.div variants={fadeUp} className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-border/50 overflow-hidden">
-          <img src={hawkersMessi1} alt="Messi con gafas Hawkers" width={800} height={530} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          <img src={hawkersMessi1} alt={isEn ? "Messi wearing Hawkers sunglasses" : "Messi con gafas Hawkers"} width={800} height={530} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
         <div className="rounded-2xl border border-border/50 overflow-hidden">
-          <img src={hawkersMessi2} alt="Messi perfil con gafas Hawkers" width={512} height={342} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+          <img src={hawkersMessi2} alt={isEn ? "Messi profile with Hawkers sunglasses" : "Messi perfil con gafas Hawkers"} width={512} height={342} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         </div>
       </div>
       <div className="text-center">
-        <p className="text-sm font-semibold text-primary">Colección exclusiva Messi & Hawkers</p>
+        <p className="text-sm font-semibold text-primary">{isEn ? "Official Messi & Hawkers Exclusive Collection" : "Colección exclusiva Messi & Hawkers"}</p>
       </div>
     </motion.div>
   );
@@ -610,6 +638,7 @@ function MessiGallery() {
 /* -------------------- Page -------------------- */
 
 export default function CasoHawkers() {
+  const { isEn } = useTranslation();
   const [showSticky, setShowSticky] = useState(true);
   const [showTop, setShowTop] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
@@ -617,7 +646,20 @@ export default function CasoHawkers() {
   const [tocOpen, setTocOpen] = useState(false);
 
   const sections = useMemo(
-    () => [
+    () => (isEn ? [
+      { id: "hero", label: "Overview", icon: House },
+      { id: "intro", label: "Introduction", icon: AlertTriangle },
+      { id: "chispa", label: "The Spark", icon: Zap },
+      { id: "giro", label: "The Pivot", icon: RefreshCw },
+      { id: "origen", label: "The Origin", icon: Lightbulb },
+      { id: "crecimiento", label: "Growth", icon: Flame },
+      { id: "caidas", label: "Setbacks & Scale", icon: BarChart3 },
+      { id: "videos", label: "Campaigns", icon: Play },
+      { id: "timeline", label: "Milestones", icon: ListOrdered },
+      { id: "lecciones", label: "5 Lessons", icon: Brain },
+      { id: "cierre", label: "Conclusion", icon: Trophy },
+      { id: "cta", label: "Next Steps", icon: ArrowRight },
+    ] : [
       { id: "hero", label: "Portada", icon: House },
       { id: "intro", label: "Introducción", icon: AlertTriangle },
       { id: "chispa", label: "La chispa", icon: Zap },
@@ -630,8 +672,8 @@ export default function CasoHawkers() {
       { id: "lecciones", label: "5 lecciones", icon: Brain },
       { id: "cierre", label: "Conclusión", icon: Trophy },
       { id: "cta", label: "CTA final", icon: ArrowRight },
-    ],
-    []
+    ]),
+    [isEn]
   );
 
   const jumpTo = (id: string) => {
@@ -712,7 +754,7 @@ export default function CasoHawkers() {
           <div className="flex items-center gap-2">
             <Link
               to="/casos-exito"
-              aria-label="Volver a casos de éxito"
+              aria-label={isEn ? "Back to Case Studies" : "Volver a casos de éxito"}
               className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-muted/50 px-2 py-2 text-sm text-foreground/80 hover:bg-muted"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -722,12 +764,12 @@ export default function CasoHawkers() {
               className="inline-flex items-center gap-2 rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
             >
               <Menu className="h-4 w-4" />
-              Secciones
+              {isEn ? "Sections" : "Secciones"}
             </button>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:block text-xs text-foreground/70">
-              En: <span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
+              {isEn ? "In: " : "En: "}<span className="text-foreground/80 font-semibold">{sections.find(s => s.id === activeId)?.label}</span>
             </div>
             <ReadingModeToggle readingMode={readingMode} setReadingMode={setReadingMode} />
             <ThemeToggle />
@@ -744,33 +786,33 @@ export default function CasoHawkers() {
           </motion.div>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-2">
-            <Chip icon={BadgeCheck}>Caso real</Chip>
-            <Chip icon={TrendingUp}>Crecimiento</Chip>
-            <Chip icon={Brain}>Lecciones prácticas</Chip>
+            <Chip icon={BadgeCheck}>{isEn ? "Real Case" : "Caso real"}</Chip>
+            <Chip icon={TrendingUp}>{isEn ? "Growth" : "Crecimiento"}</Chip>
+            <Chip icon={Brain}>{isEn ? "Actionable Lessons" : "Lecciones prácticas"}</Chip>
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-3xl font-semibold leading-tight sm:text-4xl">
-            Hawkers: de una idea simple a una marca global
+            {isEn ? "Hawkers: From a Simple Idea to a Global Brand" : "Hawkers: de una idea simple a una marca global"}
           </motion.h1>
 
           <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3">
-            <StatCard label="Punto de partida" value="Sin inversores" icon={AlertTriangle} />
-            <StatCard label="Estrategia" value="100% digital" icon={Globe} />
-            <StatCard label="Clave" value="Marca + comunidad" icon={Heart} />
+            <StatCard label={isEn ? "Starting Point" : "Punto de partida"} value={isEn ? "Zero Investors" : "Sin inversores"} icon={AlertTriangle} />
+            <StatCard label={isEn ? "Strategy" : "Estrategia"} value="100% digital" icon={Globe} />
+            <StatCard label={isEn ? "Core Driver" : "Clave"} value={isEn ? "Brand + Community" : "Marca + comunidad"} icon={Heart} />
           </motion.div>
 
           {/* Typing hook */}
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/70">Gancho (retención)</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "Core Philosophy" : "Gancho (retención)"}</p>
             <div className="mt-2">
               <TypingLine
-                text="La gente no compra productos. Compra cómo se siente al usarlos."
+                text={isEn ? "People don't buy products. They buy how using them makes them feel." : "La gente no compra productos. Compra cómo se siente al usarlos."}
                 speed={18}
                 className="text-base sm:text-lg"
               />
             </div>
             <p className={cn("mt-3 text-foreground/70", textSize, lineHeight)}>
-              Esta idea explica por qué Hawkers pudo escalar tan rápido: construyó identidad, no solo catálogo.
+              {isEn ? "This mindset explains why Hawkers scaled at record speed: they created an unmistakable identity, not just a product catalog." : "Esta idea explica por qué Hawkers pudo escalar tan rápido: construyó identidad, no solo catálogo."}
             </p>
           </motion.div>
         </motion.header>
@@ -778,24 +820,44 @@ export default function CasoHawkers() {
         {/* INTRO */}
         <motion.section id="intro" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🌍 Introducción: el miedo a dar el primer paso
+            {isEn ? "🌍 Introduction: The Fear of Taking the First Step" : "🌍 Introducción: el miedo a dar el primer paso"}
           </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>La mayoría de proyectos no fallan por falta de ideas.</p>
-            <p><span className="font-semibold text-foreground">Fallan por miedo.</span></p>
-            <p>Miedo a equivocarse.<br/>Miedo a no vender.<br/>Miedo a no saber por dónde empezar.</p>
-            <p>Muchos emprendedores esperan "el momento perfecto".<br/>Hawkers nació justo en el momento imperfecto.</p>
+            {isEn ? (
+              <>
+                <p>Most ventures don't fail due to a lack of good ideas.</p>
+                <p><span className="font-semibold text-foreground">They fail because of hesitation.</span></p>
+                <p>Fear of making mistakes.<br/>Fear of zero sales.<br/>Fear of not knowing where to begin.</p>
+                <p>Many entrepreneurs stall waiting for the "perfect moment".<br/>Hawkers was born right in an imperfect moment.</p>
+              </>
+            ) : (
+              <>
+                <p>La mayoría de proyectos no fallan por falta de ideas.</p>
+                <p><span className="font-semibold text-foreground">Fallan por miedo.</span></p>
+                <p>Miedo a equivocarse.<br/>Miedo a no vender.<br/>Miedo a no saber por dónde empezar.</p>
+                <p>Muchos emprendedores esperan "el momento perfecto".<br/>Hawkers nació justo en el momento imperfecto.</p>
+              </>
+            )}
           </motion.div>
 
-          <Callout icon={AlertTriangle} title="Verdad incómoda" tone="warning">
-            No tenían inversores.<br/>No tenían contactos en moda.<br/>No tenían experiencia previa en grandes marcas.<br/><br/>
-            Tenían algo más poderoso: <span className="font-semibold text-foreground">hambre, curiosidad y acción</span>.
+          <Callout icon={AlertTriangle} title={isEn ? "The Raw Truth" : "Verdad incómoda"} tone="warning">
+            {isEn ? (
+              <>They had zero outside investors.<br/>They had no fashion industry connections.<br/>They had zero prior experience building global brands.<br/><br/>
+              They possessed something far more potent: <span className="font-semibold text-foreground">hunger, relentless curiosity, and decisive execution</span>.</>
+            ) : (
+              <>No tenían inversores.<br/>No tenían contactos en moda.<br/>No tenían experiencia previa en grandes marcas.<br/><br/>
+              Tenían algo más poderoso: <span className="font-semibold text-foreground">hambre, curiosidad y acción</span>.</>
+            )}
           </Callout>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-background/50 p-5">
-            <p className="text-sm font-semibold text-foreground">Mini-ejercicio</p>
+            <p className="text-sm font-semibold text-foreground">{isEn ? "Thought Experiment" : "Mini-ejercicio"}</p>
             <p className={cn("mt-2 text-foreground/75", textSize, lineHeight)}>
-              Si hoy empezaras…<br/>¿Venderías primero <span className="font-semibold text-foreground">un producto</span> o <span className="font-semibold text-foreground">una promesa clara</span>?
+              {isEn ? (
+                <>If you were starting today...<br/>Would you sell <span className="font-semibold text-foreground">a commodity product</span> or <span className="font-semibold text-foreground">a compelling promise</span> first?</>
+              ) : (
+                <>Si hoy empezaras…<br/>¿Venderías primero <span className="font-semibold text-foreground">un producto</span> o <span className="font-semibold text-foreground">una promesa clara</span>?</>
+              )}
             </p>
           </motion.div>
         </motion.section>
@@ -803,23 +865,42 @@ export default function CasoHawkers() {
         {/* LA CHISPA */}
         <motion.section id="chispa" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            ⚡ La chispa: antes de Hawkers
+            {isEn ? "⚡ The Spark: Before Hawkers Existed" : "⚡ La chispa: antes de Hawkers"}
           </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>Esta historia no empieza con unas gafas.<br/>Empieza con un <span className="font-semibold text-foreground">fracaso</span>.</p>
-            <p>Antes de Hawkers, sus fundadores intentaron lanzar otros proyectos online.<br/>Ninguno funcionó como esperaban.<br/>Hubo pérdidas.<br/>Hubo dudas.<br/>Hubo errores.</p>
-            <p>La mayoría se habría rendido.</p>
-            <p>Ellos hicieron lo contrario: <span className="font-semibold text-foreground">analizar, aprender y pivotar</span>.</p>
+            {isEn ? (
+              <>
+                <p>This journey did not begin with sunglasses.<br/>It started with a <span className="font-semibold text-foreground">failed venture</span>.</p>
+                <p>Before launching Hawkers, the founding team built several web apps and platforms.<br/>None delivered the anticipated traction.<br/>There were financial hits.<br/>Doubts crept in.<br/>Mistakes were made.</p>
+                <p>Most people would have thrown in the towel.</p>
+                <p>They did the exact opposite: <span className="font-semibold text-foreground">deconstructed the failures, adapted, and pivoted</span>.</p>
+              </>
+            ) : (
+              <>
+                <p>Esta historia no empieza con unas gafas.<br/>Empieza con un <span className="font-semibold text-foreground">fracaso</span>.</p>
+                <p>Antes de Hawkers, sus fundadores intentaron lanzar otros proyectos online.<br/>Ninguno funcionó como esperaban.<br/>Hubo pérdidas.<br/>Hubo dudas.<br/>Hubo errores.</p>
+                <p>La mayoría se habría rendido.</p>
+                <p>Ellos hicieron lo contrario: <span className="font-semibold text-foreground">analizar, aprender y pivotar</span>.</p>
+              </>
+            )}
           </motion.div>
 
-          <Callout icon={Zap} title="Lección temprana" tone="success">
-            Emprender no es acertar a la primera.<br/>Es <span className="font-semibold text-foreground">ajustar sin rendirse</span>.
+          <Callout icon={Zap} title={isEn ? "Early Takeaway" : "Lección temprana"} tone="success">
+            {isEn ? (
+              <>Building a business is never about nailing it on day one.<br/>It is about <span className="font-semibold text-foreground">adapting without slowing down</span>.</>
+            ) : (
+              <>Emprender no es acertar a la primera.<br/>Es <span className="font-semibold text-foreground">ajustar sin rendirse</span>.</>
+            )}
           </Callout>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-background/50 p-5">
-            <p className="text-sm font-semibold text-foreground">Micro-lección</p>
+            <p className="text-sm font-semibold text-foreground">{isEn ? "Actionable Insight" : "Micro-lección"}</p>
             <p className={cn("mt-2 text-foreground/75", textSize, lineHeight)}>
-              Si tu idea no vende, no es mala.<br/>Tu mensaje, formato o canal <span className="font-semibold text-foreground">aún no encajan</span>.
+              {isEn ? (
+                <>If your initial offer isn't converting, it doesn't mean the idea is broken.<br/>It means your positioning, format, or distribution channel <span className="font-semibold text-foreground">hasn't clicked yet</span>.</>
+              ) : (
+                <>Si tu idea no vende, no es mala.<br/>Tu mensaje, formato o canal <span className="font-semibold text-foreground">aún no encajan</span>.</>
+              )}
             </p>
           </motion.div>
         </motion.section>
@@ -827,31 +908,46 @@ export default function CasoHawkers() {
         {/* EL GIRO */}
         <motion.section id="giro" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🔁 El giro: cuando descubren el verdadero negocio
+            {isEn ? "🔁 The Pivot: Discovering the Real Business Model" : "🔁 El giro: cuando descubren el verdadero negocio"}
           </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>Al principio vendían gafas de otras marcas.<br/>No eran suyas.<br/>No controlaban el producto.</p>
-            <p>Pero sí dominaban algo clave:<br/><span className="font-semibold text-foreground">el canal digital</span>.</p>
-            <p>Redes sociales.<br/>Anuncios.<br/>Conversión.<br/>Storytelling.</p>
-            <p>Y entonces llegó la pregunta que cambió todo:</p>
+            {isEn ? (
+              <>
+                <p>At first, they resold third-party sunglasses.<br/>They didn't own the brand.<br/>They had zero product control.</p>
+                <p>Yet they mastered one critical weapon:<br/><span className="font-semibold text-foreground">digital customer acquisition</span>.</p>
+                <p>Social media feeds.<br/>Targeted ad units.<br/>High-converting landers.<br/>Bold brand storytelling.</p>
+                <p>And that triggered the breakthrough realization:</p>
+              </>
+            ) : (
+              <>
+                <p>Al principio vendían gafas de otras marcas.<br/>No eran suyas.<br/>No controlaban el producto.</p>
+                <p>Pero sí dominaban algo clave:<br/><span className="font-semibold text-foreground">el canal digital</span>.</p>
+                <p>Redes sociales.<br/>Anuncios.<br/>Conversión.<br/>Storytelling.</p>
+                <p>Y entonces llegó la pregunta que cambió todo:</p>
+              </>
+            )}
           </motion.div>
           
           <motion.blockquote variants={fadeUp} className="border-l-4 border-primary/50 pl-4 italic text-foreground/80 text-lg">
-            "Si esto ya se vende… ¿por qué no crear nuestra propia marca?"
+            {isEn ? '"If this is already selling out... why not create our own brand?"' : '"Si esto ya se vende… ¿por qué no crear nuestra propia marca?"'}
           </motion.blockquote>
           
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize)}>
-            Ahí nació Hawkers.
+            {isEn ? "And that is how Hawkers was born." : "Ahí nació Hawkers."}
           </motion.p>
 
-          <Callout icon={RefreshCw} title="El verdadero insight" tone="info">
-            El negocio no eran las gafas.<br/>Era <span className="font-semibold text-foreground">saber venderlas</span>.
+          <Callout icon={RefreshCw} title={isEn ? "The Core Breakthrough" : "El verdadero insight"} tone="info">
+            {isEn ? (
+              <>The business was never about sunglasses.<br/>It was all about <span className="font-semibold text-foreground">mastering acquisition and storytelling</span>.</>
+            ) : (
+              <>El negocio no eran las gafas.<br/>Era <span className="font-semibold text-foreground">saber venderlas</span>.</>
+            )}
           </Callout>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/70">Frase para recordar</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "Guiding Rule" : "Frase para recordar"}</p>
             <div className="mt-2">
-              <TypingLine text="No ganaron por tener el mejor producto. Ganaron por venderlo mejor." speed={20} className="text-base sm:text-lg" />
+              <TypingLine text={isEn ? "They didn't win by creating the finest product. They won by marketing it better than anyone else." : "No ganaron por tener el mejor producto. Ganaron por venderlo mejor."} speed={20} className="text-base sm:text-lg" />
             </div>
           </motion.div>
         </motion.section>
@@ -859,63 +955,81 @@ export default function CasoHawkers() {
         {/* ORIGEN */}
         <motion.section id="origen" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            💡 El origen: una oportunidad en el caos
+            {isEn ? "💡 The Opportunity: Finding Clarity in Chaos" : "💡 El origen: una oportunidad en el caos"}
           </motion.h2>
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            Detectaron algo simple:
+            {isEn ? "They recognized an obvious market inefficiency:" : "Detectaron algo simple:"}
           </motion.p>
 
           <motion.ul variants={fadeUp} className={cn("space-y-2 text-foreground/75", textSize)}>
             <li className="flex gap-2">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
-              Las gafas eran caras
+              {isEn ? "Designer eyewear was artificially expensive" : "Las gafas eran caras"}
             </li>
             <li className="flex gap-2">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
-              Había demasiados intermediarios
+              {isEn ? "Traditional retail was bloated with middlemen" : "Había demasiados intermediarios"}
             </li>
             <li className="flex gap-2">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
-              Internet permitía vender directo
+              {isEn ? "Direct-to-consumer online allowed 80% cheaper retail pricing" : "Internet permitía vender directo"}
             </li>
             <li className="flex gap-2">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
-              El marketing digital era una ventaja
+              {isEn ? "Performance marketing gave young brands an unfair advantage" : "El marketing digital era una ventaja"}
             </li>
           </motion.ul>
 
           <TableBlock />
 
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            No vendían plástico y cristal.<br/>Vendían <span className="font-semibold text-foreground">pertenencia</span>.
+            {isEn ? <>They weren't selling polycarbonate lenses.<br/>They were selling <span className="font-semibold text-foreground">community belonging</span>.</> : <>No vendían plástico y cristal.<br/>Vendían <span className="font-semibold text-foreground">pertenencia</span>.</>}
           </motion.p>
 
-          <Callout icon={Lightbulb} title="Moral #1" tone="success">
-            No necesitas un plan perfecto.<br/>Necesitas <span className="font-semibold text-foreground">acción + mejora constante</span>.
+          <Callout icon={Lightbulb} title={isEn ? "Takeaway #1" : "Moral #1"} tone="success">
+            {isEn ? (
+              <>You don't need a five-year blueprint.<br/>You need <span className="font-semibold text-foreground">immediate execution + relentless optimization</span>.</>
+            ) : (
+              <>No necesitas un plan perfecto.<br/>Necesitas <span className="font-semibold text-foreground">acción + mejora constante</span>.</>
+            )}
           </Callout>
         </motion.section>
 
         {/* CRECIMIENTO */}
         <motion.section id="crecimiento" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🔥 El crecimiento: vender identidad, no solo productos
+            {isEn ? "🔥 Scaling: Selling Identity, Not Commodities" : "🔥 El crecimiento: vender identidad, no solo productos"}
           </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>Hawkers entendió algo antes que muchos:</p>
-            <p><span className="font-semibold text-foreground">La gente no compra gafas.<br/>Compra quién quiere ser cuando se las pone.</span></p>
-            <p>Por eso su contenido no hablaba solo de precios.<br/>Hablaba de estilo de vida.<br/>De actitud.<br/>De tribu.</p>
+            {isEn ? (
+              <>
+                <p>Hawkers understood something before most competitors:</p>
+                <p><span className="font-semibold text-foreground">Customers don't purchase eyewear.<br/>They purchase who they want to become when wearing them.</span></p>
+                <p>That is why their creative campaigns never obsessed over product specs alone.<br/>They talked about freedom.<br/>Unapologetic confidence.<br/>Belonging to a tribe.</p>
+              </>
+            ) : (
+              <>
+                <p>Hawkers entendió algo antes que muchos:</p>
+                <p><span className="font-semibold text-foreground">La gente no compra gafas.<br/>Compra quién quiere ser cuando se las pone.</span></p>
+                <p>Por eso su contenido no hablaba solo de precios.<br/>Hablaba de estilo de vida.<br/>De actitud.<br/>De tribu.</p>
+              </>
+            )}
           </motion.div>
 
-          <Callout icon={Flame} title="Mini-resumen visual" tone="default">
-            Seguidores <span className="text-foreground/90 font-semibold">→</span> Clientes <span className="text-foreground/90 font-semibold">→</span> Comunidad <span className="text-foreground/90 font-semibold">→</span> Expansión
+          <Callout icon={Flame} title={isEn ? "The Conversion Progression" : "Mini-resumen visual"} tone="default">
+            {isEn ? (
+              <>Followers <span className="text-foreground/90 font-semibold">→</span> Customers <span className="text-foreground/90 font-semibold">→</span> Community <span className="text-foreground/90 font-semibold">→</span> Global Scale</>
+            ) : (
+              <>Seguidores <span className="text-foreground/90 font-semibold">→</span> Clientes <span className="text-foreground/90 font-semibold">→</span> Comunidad <span className="text-foreground/90 font-semibold">→</span> Expansión</>
+            )}
           </Callout>
 
           <FlowTimeline />
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-muted/30 p-5 backdrop-blur">
-            <p className="text-xs uppercase tracking-wider text-foreground/70">Frase para fijar la idea</p>
+            <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "Key Distinction" : "Frase para fijar la idea"}</p>
             <div className="mt-2">
-              <TypingLine text="Tu competencia vende cosas. Tú debes vender significado." speed={20} className="text-base sm:text-lg" />
+              <TypingLine text={isEn ? "Your competitors sell commodities. You must sell meaning." : "Tu competencia vende cosas. Tú debes vender significado."} speed={20} className="text-base sm:text-lg" />
             </div>
           </motion.div>
         </motion.section>
@@ -923,48 +1037,71 @@ export default function CasoHawkers() {
         {/* CAÍDAS Y EXPANSIÓN */}
         <motion.section id="caidas" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            📈 Caídas y expansión: cuando creces, también fallas
+            {isEn ? "📈 Setbacks & Expansion: Hypergrowth Brings Scars" : "📈 Caídas y expansión: cuando creces, también fallas"}
           </motion.h2>
           <motion.div variants={fadeUp} className={cn("text-foreground/75 space-y-4", textSize, lineHeight)}>
-            <p>El crecimiento rápido tiene un precio.</p>
-            <p>Cuanto más grande es una marca,<br/>más frágil se vuelve su reputación.</p>
-            <p>Hawkers vivió una <span className="font-semibold text-foreground">crisis importante</span> por un mensaje polémico en redes.<br/>La reacción fue inmediata.<br/>La polémica se viralizó.<br/>La imagen de marca se vio afectada.</p>
+            {isEn ? (
+              <>
+                <p>Explosive growth carries significant risks.</p>
+                <p>The larger a consumer brand scales,<br/>the more fragile its reputation becomes.</p>
+                <p>Hawkers navigated a <span className="font-semibold text-foreground">major reputational crisis</span> sparked by an insensitive social media campaign.<br/>The public backlash was swift.<br/>Sponsors terminated contracts.<br/>Brand equity took an immediate hit.</p>
+              </>
+            ) : (
+              <>
+                <p>El crecimiento rápido tiene un precio.</p>
+                <p>Cuanto más grande es una marca,<br/>más frágil se vuelve su reputación.</p>
+                <p>Hawkers vivió una <span className="font-semibold text-foreground">crisis importante</span> por un mensaje polémico en redes.<br/>La reacción fue inmediata.<br/>La polémica se viralizó.<br/>La imagen de marca se vio afectada.</p>
+              </>
+            )}
           </motion.div>
 
-          <Callout icon={AlertTriangle} title="Aprendizaje crítico" tone="warning">
-            Una marca fuerte necesita:<br/><br/>
-            • Protocolos<br/>
-            • Revisión<br/>
-            • Normas<br/>
-            • Control de comunicación<br/><br/>
-            La reputación se construye lento…<br/>pero puede romperse en segundos.
+          <Callout icon={AlertTriangle} title={isEn ? "Critical Growth Lesson" : "Aprendizaje crítico"} tone="warning">
+            {isEn ? (
+              <>A resilient enterprise demands:<br/><br/>
+              • Clear communication protocols<br/>
+              • Multi-tier review safeguards<br/>
+              • Brand safety guidelines<br/>
+              • Swift crisis response mechanisms<br/><br/>
+              Reputation takes years to forge…<br/>yet can be shattered in seconds.</>
+            ) : (
+              <>Una marca fuerte necesita:<br/><br/>
+              • Protocolos<br/>
+              • Revisión<br/>
+              • Normas<br/>
+              • Control de comunicación<br/><br/>
+              La reputación se construye lento…<br/>pero puede romperse en segundos.</>
+            )}
           </Callout>
         </motion.section>
 
         {/* VIDEOS */}
         <motion.section id="videos" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🎬 Publicidad real de Hawkers
+            {isEn ? "🎬 Hawkers' Actual Advertising Campaigns" : "🎬 Publicidad real de Hawkers"}
           </motion.h2>
           
           <VideoEmbed 
             url="https://www.youtube.com/embed/hfgntecIEac"
-            title="Publicidad Hawkers"
-            description="Campaña publicitaria de Hawkers"
+            title={isEn ? "Hawkers Signature Campaign" : "Publicidad Hawkers"}
+            description={isEn ? "Direct-to-consumer video creative" : "Campaña publicitaria de Hawkers"}
           />
           
           <VideoEmbed 
             url="https://www.youtube.com/embed/38IpRUsbmXU"
-            title="Ejemplo real: publicidad de Hawkers (2016)"
-            description="Campaña emocional de 2016"
+            title={isEn ? "Case Study: Hawkers Brand Ad (2016)" : "Ejemplo real: publicidad de Hawkers (2016)"}
+            description={isEn ? "Emotional brand positioning campaign" : "Campaña emocional de 2016"}
           />
           
           <motion.p variants={fadeUp} className={cn("text-foreground/75", textSize, lineHeight)}>
-            Este anuncio muestra cómo Hawkers no vendía solo gafas. Vendía <span className="font-semibold text-foreground">valores, identidad y comunidad</span>.
+            {isEn ? (
+              <>These campaigns illustrate why Hawkers stood out: they didn't push glass and plastic frames—they communicated <span className="font-semibold text-foreground">confidence, personal identity, and tribe culture</span>.</>
+            ) : (
+              <>Este anuncio muestra cómo Hawkers no vendía solo gafas. Vendía <span className="font-semibold text-foreground">valores, identidad y comunidad</span>.</>
+            )}
           </motion.p>
           
           <motion.p variants={fadeUp} className="text-sm text-foreground/70">
-            📌 Importante: campaña de 2016. Prueba real de su estrategia emocional desde el inicio.
+            {isEn ? "📌 Archival 2016 campaign: firsthand evidence of their emotional performance marketing." : "📌 Importante: campaña de 2016. Prueba real de su estrategia emocional desde el inicio."}
           </motion.p>
 
           {/* Messi Gallery */}
@@ -974,7 +1111,7 @@ export default function CasoHawkers() {
         {/* TIMELINE */}
         <motion.section id="timeline" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🧭 Momentos clave
+            {isEn ? "🧭 Defining Milestones" : "🧭 Momentos clave"}
           </motion.h2>
           <VerticalTimeline />
         </motion.section>
@@ -982,44 +1119,49 @@ export default function CasoHawkers() {
         {/* LECCIONES */}
         <motion.section id="lecciones" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🧠 Las 5 lecciones clave para emprendedores
+            {isEn ? "🧠 5 Core Lessons for Founders & Business Owners" : "🧠 Las 5 lecciones clave para emprendedores"}
           </motion.h2>
 
           <div className="grid gap-4">
             <Lesson
               index="1"
-              title="No esperes el producto perfecto"
+              isEn={isEn}
+              title={isEn ? "Don't Wait for the 'Perfect' Product" : "No esperes el producto perfecto"}
               icon={Lightbulb}
-              bullets={["Empieza con algo viable.", "Mejora con feedback real."]}
-              highlight="Primero valida. Luego perfecciona."
+              bullets={isEn ? ["Launch with a viable, functional offer.", "Iterate based on real paying customer feedback."] : ["Empieza con algo viable.", "Mejora con feedback real."]}
+              highlight={isEn ? "Validate commercial demand first. Polish second." : "Primero valida. Luego perfecciona."}
             />
             <Lesson
               index="2"
-              title="La marca vale más que el producto"
+              isEn={isEn}
+              title={isEn ? "Brand Equity Outweighs Commodity Features" : "La marca vale más que el producto"}
               icon={Gem}
-              bullets={["Identidad + voz + historia = recuerdo."]}
-              highlight="No vendas productos: construye una historia."
+              bullets={isEn ? ["Identity + unique voice + storytelling = enduring retention."] : ["Identidad + voz + historia = recuerdo."]}
+              highlight={isEn ? "Don't just sell goods: build a narrative people want to belong to." : "No vendas productos: construye una historia."}
             />
             <Lesson
               index="3"
-              title="El marketing es el motor"
+              isEn={isEn}
+              title={isEn ? "Distribution is the Engine" : "El marketing es el motor"}
               icon={TrendingUp}
-              bullets={["Si no te ven, no existes."]}
-              highlight="Invierte en visibilidad."
+              bullets={isEn ? ["If prospects never see you, your superior quality is irrelevant."] : ["Si no te ven, no existes."]}
+              highlight={isEn ? "Invest consistently in discoverability and targeted reach." : "Invierte en visibilidad."}
             />
             <Lesson
               index="4"
-              title="Emoción > descuento"
+              isEn={isEn}
+              title={isEn ? "Emotional Connection > Constant Discounts" : "Emoción > descuento"}
               icon={Heart}
-              bullets={["La pertenencia convierte más que el precio."]}
-              highlight="La emoción abre la puerta."
+              bullets={isEn ? ["Tribe belonging converts and retains far better than racing to the bottom on price."] : ["La pertenencia convierte más que el precio."]}
+              highlight={isEn ? "Emotion sparks the transaction; clarity seals it." : "La emoción abre la puerta."}
             />
             <Lesson
               index="5"
-              title="Digitaliza o desaparece"
+              isEn={isEn}
+              title={isEn ? "Embrace Digital or Get Replaced" : "Digitaliza o desaparece"}
               icon={Globe}
-              bullets={["El cliente decide online."]}
-              highlight="Estar digital es supervivencia."
+              bullets={isEn ? ["Modern buying decisions begin and close on screen."] : ["El cliente decide online."]}
+              highlight={isEn ? "A high-converting digital presence is essential for long-term survival." : "Estar digital es supervivencia."}
             />
           </div>
         </motion.section>
@@ -1027,30 +1169,41 @@ export default function CasoHawkers() {
         {/* CIERRE */}
         <motion.section id="cierre" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="mt-10 space-y-5">
           <motion.h2 variants={fadeUp} className="text-xl font-semibold">
-            🎯 Conclusión: el verdadero mensaje
+            {isEn ? "🎯 Conclusion: The Real Takeaway" : "🎯 Conclusión: el verdadero mensaje"}
           </motion.h2>
 
-          <Callout icon={Brain} title="En una frase" tone="info">
-            No necesitas ser grande para empezar.<br/>Necesitas empezar para ser grande.
+          <Callout icon={Brain} title={isEn ? "In One Sentence" : "En una frase"} tone="info">
+            {isEn ? (
+              <>You don't have to be great to start.<br/>You have to start to become great.</>
+            ) : (
+              <>No necesitas ser grande para empezar.<br/>Necesitas empezar para ser grande.</>
+            )}
           </Callout>
 
           <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3">
-            <StatCard label="Lo que impulsó" value="Acción" icon={Zap} />
-            <StatCard label="Lo que sostuvo" value="Estrategia" icon={Brain} />
-            <StatCard label="Lo que escaló" value="Marketing" icon={TrendingUp} />
+            <StatCard label={isEn ? "Sparked By" : "Lo que impulsó"} value={isEn ? "Action" : "Acción"} icon={Zap} />
+            <StatCard label={isEn ? "Sustained By" : "Lo que sostuvo"} value={isEn ? "Strategy" : "Estrategia"} icon={Brain} />
+            <StatCard label={isEn ? "Scaled By" : "Lo que escaló"} value="Marketing" icon={TrendingUp} />
           </motion.div>
 
           <motion.div variants={fadeUp} className="rounded-2xl border border-border/50 bg-background/50 p-6">
-            <p className="text-sm font-semibold text-foreground">Checklist rápido para el lector</p>
+            <p className="text-sm font-semibold text-foreground">{isEn ? "Founder Execution Checklist" : "Checklist rápido para el lector"}</p>
             <div className="mt-3 grid gap-2">
-              {[
+              {(isEn ? [
+                "Define a crystal-clear value promise",
+                "Establish a distinctive visual identity",
+                "Publish consistent, value-driven content",
+                "Launch a simple, high-converting offer",
+                "Track end-to-end attribution",
+                "Continuously optimize each step",
+              ] : [
                 "Definir una promesa",
                 "Crear identidad visual",
                 "Publicar contenido",
                 "Lanzar oferta simple",
                 "Medir resultados",
                 "Optimizar",
-              ].map((x, i) => (
+              ]).map((x, i) => (
                 <div key={i} className="flex gap-2 text-foreground/75">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span className={cn(textSize)}>{x}</span>
@@ -1065,26 +1218,26 @@ export default function CasoHawkers() {
           <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl border border-border/50 bg-muted/30 p-7 backdrop-blur">
             <div className="flex flex-col gap-4">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-wider text-foreground/70">🚀 Siguiente paso</p>
+                <p className="text-xs uppercase tracking-wider text-foreground/70">{isEn ? "🚀 Next Steps" : "🚀 Siguiente paso"}</p>
                 <h3 className="mt-2 text-xl font-semibold text-foreground">
-                  ¿Quieres tu propia historia de éxito?
+                  {isEn ? "Ready to write your own success story?" : "¿Quieres tu propia historia de éxito?"}
                 </h3>
                 <p className={cn("mt-2 text-foreground/70", textSize, lineHeight)}>
-                  Te ayudamos a crear marca, presencia digital y estrategia clara.
+                  {isEn ? "We help you build your brand, digital presence, and a high-converting growth strategy." : "Te ayudamos a crear marca, presencia digital y estrategia clara."}
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  to="/#servicios"
+                  to={isEn ? "/services" : "/#servicios"}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground transition hover:bg-muted"
                 >
-                  Ver servicios <ArrowRight className="h-4 w-4" />
+                  {isEn ? "View Services" : "Ver servicios"} <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  to="/#contacto"
+                  to={isEn ? "/contact" : "/#contacto"}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-foreground px-4 py-3 text-sm font-semibold text-background transition hover:bg-foreground/90"
                 >
-                  Contactar <Send className="h-4 w-4" />
+                  {isEn ? "Contact Us" : "Contactar"} <Send className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -1097,10 +1250,10 @@ export default function CasoHawkers() {
       <button
         onClick={() => setTocOpen(true)}
         className="fixed bottom-20 left-4 z-[58] inline-flex items-center gap-2 rounded-2xl border border-border/50 bg-background/80 px-3 py-2 text-sm font-semibold text-foreground backdrop-blur hover:bg-muted lg:hidden"
-        aria-label="Abrir secciones"
+        aria-label={isEn ? "Open sections" : "Abrir secciones"}
       >
         <ListOrdered className="h-4 w-4" />
-        Secciones
+        {isEn ? "Sections" : "Secciones"}
       </button>
     </div>
     </>
