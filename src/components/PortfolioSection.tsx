@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Lightbulb, Quote, Sparkles, Star } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
 import DemoVideo from '@/components/DemoVideo';
-import { PORTFOLIO_PROJECTS, type PortfolioProject } from '@/data/portfolio';
+import { getPortfolioProjects, type PortfolioProject } from '@/data/portfolio';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { cn } from '@/lib/utils';
-import { L } from '@/i18n';
+import { L, useTranslation } from '@/i18n';
 
 const MediaFrame = ({ project }: { project: PortfolioProject }) => {
   const media = project.video ? (
@@ -97,7 +97,9 @@ const ProjectRow = ({ project, index }: { project: PortfolioProject; index: numb
 
 const PortfolioSection = () => {
   const navigate = useNavigate();
-  if (PORTFOLIO_PROJECTS.length === 0) return null;
+  const { isEn } = useTranslation();
+  const projects = getPortfolioProjects(isEn);
+  if (projects.length === 0) return null;
 
   return (
     <section id="proyectos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
@@ -109,7 +111,7 @@ const PortfolioSection = () => {
         />
 
         <div className="space-y-20 md:space-y-28">
-          {PORTFOLIO_PROJECTS.map((project, index) => (
+          {projects.map((project, index) => (
             <ProjectRow key={project.id} project={project} index={index} />
           ))}
         </div>

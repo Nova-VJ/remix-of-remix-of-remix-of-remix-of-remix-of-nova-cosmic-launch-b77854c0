@@ -54,19 +54,6 @@ const PROJECTS_ES: PortfolioProject[] = [
     frame: 'browser',
   },
   {
-    id: 'lupa',
-    kind: 'Captación de clientes con IA · Uso propio',
-    title: 'Lupa Nova: encuentra a tus próximos clientes mientras trabajas',
-    description:
-      'Elige un nicho y una ciudad (dentistas en Valladolid, talleres en Madrid, hoteles en la costa…) y Lupa localiza a todos los negocios de la zona, analiza su web uno a uno y detecta lo que les está haciendo perder clientes: sin chat, sin reservas online, lenta en el móvil, desactualizada. Con eso prepara para cada uno una propuesta de valor personalizada y la envía con tu firma, solo a quien ha dado su permiso. Tú solo hablas con los que responden.',
-    highlights: ['Cualquier nicho', 'Análisis por ciudad', 'Propuesta personalizada', 'Envío automático', 'Seguimiento de respuestas'],
-    poster: '/videos/lupa.webp',
-    aspect: 1200 / 750,
-    frameLabel: 'lupa nova · oportunidades',
-    frame: 'browser',
-    note: 'Captura con negocios de ejemplo.',
-  },
-  {
     id: 'valetos',
     kind: 'Plataforma SaaS · Tiempo real',
     title: 'ValetOS: el sistema operativo de un valet parking',
@@ -116,15 +103,6 @@ const EN: Record<string, Partial<PortfolioProject>> = {
     highlights: ['New: delivery notes from your phone', 'New: supplier search', 'New: stock forecasting', 'Point of sale', 'Invoicing', 'Accounting'],
     frameLabel: 'novastock · all-in-one management',
   },
-  lupa: {
-    kind: 'AI client acquisition · In-house tool',
-    title: 'Lupa Nova: find your next clients while you work',
-    description:
-      'Pick a niche and a city (dentists in Miami, auto shops in Dallas, hotels on the coast…) and Lupa finds every business in the area, analyzes each website one by one and spots what is costing them customers: no chat, no online booking, slow on mobile, outdated. Then it prepares a personalized value proposal for each one and sends it under your name, only where outreach is allowed. You just talk to the ones who reply.',
-    highlights: ['Any niche', 'City-wide analysis', 'Personalized proposals', 'Automatic sending', 'Reply tracking'],
-    frameLabel: 'lupa nova · opportunities',
-    note: 'Screenshot with sample businesses.',
-  },
   valetos: {
     kind: 'SaaS platform · Real time',
     title: 'ValetOS: the operating system for a valet parking business',
@@ -150,15 +128,18 @@ const EN: Record<string, Partial<PortfolioProject>> = {
   },
 };
 
-export const PORTFOLIO_PROJECTS: PortfolioProject[] = isEn
-  ? PROJECTS_ES.map((p) => ({
-      ...p,
-      ...EN[p.id],
-      // Real client words, translated; the original Spanish stays on solutionsnova.es
-      testimonial: p.testimonial && {
-        ...p.testimonial,
-        quote:
-          'Since I started using NovaStock I can scan delivery notes with my phone and add them straight to my inventory, I find new and better suppliers every week, and I keep my stock under control so I can grow it and never run out of anything. It’s wonderful! (translated from Spanish)',
-      },
-    }))
-  : PROJECTS_ES;
+export const getPortfolioProjects = (en: boolean): PortfolioProject[] =>
+  en
+    ? PROJECTS_ES.map((p) => ({
+        ...p,
+        ...EN[p.id],
+        // Real client words, translated; the original Spanish stays on solutionsnova.es
+        testimonial: p.testimonial && {
+          ...p.testimonial,
+          quote:
+            'Since I started using NovaStock I can scan delivery notes with my phone and add them straight to my inventory, I find new and better suppliers every week, and I keep my stock under control so I can grow it and never run out of anything. It’s wonderful! (translated from Spanish)',
+        },
+      }))
+    : PROJECTS_ES;
+
+export const PORTFOLIO_PROJECTS: PortfolioProject[] = getPortfolioProjects(isEn);

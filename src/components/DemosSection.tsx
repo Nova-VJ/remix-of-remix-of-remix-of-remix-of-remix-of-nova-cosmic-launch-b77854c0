@@ -1,23 +1,27 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Lightbulb } from 'lucide-react';
 import SectionHeader from '@/components/SectionHeader';
-import { FOTOS_VERSION, SECTOR_DEMOS } from '@/data/demos';
-import { L, isEn } from '@/i18n';
+import { FOTOS_VERSION, getSectorDemos } from '@/data/demos';
+import { L, useTranslation } from '@/i18n';
 
-const DemosSection = () => (
-  <section id="demos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
-    <div className="mx-auto max-w-6xl">
-      <SectionHeader
-        eyebrow={L('Demos por sector', 'Demos by industry')}
-        title={L('¿Cómo quedaría tu negocio?', 'What would your business look like?')}
-        subtitle={L('Elige tu sector y prueba una web de ejemplo: reserva online, asistente de chat, app en Google Play y App Store, y el panel para gestionarlo todo.', 'Pick your industry and try a sample website: online booking, chat assistant, an app on Google Play and the App Store, and the dashboard to manage it all.')}
-      />
+const DemosSection = () => {
+  const { isEn } = useTranslation();
+  const demos = getSectorDemos(isEn);
 
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-        {SECTOR_DEMOS.map(({ carpeta, sector, icon: Icon }) => (
-          <li key={carpeta}>
-            <a
-              href={`/demos/${carpeta}/${isEn ? '?lang=en' : ''}`}
+  return (
+    <section id="demos" className="cv-auto relative px-4 py-20 sm:px-6 md:py-28">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeader
+          eyebrow={L('Demos por sector', 'Demos by Industry')}
+          title={L('¿Cómo quedaría tu negocio?', 'What would your business look like?')}
+          subtitle={L('Elige tu sector y prueba una web de ejemplo: reserva online, asistente de chat, app en Google Play y App Store, y el panel para gestionarlo todo.', 'Pick your industry and test a sample showcase: online bookings, automated waitlist, AI chat assistant, mobile app preview, and management dashboard.')}
+        />
+
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+          {demos.map(({ carpeta, sector, icon: Icon }) => (
+            <li key={carpeta}>
+              <a
+                href={`/demos/${carpeta}/${isEn ? '?lang=en' : ''}`}
               target="_blank"
               rel="noopener"
               className="group relative flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-2xl border border-border bg-neutral-900 p-4 lg:aspect-[16/9] text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -69,6 +73,7 @@ const DemosSection = () => (
       </p>
     </div>
   </section>
-);
+  );
+};
 
 export default DemosSection;

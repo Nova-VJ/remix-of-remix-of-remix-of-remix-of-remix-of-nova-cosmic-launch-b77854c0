@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import saraIcon from '@/assets/sara-icon.webp';
-import { L } from '@/i18n';
+import { useTranslation } from '@/i18n';
 
 interface ChatButtonProps {
   isOpen: boolean;
@@ -8,11 +8,17 @@ interface ChatButtonProps {
 }
 
 const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
+  const { isEn } = useTranslation();
+
   return (
     <button
       onClick={onClick}
       className="group fixed bottom-24 md:bottom-4 right-4 z-40 flex items-center gap-2 transition-all duration-300 hover:scale-105"
-      aria-label={isOpen ? L('Cerrar asistente', 'Close assistant') : L('¿Hablamos? Soy Sara. Abrir el asistente virtual', 'Hi, I’m Sara. Open the virtual assistant')}
+      aria-label={
+        isOpen
+          ? (isEn ? 'Close assistant' : 'Cerrar asistente')
+          : (isEn ? 'Hi, I’m Sara. Open the virtual assistant' : '¿Hablamos? Soy Sara. Abrir el asistente virtual')
+      }
     >
       {isOpen ? (
         <div
@@ -24,12 +30,12 @@ const ChatButton = ({ isOpen, onClick }: ChatButtonProps) => {
       ) : (
         <>
           <span className="hidden md:block text-sm font-medium text-foreground bg-background/90 backdrop-blur-sm px-3.5 py-2 rounded-full shadow-md border border-border/60">
-            {L('¿Hablamos? Soy Sara', 'Hi! I’m Sara, can I help?')}
+            {isEn ? 'Hi! I’m Sara, can I help?' : '¿Hablamos? Soy Sara'}
           </span>
           <span className="relative">
             <img
               src={saraIcon}
-              alt={L('Sara - Asistente Virtual', 'Sara - Virtual Assistant')}
+              alt={isEn ? 'Sara - Virtual Assistant' : 'Sara - Asistente Virtual'}
               width={64}
               height={64}
               className="h-14 w-14 sm:h-16 sm:w-16 object-contain drop-shadow-[0_8px_16px_hsl(262_70%_40%/0.35)] cursor-pointer"
