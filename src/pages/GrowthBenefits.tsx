@@ -257,7 +257,7 @@ const GrowthBenefits = () => {
                     onClick={() => setCountryFilter('US')}
                     className="h-8 text-xs px-3"
                   >
-                    🇺🇸 USA
+                    {L('Estados Unidos', 'United States')}
                   </Button>
                   <Button
                     type="button"
@@ -266,7 +266,7 @@ const GrowthBenefits = () => {
                     onClick={() => setCountryFilter('ES')}
                     className="h-8 text-xs px-3"
                   >
-                    🇪🇸 España
+                    {L('España', 'Spain')}
                   </Button>
                 </div>
               </div>

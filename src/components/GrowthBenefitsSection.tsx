@@ -92,7 +92,8 @@ const GrowthBenefitsSection = () => {
             {cards.map((c, i) => (
               <div
                 key={i}
-                className="group relative rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 flex flex-col justify-between"
+                onClick={() => setFinderOpen(true)}
+                className="group relative rounded-2xl border border-border/60 bg-card/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 flex flex-col justify-between cursor-pointer"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
