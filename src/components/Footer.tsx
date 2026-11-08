@@ -52,7 +52,6 @@ const Footer = () => {
             <ul className="mt-4 space-y-2.5">
               <li><Link to="/metodo-nova" className={linkClass}>{t.nav.novaMethod}</Link></li>
               <li><Link to="/casos-exito" className={linkClass}>{t.nav.caseStudies}</Link></li>
-              <li><Link to="/invita-a-un-amigo" className={linkClass}>{isEn ? "Refer a Friend" : "Invita a un amigo"}</Link></li>
               <li><Link to="/instalar-app" className={linkClass}>{isEn ? "Install the App" : "Instalar la app"}</Link></li>
               <li><Link to="/auth" className={linkClass}>{isEn ? "Client Portal" : "Área de clientes"}</Link></li>
             </ul>

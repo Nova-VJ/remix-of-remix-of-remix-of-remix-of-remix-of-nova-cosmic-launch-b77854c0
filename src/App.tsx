@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import Index from "./pages/Index";
@@ -16,7 +16,6 @@ const CasosExito = lazy(() => import("./pages/CasosExito"));
 const CasoHawkers = lazy(() => import("./pages/CasoHawkers"));
 const CasoDominos = lazy(() => import("./pages/CasoDominos"));
 const MetodoNova = lazy(() => import("./pages/MetodoNova"));
-const InvitaAmigo = lazy(() => import("./pages/InvitaAmigo"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const LegalNotice = lazy(() => import("./pages/LegalNotice"));
@@ -55,7 +54,7 @@ const App = () => (
             <Route path="/casos-exito/hawkers" element={<CasoHawkers />} />
             <Route path="/casos-exito/dominos" element={<CasoDominos />} />
             <Route path="/metodo-nova" element={<MetodoNova />} />
-            <Route path="/invita-a-un-amigo" element={<InvitaAmigo />} />
+            <Route path="/invita-a-un-amigo" element={<Navigate to="/" replace />} />
             <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} />
             <Route path="/politica-de-cookies" element={<CookiePolicy />} />
             <Route path="/aviso-legal" element={<LegalNotice />} />
